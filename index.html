@@ -80,49 +80,34 @@
   .milaFrame .milaFrameImg{position:relative; z-index:2; width:100%; height:auto; display:block; filter:drop-shadow(0 6px 14px rgba(30,15,55,.4))}
   .milaCap{margin:0 auto 16px; font-size:11px; letter-spacing:1px; color:#ffe08a; font-weight:600}
 
-  /* ---------- vintage admission tickets ---------- */
-  .ticket{position:relative; height:158px; margin:18px 0; cursor:pointer; perspective:1200px}
+  /* ---------- cute serrated tickets ---------- */
+  .ticket{position:relative; height:150px; margin:20px 0; cursor:pointer; perspective:1200px}
+  .c-nail{--tbg:#e4a4ac; --tink:#7c3044}
+  .c-mass{--tbg:#accbb9; --tink:#2f6152}
   .tcard{position:absolute; inset:0; transform-style:preserve-3d; transition:transform .75s cubic-bezier(.4,.2,.2,1)}
   .ticket.flipped .tcard{transform:rotateY(180deg)}
-  .tface{position:absolute; inset:0; backface-visibility:hidden; border-radius:9px; overflow:hidden;
-    background:#f3e6c8;
-    box-shadow:0 10px 24px rgba(45,25,75,.30), inset 0 0 50px rgba(150,112,60,.09);
+  .tface{position:absolute; inset:0; backface-visibility:hidden; display:flex; align-items:center; justify-content:center;
+    color:var(--tink);
     font-family:"Baskerville","Baskerville Old Face","Hoefler Text","Garamond","Palatino Linotype","Times New Roman",serif}
-  .tinner{position:absolute; inset:7px; border:2px solid currentColor; border-radius:6px; pointer-events:none}
-  .tinner2{position:absolute; inset:11px; border:1px solid currentColor; border-radius:4px; opacity:.55; pointer-events:none}
-  .corner{position:absolute; font-size:11px; line-height:1; color:currentColor; opacity:.85}
-  .corner.tl{top:13px;left:15px} .corner.tr{top:13px;right:15px}
-  .corner.bl{bottom:13px;left:15px} .corner.br{bottom:13px;right:15px}
-
-  .tfront{display:flex; height:100%; color:var(--ink-rose)}
-  .c-mass .tfront, .c-mass .tback{color:var(--ink-teal)}
-  .stub{position:relative; width:60px; flex:0 0 60px; display:flex; align-items:center; justify-content:center;
-    border-right:2px dashed currentColor}
-  .stub .vtxt{transform:rotate(-90deg); white-space:nowrap; font-size:11px; letter-spacing:3px; font-weight:700;
-    text-transform:uppercase}
-  .tmain{position:relative; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:6px 8px}
+  .tshape{position:absolute; inset:0; width:100%; height:100%; filter:drop-shadow(0 8px 16px rgba(40,20,70,.32))}
+  .tcontent{position:relative; z-index:1; text-align:center; padding:0 64px}
   .tkicker{font-size:10.5px; letter-spacing:3px; text-transform:uppercase; opacity:.8; margin-bottom:2px}
-  .ttitle{font-size:27px; font-weight:400; letter-spacing:2px; margin-bottom:4px; font-variant:small-caps;
+  .ttitle{font-size:28px; font-weight:400; letter-spacing:2px; margin-bottom:2px; font-variant:small-caps;
     font-family:"Didot","Bodoni 72","Bodoni MT","Playfair Display","Hoefler Text",Georgia,serif}
-  .trule{width:66px; height:0; border-top:1px solid currentColor; opacity:.45; margin:6px auto 10px; position:relative}
+  .trule{width:66px; height:0; border-top:1.4px solid currentColor; opacity:.5; margin:7px auto 9px; position:relative}
   .trule:before{content:"\2726"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    font-size:8px; background:#f3e6c8; padding:0 6px; opacity:.9}
-  .tadmit{font-size:10px; letter-spacing:2.5px; text-transform:uppercase; opacity:.9}
-  .tno{position:absolute; bottom:9px; right:14px; font-size:9px; letter-spacing:1.5px; opacity:.7}
-  .tflip{position:absolute; bottom:9px; left:70px; font-size:9px; letter-spacing:1px; opacity:.6; font-family:-apple-system,Arial,sans-serif}
+    font-size:8px; background:var(--tbg); padding:0 6px; opacity:.9}
+  .tadmit{font-size:10px; letter-spacing:2.5px; text-transform:uppercase; opacity:.85}
+  .tno{position:absolute; z-index:1; bottom:16px; right:72px; font-size:9px; letter-spacing:1.5px; opacity:.65}
+  .tflip{position:absolute; z-index:1; bottom:16px; left:72px; font-size:9px; letter-spacing:1px; opacity:.6; font-family:-apple-system,Arial,sans-serif}
 
-  .tback{transform:rotateY(180deg); color:var(--ink-rose); display:flex; flex-direction:column;
-    align-items:center; justify-content:center; padding:18px 20px; text-align:center}
-  .bd-title{font-size:19px; font-weight:700; font-variant:small-caps; letter-spacing:.5px; margin-bottom:6px}
-  .bd-rule{width:54px; height:1px; background:currentColor; opacity:.5; margin:0 auto 8px}
-  .bd-desc{font-size:12.5px; line-height:1.6; color:#6a5433}
-  .bd-stamp{position:absolute; right:14px; bottom:12px; transform:rotate(-11deg);
-    font-size:8.5px; letter-spacing:1px; text-transform:uppercase; font-weight:700;
-    border:1.5px solid currentColor; border-radius:4px; padding:3px 7px; opacity:.8}
-  .notch{position:absolute; top:50%; width:20px; height:20px; border-radius:50%;
-    background:linear-gradient(165deg,#7d63bd,#9880cf); transform:translateY(-50%); z-index:4}
-  body.party .notch{background:linear-gradient(165deg,#6a4fac,#8770c4)}
-  .notch.l{left:-10px} .notch.r{right:-10px}
+  .tback{transform:rotateY(180deg)}
+  .bd-title{font-size:20px; font-weight:400; font-variant:small-caps; letter-spacing:1px; margin-bottom:2px;
+    font-family:"Didot","Bodoni 72","Bodoni MT","Playfair Display","Hoefler Text",Georgia,serif}
+  .bd-desc{font-size:12.5px; line-height:1.6; opacity:.92}
+  .bd-stamp{position:absolute; z-index:1; right:70px; bottom:18px; transform:rotate(-10deg);
+    font-size:8px; letter-spacing:1px; text-transform:uppercase;
+    border:1.4px solid currentColor; border-radius:4px; padding:2px 6px; opacity:.72}
 
   .rfooter{margin-top:24px; font-size:13px; color:rgba(255,255,255,.85); line-height:1.8}
   .paw-sign{color:#ffe08a; font-weight:600}
@@ -218,52 +203,50 @@
       <div class="rsub">Mila prepared two little tickets — tap one to redeem</div>
 
       <div class="ticket c-nail" onclick="flipTicket(this)">
-        <div class="notch l"></div><div class="notch r"></div>
         <div class="tcard">
           <div class="tface tfront">
-            <div class="tinner"></div><div class="tinner2"></div>
-            <span class="corner tl">✦</span><span class="corner tr">✦</span><span class="corner bl">✦</span><span class="corner br">✦</span>
-            <div class="stub"><div class="vtxt">Admit One</div></div>
-            <div class="tmain">
+            <svg class="tshape" viewBox="0 0 420 168" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><mask id="tmr1"><rect width="420" height="168" fill="black"/><g fill="white"><rect x="8" y="6" width="404" height="156" rx="18"/><path d="M8 15.0 L8 29.0 L0 22.0 Z M8 29.0 L8 43.0 L0 36.0 Z M8 43.0 L8 57.0 L0 50.0 Z M8 57.0 L8 71.0 L0 64.0 Z M8 71.0 L8 85.0 L0 78.0 Z M8 85.0 L8 99.0 L0 92.0 Z M8 99.0 L8 113.0 L0 106.0 Z M8 113.0 L8 127.0 L0 120.0 Z M8 127.0 L8 141.0 L0 134.0 Z"/><path d="M412 15.0 L412 29.0 L420 22.0 Z M412 29.0 L412 43.0 L420 36.0 Z M412 43.0 L412 57.0 L420 50.0 Z M412 57.0 L412 71.0 L420 64.0 Z M412 71.0 L412 85.0 L420 78.0 Z M412 85.0 L412 99.0 L420 92.0 Z M412 99.0 L412 113.0 L420 106.0 Z M412 113.0 L412 127.0 L420 120.0 Z M412 127.0 L412 141.0 L420 134.0 Z"/></g><g fill="black"><circle cx="210" cy="6" r="13"/><circle cx="210" cy="162" r="13"/></g></mask></defs><rect width="420" height="168" fill="#e4a4ac" mask="url(#tmr1)"/><rect x="24" y="18" width="372" height="132" rx="11" fill="none" stroke="#cd828d" stroke-width="2.4" opacity="0.85"/><path d="M 40.00 27.80 L 41.53 31.89 L 45.90 32.08 L 42.48 34.80 L 43.64 39.02 L 40.00 36.60 L 36.36 39.02 L 37.52 34.80 L 34.10 32.08 L 38.47 31.89 Z" fill="#cd828d"/><path d="M 40.00 53.80 L 41.53 57.89 L 45.90 58.08 L 42.48 60.80 L 43.64 65.02 L 40.00 62.60 L 36.36 65.02 L 37.52 60.80 L 34.10 58.08 L 38.47 57.89 Z" fill="#cd828d"/><path d="M 40.00 79.80 L 41.53 83.89 L 45.90 84.08 L 42.48 86.80 L 43.64 91.02 L 40.00 88.60 L 36.36 91.02 L 37.52 86.80 L 34.10 84.08 L 38.47 83.89 Z" fill="#cd828d"/><path d="M 40.00 105.80 L 41.53 109.89 L 45.90 110.08 L 42.48 112.80 L 43.64 117.02 L 40.00 114.60 L 36.36 117.02 L 37.52 112.80 L 34.10 110.08 L 38.47 109.89 Z" fill="#cd828d"/><path d="M 40.00 131.80 L 41.53 135.89 L 45.90 136.08 L 42.48 138.80 L 43.64 143.02 L 40.00 140.60 L 36.36 143.02 L 37.52 138.80 L 34.10 136.08 L 38.47 135.89 Z" fill="#cd828d"/><path d="M 380.00 27.80 L 381.53 31.89 L 385.90 32.08 L 382.48 34.80 L 383.64 39.02 L 380.00 36.60 L 376.36 39.02 L 377.52 34.80 L 374.10 32.08 L 378.47 31.89 Z" fill="#cd828d"/><path d="M 380.00 53.80 L 381.53 57.89 L 385.90 58.08 L 382.48 60.80 L 383.64 65.02 L 380.00 62.60 L 376.36 65.02 L 377.52 60.80 L 374.10 58.08 L 378.47 57.89 Z" fill="#cd828d"/><path d="M 380.00 79.80 L 381.53 83.89 L 385.90 84.08 L 382.48 86.80 L 383.64 91.02 L 380.00 88.60 L 376.36 91.02 L 377.52 86.80 L 374.10 84.08 L 378.47 83.89 Z" fill="#cd828d"/><path d="M 380.00 105.80 L 381.53 109.89 L 385.90 110.08 L 382.48 112.80 L 383.64 117.02 L 380.00 114.60 L 376.36 117.02 L 377.52 112.80 L 374.10 110.08 L 378.47 109.89 Z" fill="#cd828d"/><path d="M 380.00 131.80 L 381.53 135.89 L 385.90 136.08 L 382.48 138.80 L 383.64 143.02 L 380.00 140.60 L 376.36 143.02 L 377.52 138.80 L 374.10 136.08 L 378.47 135.89 Z" fill="#cd828d"/></svg>
+            <div class="tcontent">
               <div class="tkicker">Treat No.1</div>
               <div class="ttitle">Manicure</div>
               <div class="trule"></div>
               <div class="tadmit">Good for one</div>
-              <div class="tno">No. 0031</div>
-              <div class="tflip">tap to flip ↻</div>
             </div>
+            <div class="tno">No. 0031</div>
+            <div class="tflip">tap to flip ↻</div>
           </div>
           <div class="tface tback">
-            <div class="tinner"></div><div class="tinner2"></div>
-            <div class="bd-title">One Free Manicure</div>
-            <div class="bd-rule"></div>
-            <div class="bd-desc">Pick your favorite color<br>and step into 31 in style</div>
+            <svg class="tshape" viewBox="0 0 420 168" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><mask id="tmr2"><rect width="420" height="168" fill="black"/><g fill="white"><rect x="8" y="6" width="404" height="156" rx="18"/><path d="M8 15.0 L8 29.0 L0 22.0 Z M8 29.0 L8 43.0 L0 36.0 Z M8 43.0 L8 57.0 L0 50.0 Z M8 57.0 L8 71.0 L0 64.0 Z M8 71.0 L8 85.0 L0 78.0 Z M8 85.0 L8 99.0 L0 92.0 Z M8 99.0 L8 113.0 L0 106.0 Z M8 113.0 L8 127.0 L0 120.0 Z M8 127.0 L8 141.0 L0 134.0 Z"/><path d="M412 15.0 L412 29.0 L420 22.0 Z M412 29.0 L412 43.0 L420 36.0 Z M412 43.0 L412 57.0 L420 50.0 Z M412 57.0 L412 71.0 L420 64.0 Z M412 71.0 L412 85.0 L420 78.0 Z M412 85.0 L412 99.0 L420 92.0 Z M412 99.0 L412 113.0 L420 106.0 Z M412 113.0 L412 127.0 L420 120.0 Z M412 127.0 L412 141.0 L420 134.0 Z"/></g><g fill="black"><circle cx="210" cy="6" r="13"/><circle cx="210" cy="162" r="13"/></g></mask></defs><rect width="420" height="168" fill="#e4a4ac" mask="url(#tmr2)"/><rect x="24" y="18" width="372" height="132" rx="11" fill="none" stroke="#cd828d" stroke-width="2.4" opacity="0.85"/><path d="M 40.00 27.80 L 41.53 31.89 L 45.90 32.08 L 42.48 34.80 L 43.64 39.02 L 40.00 36.60 L 36.36 39.02 L 37.52 34.80 L 34.10 32.08 L 38.47 31.89 Z" fill="#cd828d"/><path d="M 40.00 53.80 L 41.53 57.89 L 45.90 58.08 L 42.48 60.80 L 43.64 65.02 L 40.00 62.60 L 36.36 65.02 L 37.52 60.80 L 34.10 58.08 L 38.47 57.89 Z" fill="#cd828d"/><path d="M 40.00 79.80 L 41.53 83.89 L 45.90 84.08 L 42.48 86.80 L 43.64 91.02 L 40.00 88.60 L 36.36 91.02 L 37.52 86.80 L 34.10 84.08 L 38.47 83.89 Z" fill="#cd828d"/><path d="M 40.00 105.80 L 41.53 109.89 L 45.90 110.08 L 42.48 112.80 L 43.64 117.02 L 40.00 114.60 L 36.36 117.02 L 37.52 112.80 L 34.10 110.08 L 38.47 109.89 Z" fill="#cd828d"/><path d="M 40.00 131.80 L 41.53 135.89 L 45.90 136.08 L 42.48 138.80 L 43.64 143.02 L 40.00 140.60 L 36.36 143.02 L 37.52 138.80 L 34.10 136.08 L 38.47 135.89 Z" fill="#cd828d"/><path d="M 380.00 27.80 L 381.53 31.89 L 385.90 32.08 L 382.48 34.80 L 383.64 39.02 L 380.00 36.60 L 376.36 39.02 L 377.52 34.80 L 374.10 32.08 L 378.47 31.89 Z" fill="#cd828d"/><path d="M 380.00 53.80 L 381.53 57.89 L 385.90 58.08 L 382.48 60.80 L 383.64 65.02 L 380.00 62.60 L 376.36 65.02 L 377.52 60.80 L 374.10 58.08 L 378.47 57.89 Z" fill="#cd828d"/><path d="M 380.00 79.80 L 381.53 83.89 L 385.90 84.08 L 382.48 86.80 L 383.64 91.02 L 380.00 88.60 L 376.36 91.02 L 377.52 86.80 L 374.10 84.08 L 378.47 83.89 Z" fill="#cd828d"/><path d="M 380.00 105.80 L 381.53 109.89 L 385.90 110.08 L 382.48 112.80 L 383.64 117.02 L 380.00 114.60 L 376.36 117.02 L 377.52 112.80 L 374.10 110.08 L 378.47 109.89 Z" fill="#cd828d"/><path d="M 380.00 131.80 L 381.53 135.89 L 385.90 136.08 L 382.48 138.80 L 383.64 143.02 L 380.00 140.60 L 376.36 143.02 L 377.52 138.80 L 374.10 136.08 L 378.47 135.89 Z" fill="#cd828d"/></svg>
+            <div class="tcontent">
+              <div class="bd-title">One Free Manicure</div>
+              <div class="trule"></div>
+              <div class="bd-desc">Pick your favorite color<br>and step into 31 in style</div>
+            </div>
             <div class="bd-stamp">No Expiry</div>
           </div>
         </div>
       </div>
 
       <div class="ticket c-mass" onclick="flipTicket(this)">
-        <div class="notch l"></div><div class="notch r"></div>
         <div class="tcard">
           <div class="tface tfront">
-            <div class="tinner"></div><div class="tinner2"></div>
-            <span class="corner tl">✦</span><span class="corner tr">✦</span><span class="corner bl">✦</span><span class="corner br">✦</span>
-            <div class="stub"><div class="vtxt">Admit One</div></div>
-            <div class="tmain">
+            <svg class="tshape" viewBox="0 0 420 168" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><mask id="tms1"><rect width="420" height="168" fill="black"/><g fill="white"><rect x="8" y="6" width="404" height="156" rx="18"/><path d="M8 15.0 L8 29.0 L0 22.0 Z M8 29.0 L8 43.0 L0 36.0 Z M8 43.0 L8 57.0 L0 50.0 Z M8 57.0 L8 71.0 L0 64.0 Z M8 71.0 L8 85.0 L0 78.0 Z M8 85.0 L8 99.0 L0 92.0 Z M8 99.0 L8 113.0 L0 106.0 Z M8 113.0 L8 127.0 L0 120.0 Z M8 127.0 L8 141.0 L0 134.0 Z"/><path d="M412 15.0 L412 29.0 L420 22.0 Z M412 29.0 L412 43.0 L420 36.0 Z M412 43.0 L412 57.0 L420 50.0 Z M412 57.0 L412 71.0 L420 64.0 Z M412 71.0 L412 85.0 L420 78.0 Z M412 85.0 L412 99.0 L420 92.0 Z M412 99.0 L412 113.0 L420 106.0 Z M412 113.0 L412 127.0 L420 120.0 Z M412 127.0 L412 141.0 L420 134.0 Z"/></g><g fill="black"><circle cx="210" cy="6" r="13"/><circle cx="210" cy="162" r="13"/></g></mask></defs><rect width="420" height="168" fill="#accbb9" mask="url(#tms1)"/><rect x="24" y="18" width="372" height="132" rx="11" fill="none" stroke="#7fa896" stroke-width="2.4" opacity="0.85"/><path d="M 40.00 27.80 L 41.53 31.89 L 45.90 32.08 L 42.48 34.80 L 43.64 39.02 L 40.00 36.60 L 36.36 39.02 L 37.52 34.80 L 34.10 32.08 L 38.47 31.89 Z" fill="#7fa896"/><path d="M 40.00 53.80 L 41.53 57.89 L 45.90 58.08 L 42.48 60.80 L 43.64 65.02 L 40.00 62.60 L 36.36 65.02 L 37.52 60.80 L 34.10 58.08 L 38.47 57.89 Z" fill="#7fa896"/><path d="M 40.00 79.80 L 41.53 83.89 L 45.90 84.08 L 42.48 86.80 L 43.64 91.02 L 40.00 88.60 L 36.36 91.02 L 37.52 86.80 L 34.10 84.08 L 38.47 83.89 Z" fill="#7fa896"/><path d="M 40.00 105.80 L 41.53 109.89 L 45.90 110.08 L 42.48 112.80 L 43.64 117.02 L 40.00 114.60 L 36.36 117.02 L 37.52 112.80 L 34.10 110.08 L 38.47 109.89 Z" fill="#7fa896"/><path d="M 40.00 131.80 L 41.53 135.89 L 45.90 136.08 L 42.48 138.80 L 43.64 143.02 L 40.00 140.60 L 36.36 143.02 L 37.52 138.80 L 34.10 136.08 L 38.47 135.89 Z" fill="#7fa896"/><path d="M 380.00 27.80 L 381.53 31.89 L 385.90 32.08 L 382.48 34.80 L 383.64 39.02 L 380.00 36.60 L 376.36 39.02 L 377.52 34.80 L 374.10 32.08 L 378.47 31.89 Z" fill="#7fa896"/><path d="M 380.00 53.80 L 381.53 57.89 L 385.90 58.08 L 382.48 60.80 L 383.64 65.02 L 380.00 62.60 L 376.36 65.02 L 377.52 60.80 L 374.10 58.08 L 378.47 57.89 Z" fill="#7fa896"/><path d="M 380.00 79.80 L 381.53 83.89 L 385.90 84.08 L 382.48 86.80 L 383.64 91.02 L 380.00 88.60 L 376.36 91.02 L 377.52 86.80 L 374.10 84.08 L 378.47 83.89 Z" fill="#7fa896"/><path d="M 380.00 105.80 L 381.53 109.89 L 385.90 110.08 L 382.48 112.80 L 383.64 117.02 L 380.00 114.60 L 376.36 117.02 L 377.52 112.80 L 374.10 110.08 L 378.47 109.89 Z" fill="#7fa896"/><path d="M 380.00 131.80 L 381.53 135.89 L 385.90 136.08 L 382.48 138.80 L 383.64 143.02 L 380.00 140.60 L 376.36 143.02 L 377.52 138.80 L 374.10 136.08 L 378.47 135.89 Z" fill="#7fa896"/></svg>
+            <div class="tcontent">
               <div class="tkicker">Treat No.2</div>
               <div class="ttitle">Massage</div>
               <div class="trule"></div>
               <div class="tadmit">Good for one</div>
-              <div class="tno">No. 0031</div>
-              <div class="tflip">tap to flip ↻</div>
             </div>
+            <div class="tno">No. 0031</div>
+            <div class="tflip">tap to flip ↻</div>
           </div>
           <div class="tface tback">
-            <div class="tinner"></div><div class="tinner2"></div>
-            <div class="bd-title">One Free Sports Massage</div>
-            <div class="bd-rule"></div>
-            <div class="bd-desc">Tennis, travel, work trips —<br>let me take the tension away</div>
+            <svg class="tshape" viewBox="0 0 420 168" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><mask id="tms2"><rect width="420" height="168" fill="black"/><g fill="white"><rect x="8" y="6" width="404" height="156" rx="18"/><path d="M8 15.0 L8 29.0 L0 22.0 Z M8 29.0 L8 43.0 L0 36.0 Z M8 43.0 L8 57.0 L0 50.0 Z M8 57.0 L8 71.0 L0 64.0 Z M8 71.0 L8 85.0 L0 78.0 Z M8 85.0 L8 99.0 L0 92.0 Z M8 99.0 L8 113.0 L0 106.0 Z M8 113.0 L8 127.0 L0 120.0 Z M8 127.0 L8 141.0 L0 134.0 Z"/><path d="M412 15.0 L412 29.0 L420 22.0 Z M412 29.0 L412 43.0 L420 36.0 Z M412 43.0 L412 57.0 L420 50.0 Z M412 57.0 L412 71.0 L420 64.0 Z M412 71.0 L412 85.0 L420 78.0 Z M412 85.0 L412 99.0 L420 92.0 Z M412 99.0 L412 113.0 L420 106.0 Z M412 113.0 L412 127.0 L420 120.0 Z M412 127.0 L412 141.0 L420 134.0 Z"/></g><g fill="black"><circle cx="210" cy="6" r="13"/><circle cx="210" cy="162" r="13"/></g></mask></defs><rect width="420" height="168" fill="#accbb9" mask="url(#tms2)"/><rect x="24" y="18" width="372" height="132" rx="11" fill="none" stroke="#7fa896" stroke-width="2.4" opacity="0.85"/><path d="M 40.00 27.80 L 41.53 31.89 L 45.90 32.08 L 42.48 34.80 L 43.64 39.02 L 40.00 36.60 L 36.36 39.02 L 37.52 34.80 L 34.10 32.08 L 38.47 31.89 Z" fill="#7fa896"/><path d="M 40.00 53.80 L 41.53 57.89 L 45.90 58.08 L 42.48 60.80 L 43.64 65.02 L 40.00 62.60 L 36.36 65.02 L 37.52 60.80 L 34.10 58.08 L 38.47 57.89 Z" fill="#7fa896"/><path d="M 40.00 79.80 L 41.53 83.89 L 45.90 84.08 L 42.48 86.80 L 43.64 91.02 L 40.00 88.60 L 36.36 91.02 L 37.52 86.80 L 34.10 84.08 L 38.47 83.89 Z" fill="#7fa896"/><path d="M 40.00 105.80 L 41.53 109.89 L 45.90 110.08 L 42.48 112.80 L 43.64 117.02 L 40.00 114.60 L 36.36 117.02 L 37.52 112.80 L 34.10 110.08 L 38.47 109.89 Z" fill="#7fa896"/><path d="M 40.00 131.80 L 41.53 135.89 L 45.90 136.08 L 42.48 138.80 L 43.64 143.02 L 40.00 140.60 L 36.36 143.02 L 37.52 138.80 L 34.10 136.08 L 38.47 135.89 Z" fill="#7fa896"/><path d="M 380.00 27.80 L 381.53 31.89 L 385.90 32.08 L 382.48 34.80 L 383.64 39.02 L 380.00 36.60 L 376.36 39.02 L 377.52 34.80 L 374.10 32.08 L 378.47 31.89 Z" fill="#7fa896"/><path d="M 380.00 53.80 L 381.53 57.89 L 385.90 58.08 L 382.48 60.80 L 383.64 65.02 L 380.00 62.60 L 376.36 65.02 L 377.52 60.80 L 374.10 58.08 L 378.47 57.89 Z" fill="#7fa896"/><path d="M 380.00 79.80 L 381.53 83.89 L 385.90 84.08 L 382.48 86.80 L 383.64 91.02 L 380.00 88.60 L 376.36 91.02 L 377.52 86.80 L 374.10 84.08 L 378.47 83.89 Z" fill="#7fa896"/><path d="M 380.00 105.80 L 381.53 109.89 L 385.90 110.08 L 382.48 112.80 L 383.64 117.02 L 380.00 114.60 L 376.36 117.02 L 377.52 112.80 L 374.10 110.08 L 378.47 109.89 Z" fill="#7fa896"/><path d="M 380.00 131.80 L 381.53 135.89 L 385.90 136.08 L 382.48 138.80 L 383.64 143.02 L 380.00 140.60 L 376.36 143.02 L 377.52 138.80 L 374.10 136.08 L 378.47 135.89 Z" fill="#7fa896"/></svg>
+            <div class="tcontent">
+              <div class="bd-title">One Free Sports Massage</div>
+              <div class="trule"></div>
+              <div class="bd-desc">Tennis, travel, work trips —<br>let me take the tension away</div>
+            </div>
             <div class="bd-stamp">No Expiry</div>
           </div>
         </div>
