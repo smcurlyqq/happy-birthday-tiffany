@@ -87,7 +87,7 @@
   .name{font-family:"Homemade Apple",cursive; font-size:21px; font-weight:400; line-height:1.4;
     margin-bottom:6px; color:#fff; text-shadow:0 2px 12px rgba(40,20,70,.4)}
   .name .en{color:#ffd76a; font-size:28px}
-  .rsub{font-size:11px; color:rgba(255,255,255,.82); margin-top:5px; margin-bottom:4px}
+  .rsub{font-size:10px; color:rgba(255,255,255,.82); margin-top:5px; margin-bottom:4px}
 
   .milaFrame{position:relative; width:150px; margin:2px auto 4px}
   .milaFrame .milaPhoto{position:absolute; left:20.622%; top:17.200%; width:59.090%; height:65.880%; object-fit:cover; object-position:50% 42%; z-index:1}
@@ -278,7 +278,16 @@
   /* ---------- cute sound effects (Web Audio, no files) ---------- */
   var SFX=null;
   function ac(){
-    if(!SFX){ try{ SFX=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } }
+    if(!SFX){
+      try{ SFX=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; }
+      try{
+        var comp=SFX.createDynamicsCompressor();
+        comp.threshold.value=-22; comp.knee.value=24; comp.ratio.value=6; comp.attack.value=0.003; comp.release.value=0.18;
+        var mg=SFX.createGain(); mg.gain.value=2.0;   /* master make-up boost */
+        comp.connect(mg); mg.connect(SFX.destination);
+        SFX._bus=comp;
+      }catch(e){ SFX._bus=SFX.destination; }
+    }
     if(SFX && SFX.state==='suspended'){ try{ SFX.resume(); }catch(e){} }
     return SFX;
   }
@@ -290,9 +299,25 @@
     g.gain.setValueAtTime(0.0001,t);
     g.gain.exponentialRampToValueAtTime(vol||0.18,t+0.012);
     g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+dur+0.03);
+    o.connect(g); g.connect(c._bus); o.start(t); o.stop(t+dur+0.03);
   }
   function sfxClick(){ tone(680,0.13,'triangle',0.20,0); tone(1020,0.16,'sine',0.13,0.05); }
+  function sfxDream(){
+    var c=ac(); if(!c) return; var t=c.currentTime;
+    var dl=c.createDelay(); dl.delayTime.value=0.19;
+    var fb=c.createGain(); fb.gain.value=0.36;
+    dl.connect(fb); fb.connect(dl); dl.connect(c._bus);
+    [784,988,1319,1568,2093].forEach(function(f,i){
+      var o=c.createOscillator(); o.type='sine'; o.frequency.value=f;
+      var o2=c.createOscillator(); o2.type='sine'; o2.frequency.value=f*1.004;
+      var g=c.createGain(); var tt=t+i*0.075;
+      g.gain.setValueAtTime(0.0001,tt);
+      g.gain.exponentialRampToValueAtTime(0.32,tt+0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001,tt+0.95);
+      o.connect(g); o2.connect(g); g.connect(c._bus); g.connect(dl);
+      o.start(tt); o2.start(tt); o.stop(tt+1.0); o2.stop(tt+1.0);
+    });
+  }
   function sfxChime(){ [523,659,784,1047].forEach(function(f,i){ tone(f,0.6,'sine',0.4,i*0.10); tone(f*2,0.5,'triangle',0.12,i*0.10); }); }
   function sfxMeow(){
     var c=ac(); if(!c) return; var t=c.currentTime;
@@ -301,7 +326,7 @@
     master.gain.exponentialRampToValueAtTime(0.95,t+0.06);
     master.gain.setValueAtTime(0.9,t+0.30);
     master.gain.exponentialRampToValueAtTime(0.0001,t+0.62);
-    master.connect(c.destination);
+    master.connect(c._bus);
     var o=c.createOscillator(); o.type='sawtooth';
     o.frequency.setValueAtTime(520,t);
     o.frequency.linearRampToValueAtTime(900,t+0.14);
@@ -324,7 +349,7 @@
     var f=c.createBiquadFilter(); f.type='lowpass';
     f.frequency.setValueAtTime(1100,t); f.frequency.exponentialRampToValueAtTime(220,t+0.36);
     var g=c.createGain(); g.gain.setValueAtTime(0.32,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
-    s.connect(f); f.connect(g); g.connect(c.destination); s.start(t); s.stop(t+0.42);
+    s.connect(f); f.connect(g); g.connect(c._bus); s.start(t); s.stop(t+0.42);
   }
 
   function show(id){
@@ -334,7 +359,7 @@
 
   function toCake(){
     ac();               /* unlock audio on first gesture */
-    tone(880,0.14,'sine',0.16,0);
+    sfxDream();
     show('s1');
     startMic();
   }
