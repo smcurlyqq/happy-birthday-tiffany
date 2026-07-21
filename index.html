@@ -58,6 +58,10 @@
 
   /* candles / flames */
   .candle{position:absolute; width:20px; text-align:center; z-index:5}
+  .numc{width:34px}
+  .candle .num{font:800 52px/0.9 -apple-system,"Helvetica Neue",Arial,sans-serif; color:#e58aa0;
+    text-shadow:-1.6px -1.6px 0 #fff, 1.6px -1.6px 0 #fff, -1.6px 1.6px 0 #fff, 1.6px 1.6px 0 #fff, 0 4px 6px rgba(60,20,50,.22)}
+  .numc .flame{top:-14px}
   .candle .stick{width:6px; height:40px; margin:0 auto; border-radius:3px;
     background:repeating-linear-gradient(-45deg,#e79ab0 0 5px,#fff5f8 5px 10px);
     box-shadow:0 1px 2px rgba(60,20,50,.25)}
@@ -194,11 +198,8 @@
           </g>
         </svg>
         <!-- retro striped candles (blown out together) -->
-        <div class="candle" style="left:84px;  top:100px"><div class="flame"></div><div class="smoke"></div><div class="stick"></div></div>
-        <div class="candle" style="left:109px; top:93px"><div class="flame"></div><div class="smoke"></div><div class="stick"></div></div>
-        <div class="candle" style="left:134px; top:90px"><div class="flame"></div><div class="smoke"></div><div class="stick"></div></div>
-        <div class="candle" style="left:159px; top:93px"><div class="flame"></div><div class="smoke"></div><div class="stick"></div></div>
-        <div class="candle" style="left:184px; top:100px"><div class="flame"></div><div class="smoke"></div><div class="stick"></div></div>
+        <div class="candle numc" style="left:104px; top:92px"><div class="flame"></div><div class="smoke"></div><div class="num">3</div></div>
+        <div class="candle numc" style="left:132px; top:92px"><div class="flame"></div><div class="smoke"></div><div class="num">1</div></div>
       </div>
       <div class="micNote" id="micNote"></div>
       <div class="fallback"><a onclick="blowOut()">Can’t blow? Tap to blow them out 🌬️</a></div>
