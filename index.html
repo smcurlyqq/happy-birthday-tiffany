@@ -124,7 +124,7 @@
     font-size:10px; letter-spacing:1px; text-transform:uppercase; font-family:"VT323",ui-monospace,monospace;
     border:1.4px solid currentColor; border-radius:4px; padding:2px 6px; opacity:.72}
 
-  .rfooter{margin-top:14px; font-size:12px; color:rgba(255,255,255,.85); line-height:1.6}
+  .rfooter{margin-top:14px; font-size:11px; color:rgba(255,255,255,.85); line-height:1.6}
   .paw-sign{color:#ffe08a; font-weight:600}
   .again{margin-top:9px; font-size:12px; color:#ffe08a; background:none; border:none; cursor:pointer; text-decoration:underline; opacity:.85}
 
@@ -282,8 +282,8 @@
       try{ SFX=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; }
       try{
         var comp=SFX.createDynamicsCompressor();
-        comp.threshold.value=-22; comp.knee.value=24; comp.ratio.value=6; comp.attack.value=0.003; comp.release.value=0.18;
-        var mg=SFX.createGain(); mg.gain.value=2.0;   /* master make-up boost */
+        comp.threshold.value=-20; comp.knee.value=18; comp.ratio.value=10; comp.attack.value=0.002; comp.release.value=0.15;
+        var mg=SFX.createGain(); mg.gain.value=3.2;   /* master make-up boost (loudness maximizer) */
         comp.connect(mg); mg.connect(SFX.destination);
         SFX._bus=comp;
       }catch(e){ SFX._bus=SFX.destination; }
@@ -318,7 +318,7 @@
       o.start(tt); o2.start(tt); o.stop(tt+1.0); o2.stop(tt+1.0);
     });
   }
-  function sfxChime(){ [523,659,784,1047].forEach(function(f,i){ tone(f,0.6,'sine',0.4,i*0.10); tone(f*2,0.5,'triangle',0.12,i*0.10); }); }
+  function sfxChime(){ [523,659,784,1047].forEach(function(f,i){ tone(f,0.65,'sine',0.6,i*0.10); tone(f*2,0.5,'triangle',0.2,i*0.10); }); }
   function sfxMeow(){
     var c=ac(); if(!c) return; var t=c.currentTime;
     var master=c.createGain();
