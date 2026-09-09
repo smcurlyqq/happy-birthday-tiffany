@@ -1,0 +1,940 @@
+<title>Seoul Loop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{
+  /* Seoul Metro line colours — the categorical palette */
+  --l1:#0052A4; --l2:#00A84D; --l3:#EF7C1C; --l4:#00A5DE;
+  --l5:#996CAC; --l6:#CD7C2F; --l7:#6E7800; --l8:#E6186C; --l9:#A79352;
+  --accent:#00A84D; --alert:#D8232A; --warn:#EF7C1C; --good:#00A84D;
+  --ink:#141917; --ink2:#4B5551; --ink3:#7C8783;
+  --paper:#EFF2F0; --card:#FFFFFF; --sunk:#F6F8F7;
+  --rule:#DBE1DE; --rule2:#C6CFCB;
+  --shadow:0 1px 1px rgba(15,30,24,.04), 0 10px 26px -20px rgba(15,30,24,.5);
+  --cjk:'Noto Sans TC';
+  --disp:'Oswald', var(--cjk), system-ui, sans-serif;
+  --body:var(--cjk), system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+  --mono:'IBM Plex Mono', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+  --l1:#4A8FDB; --l7:#9AA400; --l9:#C4B078;
+  --accent:#25C46A; --alert:#F2565C; --warn:#F79B41; --good:#25C46A;
+  --ink:#E9EEEB; --ink2:#A5B0AB; --ink3:#727E79;
+  --paper:#0D1110; --card:#161B19; --sunk:#1E2422;
+  --rule:#2A322F; --rule2:#3A4340;
+  --shadow:0 1px 1px rgba(0,0,0,.4), 0 12px 30px -22px #000;
+}
+}
+:root[data-theme="dark"]{
+  --l1:#4A8FDB; --l7:#9AA400; --l9:#C4B078;
+  --accent:#25C46A; --alert:#F2565C; --warn:#F79B41; --good:#25C46A;
+  --ink:#E9EEEB; --ink2:#A5B0AB; --ink3:#727E79;
+  --paper:#0D1110; --card:#161B19; --sunk:#1E2422;
+  --rule:#2A322F; --rule2:#3A4340;
+  --shadow:0 1px 1px rgba(0,0,0,.4), 0 12px 30px -22px #000;
+}
+:root[lang="ja"]{ --cjk:'Noto Sans JP'; }
+:root[lang="ko"]{ --cjk:'Noto Sans KR'; }
+
+*{box-sizing:border-box}
+body{margin:0;overflow-x:hidden;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-text-size-adjust:100%}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:600}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.wrap{max-width:760px;margin:0 auto;padding:0 14px 90px}
+
+/* ---------- masthead ---------- */
+.top{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:760px;margin:0 auto;padding:10px 14px 0}
+.brandrow{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:50%;background:var(--l2);color:#fff;font-family:var(--disp);font-size:15px;display:grid;place-items:center;flex:none;letter-spacing:.02em}
+.brand{font-family:var(--disp);font-size:19px;letter-spacing:.06em;text-transform:uppercase;line-height:1;min-width:0;flex:0 1 auto;white-space:nowrap}
+.brand small{display:block;font-family:var(--body);font-size:10.5px;letter-spacing:.12em;color:var(--ink3);text-transform:uppercase;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topspace{flex:1 1 6px;min-width:0}
+.pill{border:1px solid var(--rule2);background:var(--card);border-radius:999px;padding:5px 10px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;line-height:1.2;flex:none;max-width:44vw}
+#melabel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill:hover{border-color:var(--ink3)}
+select.pill{-webkit-appearance:none;appearance:none;padding-right:22px;background-image:linear-gradient(45deg,transparent 50%,var(--ink3) 50%),linear-gradient(135deg,var(--ink3) 50%,transparent 50%);background-position:calc(100% - 12px) 12px,calc(100% - 8px) 12px;background-size:4px 4px,4px 4px;background-repeat:no-repeat}
+
+/* metro-line tab rail */
+.rail{position:relative;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;margin-top:10px;padding-bottom:1px}
+.rail::-webkit-scrollbar{display:none}
+.rail::before{content:"";position:absolute;left:14px;right:14px;top:15px;height:3px;background:var(--rule2);border-radius:2px}
+.stop{position:relative;background:none;border:0;padding:0 4px 9px;cursor:pointer;flex:1 0 auto;min-width:19%;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink3)}
+.dot{width:13px;height:13px;border-radius:50%;background:var(--card);border:3px solid var(--rule2);position:relative;z-index:1;transition:transform .16s ease,border-color .16s}
+.stop span{font-family:var(--disp);font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+.stop[aria-selected="true"]{color:var(--ink)}
+.stop[aria-selected="true"] .dot{border-color:var(--ln);background:var(--ln);transform:scale(1.25)}
+.stop[aria-selected="true"]::after{content:"";position:absolute;bottom:0;left:8px;right:8px;height:2px;background:var(--ln)}
+
+/* ---------- generic ---------- */
+.card{background:var(--card);border:1px solid var(--rule);border-radius:5px;box-shadow:var(--shadow)}
+section.pane{padding-top:16px;display:flex;flex-direction:column;gap:14px}
+section.pane[hidden]{display:none}
+.head{display:flex;align-items:baseline;gap:4px 10px;flex-wrap:wrap;padding-left:9px;border-left:3px solid var(--ln);margin-bottom:-2px}
+.head h2{font-family:var(--disp);font-size:16px;letter-spacing:.09em;text-transform:uppercase}
+.head p{margin:0;font-size:12px;color:var(--ink3);min-width:0;flex:1 1 auto}
+.lbl{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--ink3)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.stack{display:flex;flex-direction:column;gap:10px}
+.scroll-x{overflow-x:auto}
+
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=url],select,textarea{
+  width:100%;background:var(--sunk);border:1px solid var(--rule);border-radius:4px;padding:9px 10px;color:var(--ink)}
+textarea{resize:vertical;min-height:60px;font-family:var(--body)}
+input::placeholder,textarea::placeholder{color:var(--ink3)}
+label.f{display:flex;flex-direction:column;gap:5px;flex:1;min-width:120px}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:4px;padding:9px 14px;font-family:var(--disp);font-size:13px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.btn:hover{opacity:.86}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule2)}
+.btn.tiny{padding:5px 9px;font-size:11px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.x{background:none;border:0;color:var(--ink3);cursor:pointer;padding:2px 5px;font-size:15px;line-height:1}
+.x:hover{color:var(--alert)}
+
+.chip{border:1px solid var(--rule2);background:var(--card);border-radius:999px;padding:5px 11px;font-size:12.5px;cursor:pointer;user-select:none}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chipset{display:flex;flex-wrap:wrap;gap:6px}
+
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:var(--sunk);color:var(--ink2);border:1px solid var(--rule)}
+.who{display:inline-flex;align-items:center;gap:5px;font-size:12.5px}
+.av{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;color:#fff;flex:none;font-family:var(--disp)}
+.empty{padding:20px 14px;text-align:center;color:var(--ink3);font-size:13px}
+
+/* ---------- overview ---------- */
+.hero{padding:18px 16px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden}
+.hero .dates{font-family:var(--disp);font-size:clamp(28px,9vw,46px);line-height:.95;letter-spacing:.01em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.hero .dates em{font-style:normal;color:var(--l2)}
+.cdown{display:flex;gap:16px;flex-wrap:wrap;border-top:1px solid var(--rule);padding-top:12px}
+.cdown div{display:flex;flex-direction:column}
+.cdown b{font-family:var(--disp);font-size:24px;line-height:1;font-weight:500}
+.daystrip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+.daystrip div{background:var(--card);padding:9px 8px;text-align:center}
+.daystrip b{display:block;font-family:var(--disp);font-size:18px;line-height:1.1}
+.daystrip span{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3)}
+
+.seats{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
+.seat{padding:11px 12px;display:flex;flex-direction:column;gap:6px;border-top:3px solid var(--ln);cursor:pointer;text-align:left;background:var(--card);border-left:1px solid var(--rule);border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);border-radius:0 0 5px 5px;font:inherit;color:inherit}
+.seat:hover{border-color:var(--rule2)}
+.seat .nm{font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px}
+.seat .fl{font-size:11.5px;color:var(--ink3);font-family:var(--mono)}
+.seat.free .nm{color:var(--ink3);font-weight:400;font-style:italic}
+.seat.isme{box-shadow:inset 0 0 0 1px var(--ln)}
+
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:1fr 46px;gap:8px;align-items:center;font-size:13px}
+.bar .track{height:8px;background:var(--sunk);border-radius:2px;overflow:hidden;margin-top:4px}
+.bar .fill{height:100%;border-radius:2px;background:var(--ln)}
+.bar .n{font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:right}
+
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13.5px}
+.kv dt{color:var(--ink3)}
+.kv dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;font-size:13.5px}
+.checklist li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start}
+.checklist li b{font-weight:700}
+.rates{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.rates label{display:flex;flex-direction:column;gap:3px;font-size:11px}
+.rates input{font-family:var(--mono);padding:6px 8px;font-size:13px}
+
+/* ---------- lists ---------- */
+.item{padding:11px 12px;display:flex;gap:10px;align-items:flex-start;border-bottom:1px solid var(--rule)}
+.item:last-child{border-bottom:0}
+.item .body{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.item .ttl{font-weight:700;font-size:14.5px;word-break:break-word}
+.item .sub{font-size:12.5px;color:var(--ink3);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.vote{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--rule2);border-radius:4px;background:var(--card);padding:5px 9px;cursor:pointer;flex:none;min-width:44px}
+.vote b{font-family:var(--disp);font-size:16px;line-height:1}
+.vote small{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.vote[aria-pressed="true"]{border-color:var(--l2);background:color-mix(in srgb,var(--l2) 12%,var(--card));color:var(--l2)}
+.vote[aria-pressed="true"] small{color:var(--l2)}
+.avstack{display:flex}
+.avstack .av{margin-left:-5px;box-shadow:0 0 0 2px var(--card)}
+.avstack .av:first-child{margin-left:0}
+
+.dayhead{display:flex;align-items:center;gap:4px 9px;flex-wrap:wrap;padding:9px 12px;background:var(--sunk);border-bottom:1px solid var(--rule)}
+.dayhead b{font-family:var(--disp);font-size:14px;letter-spacing:.07em;text-transform:uppercase}
+.dayhead .n{width:20px;height:20px;border-radius:50%;background:var(--ln);color:#fff;display:grid;place-items:center;font-family:var(--disp);font-size:11px;flex:none}
+.slot{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;padding:10px 12px;border-bottom:1px solid var(--rule);align-items:start;overflow-wrap:anywhere}
+.slot:last-child{border-bottom:0}
+.slot .tm{font-family:var(--mono);font-size:12.5px;color:var(--ink2);padding-top:1px}
+
+/* ---------- split ---------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+.tile{background:var(--card);padding:12px}
+.tile .lbl{display:block;margin-bottom:5px}
+.tile b{font-family:var(--disp);font-size:23px;line-height:1;font-weight:500;font-variant-numeric:tabular-nums}
+.tile small{display:block;font-size:11.5px;color:var(--ink3);font-family:var(--mono);margin-top:3px}
+.bal{display:grid;grid-template-columns:1fr auto;gap:10px;padding:9px 12px;border-bottom:1px solid var(--rule);align-items:center}
+.bal:last-child{border-bottom:0}
+.bal .amt{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13.5px}
+.pos{color:var(--good)}.neg{color:var(--alert)}
+.settle{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--rule);font-size:13.5px;flex-wrap:wrap}
+.settle:last-child{border-bottom:0}
+.arrow{color:var(--ink3);font-family:var(--mono)}
+.splitters{display:flex;flex-wrap:wrap;gap:6px}
+
+/* ---------- misc ---------- */
+.notice{border-left:3px solid var(--warn);background:color-mix(in srgb,var(--warn) 8%,var(--card));padding:10px 12px;font-size:13px;border-radius:0 4px 4px 0}
+.foot{padding:22px 4px 0;font-size:11.5px;color:var(--ink3);text-align:center;line-height:1.7}
+dialog{border:1px solid var(--rule);background:var(--card);color:var(--ink);border-radius:6px;padding:0;max-width:400px;width:calc(100% - 28px);box-shadow:0 24px 60px -20px rgba(0,0,0,.45)}
+dialog::backdrop{background:rgba(10,16,14,.55)}
+.dlg{padding:16px}
+.dlg h3{font-family:var(--disp);font-size:16px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:999px;font-size:13px;z-index:99;box-shadow:0 10px 30px -12px rgba(0,0,0,.6)}
+@media(max-width:420px){ .stop span{font-size:11px} .wrap{padding:0 11px 80px} }
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brandrow">
+      <div class="mark">2</div>
+      <div class="brand">Seoul&nbsp;Loop<small data-i="tagline">five passports · one october</small></div>
+      <div class="topspace"></div>
+      <button class="pill" id="mebtn"><span class="av" id="meav" style="display:none"></span><span id="melabel" data-i="whoami">Who are you?</span></button>
+      <select class="pill" id="lang" aria-label="Language">
+        <option value="en">EN</option>
+        <option value="zh">中文</option>
+        <option value="ja">日本語</option>
+        <option value="ko">한국어</option>
+        <option value="id">Indo</option>
+      </select>
+    </div>
+    <nav class="rail" role="tablist" id="rail">
+      <button class="stop" role="tab" data-p="trip"  style="--ln:var(--l2)" aria-selected="true"><i class="dot"></i><span data-i="t.trip">Trip</span></button>
+      <button class="stop" role="tab" data-p="prefs" style="--ln:var(--l3)" aria-selected="false"><i class="dot"></i><span data-i="t.prefs">Taste</span></button>
+      <button class="stop" role="tab" data-p="ideas" style="--ln:var(--l5)" aria-selected="false"><i class="dot"></i><span data-i="t.ideas">Ideas</span></button>
+      <button class="stop" role="tab" data-p="plan"  style="--ln:var(--l4)" aria-selected="false"><i class="dot"></i><span data-i="t.plan">Plan</span></button>
+      <button class="stop" role="tab" data-p="split" style="--ln:var(--l1)" aria-selected="false"><i class="dot"></i><span data-i="t.split">Split</span></button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ========== TRIP ========== -->
+<section class="pane" id="p-trip" style="--ln:var(--l2)">
+  <div class="card hero">
+    <div>
+      <div class="lbl" data-i="hero.kicker">Seoul · Republic of Korea</div>
+      <div class="dates"><span id="d1">17</span><em>—</em><span id="d2">20</span> <span id="mon">OCT</span> <span id="yr" class="muted">2026</span></div>
+    </div>
+    <div class="daystrip" id="daystrip"></div>
+    <div class="cdown" id="cdown"></div>
+  </div>
+
+  <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:10px;border-top:3px solid var(--l5);border-radius:0 0 5px 5px">
+    <div>
+      <div class="lbl" data-i="link.p">Notion holds what we edit together</div>
+      <a id="notionlink" href="https://www.notion.so/3d6b331a325081989f75d13d4fff3184" target="_blank" rel="noopener"
+         style="font-family:var(--disp);font-size:17px;letter-spacing:.04em;color:var(--l5);text-decoration:none;display:inline-block;margin-top:3px"
+         data-i="link.go">Open the Notion boards →</a>
+    </div>
+    <div class="muted" style="font-size:12.5px" data-i="link.what">Crew &amp; taste · Ideas &amp; votes · Itinerary · Expenses</div>
+    <div class="row"><button class="btn ghost tiny" id="copylink2" data-i="link.copy">Copy the link for LINE</button></div>
+  </div>
+
+  <div class="head"><h2 data-i="crew.h">The crew</h2><p data-i="crew.p">tap your seat to claim it</p></div>
+  <div class="seats" id="seats"></div>
+  <div class="row"><button class="btn ghost tiny" id="addseat" data-i="crew.add">+ add someone</button></div>
+
+  <div class="head"><h2 data-i="ess.h">Before we fly</h2><p data-i="ess.p">five passports, five sets of rules</p></div>
+  <div class="card" style="padding:13px 14px">
+    <ul class="checklist" id="essentials"></ul>
+  </div>
+
+  <div class="head"><h2 data-i="fx.h">Exchange rates</h2><p data-i="fx.p">KRW per 1 unit — edit before we go</p></div>
+  <div class="card" style="padding:13px 14px;display:flex;flex-direction:column;gap:10px">
+    <div class="rates" id="rates"></div>
+    <div class="muted" style="font-size:12px" data-i="fx.note">Everything in Split is stored in won and shown in your own currency.</div>
+  </div>
+</section>
+
+<!-- ========== PREFS ========== -->
+<section class="pane" id="p-prefs" hidden style="--ln:var(--l3)">
+  <div class="head"><h2 data-i="pref.h">What you want</h2><p data-i="pref.p">visible to the whole group</p></div>
+  <div class="card" id="prefcard" style="padding:14px;display:flex;flex-direction:column;gap:14px">
+    <div>
+      <div class="lbl" style="margin-bottom:7px" data-i="pref.act">I'm here for…</div>
+      <div class="chipset" id="actchips"></div>
+    </div>
+    <div>
+      <div class="lbl" style="margin-bottom:7px" data-i="pref.area">Base us around…</div>
+      <div class="chipset" id="areachips"></div>
+    </div>
+    <div class="row">
+      <label class="f"><span class="lbl" data-i="pref.stay">Stay</span>
+        <select id="p_stay"></select></label>
+      <label class="f"><span class="lbl" data-i="pref.pace">Pace</span>
+        <select id="p_pace"></select></label>
+    </div>
+    <div class="row">
+      <label class="f"><span class="lbl" data-i="pref.budget">Budget for the whole trip</span>
+        <input type="number" id="p_budget" min="0" step="10" placeholder="0"></label>
+      <label class="f" style="max-width:120px"><span class="lbl" data-i="pref.cur">Currency</span>
+        <select id="p_cur"></select></label>
+    </div>
+    <div class="muted mono" id="budgethint" style="font-size:12px"></div>
+    <div>
+      <div class="lbl" style="margin-bottom:7px" data-i="pref.food">Food I can't eat</div>
+      <div class="chipset" id="foodchips"></div>
+    </div>
+    <label class="f"><span class="lbl" data-i="pref.note">One thing I really don't want to miss</span>
+      <textarea id="p_note" data-ip="pref.noteph"></textarea></label>
+    <div class="row"><button class="btn" id="savepref" data-i="pref.save">Save</button><span class="muted" id="prefsaved" style="font-size:12px"></span></div>
+  </div>
+
+  <div class="head"><h2 data-i="agg.h">Where we agree</h2><p data-i="agg.p">live tally</p></div>
+  <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:16px" id="aggcard"></div>
+
+  <div class="head"><h2 data-i="ans.h">Everyone's answers</h2><p id="anscount"></p></div>
+  <div class="card" id="answers"></div>
+</section>
+
+<!-- ========== IDEAS ========== -->
+<section class="pane" id="p-ideas" hidden style="--ln:var(--l5)">
+  <div class="head"><h2 data-i="idea.h">Ideas board</h2><p data-i="idea.p">drop it here, then vote</p></div>
+  <div class="card" style="padding:13px 14px;display:flex;flex-direction:column;gap:10px">
+    <div class="row">
+      <label class="f" style="min-width:180px"><span class="lbl" data-i="idea.name">Place or thing</span>
+        <input type="text" id="i_title" data-ip="idea.nameph"></label>
+      <label class="f" style="max-width:150px"><span class="lbl" data-i="idea.cat">Kind</span>
+        <select id="i_cat"></select></label>
+    </div>
+    <div class="row">
+      <label class="f"><span class="lbl" data-i="idea.link">Link (map, blog, IG)</span>
+        <input type="url" id="i_link" placeholder="https://"></label>
+    </div>
+    <label class="f"><span class="lbl" data-i="idea.why">Why</span><input type="text" id="i_note" data-ip="idea.whyph"></label>
+    <div class="row"><button class="btn" id="addidea" data-i="idea.add">Add idea</button></div>
+  </div>
+  <div class="row" id="ideafilter"></div>
+  <div class="card" id="idealist"></div>
+</section>
+
+<!-- ========== PLAN ========== -->
+<section class="pane" id="p-plan" hidden style="--ln:var(--l4)">
+  <div class="head"><h2 data-i="plan.h">The day plan</h2><p data-i="plan.p">nothing is fixed until we all see it</p></div>
+  <div class="card" style="padding:13px 14px;display:flex;flex-direction:column;gap:10px">
+    <div class="row">
+      <label class="f" style="max-width:150px"><span class="lbl" data-i="plan.day">Day</span><select id="s_day"></select></label>
+      <label class="f" style="max-width:110px"><span class="lbl" data-i="plan.time">Time</span><input type="time" id="s_time"></label>
+      <label class="f" style="min-width:170px"><span class="lbl" data-i="plan.what">What</span><input type="text" id="s_title" data-ip="plan.whatph"></label>
+    </div>
+    <label class="f"><span class="lbl" data-i="plan.note">Note (meeting point, booking, ₩)</span><input type="text" id="s_note" data-ip="plan.noteph"></label>
+    <div class="row"><button class="btn" id="addslot" data-i="plan.add">Add to day</button></div>
+  </div>
+  <div id="planlist" class="stack"></div>
+</section>
+
+<!-- ========== SPLIT ========== -->
+<section class="pane" id="p-split" hidden style="--ln:var(--l1)">
+  <div class="head"><h2 data-i="sp.h">Who paid what</h2><p data-i="sp.p">log it the moment you tap the card</p></div>
+  <div class="tiles" id="sptiles"></div>
+
+  <div class="card" style="padding:13px 14px;display:flex;flex-direction:column;gap:10px">
+    <div class="row">
+      <label class="f" style="min-width:160px"><span class="lbl" data-i="sp.what">What for</span><input type="text" id="e_desc" data-ip="sp.whatph"></label>
+      <label class="f" style="max-width:130px"><span class="lbl" data-i="sp.amt">Amount</span><input type="number" id="e_amt" min="0" step="0.01" placeholder="0"></label>
+      <label class="f" style="max-width:110px"><span class="lbl" data-i="sp.cur">Currency</span><select id="e_cur"></select></label>
+    </div>
+    <div class="row">
+      <label class="f" style="max-width:170px"><span class="lbl" data-i="sp.payer">Paid by</span><select id="e_payer"></select></label>
+      <label class="f" style="max-width:150px"><span class="lbl" data-i="sp.day">Day</span><select id="e_day"></select></label>
+    </div>
+    <div>
+      <div class="row" style="justify-content:space-between;margin-bottom:7px">
+        <span class="lbl" data-i="sp.for">Split between</span>
+        <button class="btn ghost tiny" id="e_all" data-i="sp.all">everyone</button>
+      </div>
+      <div class="splitters" id="e_with"></div>
+    </div>
+    <div class="row"><button class="btn" id="addexp" data-i="sp.add">Add expense</button><span class="muted mono" id="e_hint" style="font-size:12px"></span></div>
+  </div>
+
+  <div class="head"><h2 data-i="sp.bal">Balances</h2><p data-i="sp.balp">plus is owed to you</p></div>
+  <div class="card" id="balances"></div>
+
+  <div class="head"><h2 data-i="sp.set">Settle up</h2><p data-i="sp.setp">fewest possible transfers</p></div>
+  <div class="card" id="settle"></div>
+
+  <div class="head"><h2 data-i="sp.log">Expense log</h2><p id="explogp"></p></div>
+  <div class="card" id="explist"></div>
+
+  <div class="row" style="margin-top:2px">
+    <button class="btn ghost" id="copyline" data-i="sp.copy">Copy summary for LINE</button>
+    <button class="btn ghost" id="copylink" data-i="sp.link">Copy this link</button>
+  </div>
+</section>
+
+<p class="foot" id="foot"></p>
+</main>
+
+<dialog id="medlg"><form method="dialog" class="dlg">
+  <h3 data-i="dlg.h">Claim your seat</h3>
+  <p class="muted" style="font-size:13px;margin:0 0 12px" data-i="dlg.p">Your name shows up on votes, plans and every won you spend.</p>
+  <label class="f" style="margin-bottom:12px"><span class="lbl" data-i="dlg.name">Name</span><input type="text" id="me_name" maxlength="24"></label>
+  <label class="f" style="margin-bottom:12px"><span class="lbl" data-i="dlg.flight">Flights (optional)</span><input type="text" id="me_flight" data-ip="dlg.flightph"></label>
+  <div class="row" style="justify-content:flex-end">
+    <button class="btn ghost" value="cancel" data-i="dlg.cancel">Cancel</button>
+    <button class="btn" id="me_save" value="ok" data-i="dlg.save">Save</button>
+  </div>
+</form></dialog>
+
+<script>
+"use strict";
+/* ───────────────────────── strings: en · zh · ja · ko · id ───────────────────────── */
+const LANGS=["en","zh","ja","ko","id"];
+const S={
+"tagline":["five passports · one october","五本護照 · 一個十月","5つのパスポート · ひとつの10月","여권 다섯 · 하나의 10월","lima paspor · satu oktober"],
+"whoami":["Who are you?","你是誰？","あなたは？","누구세요?","Kamu siapa?"],
+"t.trip":["Trip","行程","旅程","여행","Trip"],
+"t.prefs":["Taste","喜好","好み","취향","Selera"],
+"t.ideas":["Ideas","口袋名單","候補","아이디어","Ide"],
+"t.plan":["Plan","每日","日程","일정","Rencana"],
+"t.split":["Split","記帳","精算","정산","Patungan"],
+"hero.kicker":["Seoul · Republic of Korea","首爾 · 大韓民國","ソウル · 大韓民国","서울 · 대한민국","Seoul · Korea Selatan"],
+"cd.days":["days to go","天後出發","日後出発","일 남음","hari lagi"],
+"cd.nights":["nights","晚","泊","박","malam"],
+"cd.people":["of us","人","人","명","orang"],
+"cd.ideas":["ideas so far","個口袋名單","候補","개 아이디어","ide"],
+"cd.gone":["we're there","出發囉","出発済み","출발!","sudah berangkat"],
+"crew.h":["The crew","成員","メンバー","멤버","Anggota"],
+"crew.p":["tap your seat to claim it","點自己的位子登記","自分の席をタップ","자리를 눌러 등록","ketuk kursimu"],
+"crew.add":["+ add someone","+ 新增成員","+ メンバー追加","+ 사람 추가","+ tambah orang"],
+"seat.free":["free seat","空位","空席","빈자리","kursi kosong"],
+"seat.noflight":["no flight yet","航班未定","便未定","항공편 미정","belum ada penerbangan"],
+"ess.h":["Before we fly","出發前","出発前に","출발 전","Sebelum terbang"],
+"ess.p":["five passports, five sets of rules","五本護照，五套規則","旅券5冊、規則も5通り","여권 다섯, 규정도 다섯","lima paspor, lima aturan"],
+"ess1":["🇮🇩|Indonesian passport|Korea isn't visa-free for Indonesia — start the tourist visa now, it takes weeks. Everyone else: check whether you need K-ETA.","🇮🇩|印尼護照|韓國對印尼不免簽，觀光簽要及早送件（需數週）。其他人請確認自己要不要 K-ETA。","🇮🇩|インドネシア旅券|韓国はインドネシアにビザ免除ではありません。観光ビザを今すぐ申請（数週間）。他の人は K-ETA の要否を確認。","🇮🇩|인도네시아 여권|한국은 인도네시아 무비자 대상이 아닙니다. 관광 비자를 지금 신청하세요(몇 주 소요). 나머지는 K-ETA 필요 여부 확인.","🇮🇩|Paspor Indonesia|Korea tidak bebas visa untuk Indonesia — ajukan visa turis sekarang, butuh berminggu-minggu. Yang lain: cek K-ETA."],
+"ess2":["📱|Maps|Google Maps barely navigates in Korea. Install Naver Map or KakaoMap before you land.","📱|地圖|Google 地圖在韓國幾乎不能導航。落地前先裝 Naver Map 或 KakaoMap。","📱|地図|韓国では Google マップがほぼ案内できません。着陸前に Naver Map か KakaoMap を。","📱|지도|외국 번호로는 구글 지도 길찾기가 제한됩니다. 네이버 지도·카카오맵을 미리 받아 두세요.","📱|Peta|Google Maps nyaris tak bisa navigasi di Korea. Pasang Naver Map atau KakaoMap sebelum mendarat."],
+"ess3":["💳|T-money|One card for subway, buses and most taxis. Any convenience store sells and tops it up — cash.","💳|T-money 卡|地鐵、公車、多數計程車都能用。超商就能買和加值，收現金。","💳|T-money|地下鉄・バス・多くのタクシーで使用可。コンビニで購入とチャージ（現金）。","💳|티머니|지하철·버스·대부분 택시에서 사용. 편의점에서 구매·충전(현금).","💳|T-money|Satu kartu untuk subway, bus, dan hampir semua taksi. Beli & isi ulang di minimarket, tunai."],
+"ess4":["📶|Data|Decide as a group: five eSIMs, or one pocket wifi we share. Book before the trip, not at the airport.","📶|網路|群組先決定：各自 eSIM，還是共用一台 WiFi 機。出發前訂好，別到機場才買。","📶|通信|各自 eSIM か、みんなで WiFi ルーター1台か。空港ではなく事前に予約。","📶|데이터|각자 eSIM 쓸지, 포켓 와이파이 하나를 나눌지 미리 정하기. 공항 말고 사전 예약.","📶|Data|Putuskan bersama: eSIM masing-masing atau satu pocket wifi patungan. Pesan sebelum berangkat."],
+"ess5":["🍁|Mid-October|Roughly 10–20 °C and genuinely cold after dark. Bring a real jacket — the leaves are just turning.","🍁|十月中|大約 10–20°C，入夜真的冷。帶件像樣的外套，楓葉正要轉紅。","🍁|10月中旬|およそ10〜20℃、夜はかなり冷えます。上着は本気のものを。紅葉は色づき始め。","🍁|10월 중순|10–20℃, 해 지면 꽤 춥습니다. 제대로 된 외투 필수. 단풍 들기 시작할 때.","🍁|Pertengahan Oktober|Sekitar 10–20 °C dan benar-benar dingin setelah gelap. Bawa jaket tebal."],
+"ess6":["🧾|Tax refund|Over ₩15,000 in one shop: keep the receipt and your passport, claim it at the airport.","🧾|退稅|同一間店超過 ₩15,000：收據和護照留著，機場辦退稅。","🧾|税金還付|1店舗₩15,000超：レシートとパスポートを保管し空港で還付。","🧾|택스 리펀드|한 매장 ₩15,000 초과 시 영수증·여권 보관, 공항에서 환급.","🧾|Tax refund|Di atas ₩15.000 dalam satu toko: simpan struk dan paspor, klaim di bandara."],
+"link.h":["Shared boards","共同編輯的表格","共同編集","같이 쓰는 표","Papan bersama"],
+"link.p":["Notion holds what we edit together","一起改的東西放在 Notion","一緒に編集するものは Notion に","같이 고치는 건 Notion에","Yang diedit bersama ada di Notion"],
+"link.go":["Open the Notion boards →","打開 Notion 共同計畫 →","Notion を開く →","Notion 열기 →","Buka Notion →"],
+"link.what":["Crew & taste · Ideas & votes · Itinerary · Expenses","成員喜好 · 口袋名單投票 · 每日行程 · 記帳","メンバー · 候補と投票 · 日程 · 精算","멤버 · 아이디어 · 일정 · 정산","Anggota · Ide & voting · Jadwal · Patungan"],
+"link.copy":["Copy the link for LINE","複製連結貼到 LINE","LINE用にリンクをコピー","LINE에 붙일 링크 복사","Salin tautan untuk LINE"],
+"fx.h":["Exchange rates","匯率","為替レート","환율","Kurs"],
+"fx.p":["KRW per 1 unit — edit before we go","1 單位兌韓元 — 出發前更新","1単位あたりのウォン — 出発前に更新","1단위당 원 — 출발 전 수정","KRW per 1 unit — ubah sebelum pergi"],
+"fx.note":["Everything in Split is stored in won and shown in your own currency.","記帳一律以韓元儲存，再換算成你的幣別顯示。","精算はウォンで保存し、各自の通貨で表示します。","정산은 원화로 저장하고 각자 통화로 보여 줍니다.","Semua di Patungan disimpan dalam won lalu ditampilkan dalam mata uangmu."],
+"pref.h":["What you want","你的喜好","あなたの希望","당신의 취향","Maumu apa"],
+"pref.p":["visible to the whole group","全員都看得到","全員に公開されます","모두에게 보입니다","terlihat oleh semua"],
+"pref.act":["I'm here for…","我最想要…","目的は…","나는 이걸 하러 간다…","Aku ke sana untuk…"],
+"pref.area":["Base us around…","住宿想在…","拠点にしたいのは…","숙소는 이 근처…","Menginap di sekitar…"],
+"pref.stay":["Stay","住宿型態","宿の種類","숙소 형태","Penginapan"],
+"pref.pace":["Pace","步調","ペース","일정 강도","Tempo"],
+"pref.budget":["Budget for the whole trip","整趟預算","旅行全体の予算","여행 전체 예산","Budget seluruh trip"],
+"pref.cur":["Currency","幣別","通貨","통화","Mata uang"],
+"pref.food":["Food I can't eat","飲食禁忌","食べられないもの","못 먹는 음식","Yang tidak bisa kumakan"],
+"pref.note":["One thing I really don't want to miss","絕對不想錯過的一件事","絶対に外せないこと","절대 놓치기 싫은 것","Satu hal yang wajib"],
+"pref.noteph":["Gwangjang market at night, a proper jjimjilbang, …","廣藏市場的夜晚、正統汗蒸幕⋯","夜の広蔵市場、本格チムジルバン…","밤의 광장시장, 제대로 된 찜질방…","Pasar Gwangjang malam hari, jjimjilbang…"],
+"pref.save":["Save","儲存","保存","저장","Simpan"],
+"pref.saved":["saved","已儲存","保存しました","저장됨","tersimpan"],
+"agg.h":["Where we agree","共識","一致点","우리의 공통점","Titik temu"],
+"agg.p":["live tally","即時統計","リアルタイム集計","실시간 집계","hitungan langsung"],
+"agg.top":["Most wanted","最多人想要","人気","최다 선택","Paling diminati"],
+"agg.area":["Where to stay","住宿區域","エリア","숙소 지역","Area menginap"],
+"agg.budget":["Budget, in won","預算（韓元）","予算（ウォン）","예산(원)","Budget dalam won"],
+"agg.pace":["Pace","步調","ペース","일정 강도","Tempo"],
+"agg.food":["Watch out for","要注意","注意","주의","Perhatikan"],
+"agg.low":["lowest","最低","最低","최저","terendah"],
+"agg.avg":["average","平均","平均","평균","rata-rata"],
+"agg.high":["highest","最高","最高","최고","tertinggi"],
+"agg.none":["Nobody has filled this in yet — you go first.","還沒有人填，你先來。","まだ誰も入力していません。最初の一人に。","아직 아무도 안 썼어요. 먼저 해 보세요.","Belum ada yang mengisi — kamu duluan."],
+"ans.h":["Everyone's answers","每個人的答案","みんなの回答","모두의 답변","Jawaban semua orang"],
+"ans.n":["of us answered","人已填","人が回答","명 응답","orang menjawab"],
+"idea.h":["Ideas board","口袋名單","候補リスト","아이디어 보드","Papan ide"],
+"idea.p":["drop it here, then vote","丟上來，然後投票","投稿して投票","올리고 투표하기","tulis lalu voting"],
+"idea.name":["Place or thing","地點或活動","場所・こと","장소 또는 활동","Tempat atau kegiatan"],
+"idea.nameph":["Gwangjang Market","廣藏市場","広蔵市場","광장시장","Pasar Gwangjang"],
+"idea.cat":["Kind","類型","種類","종류","Jenis"],
+"idea.link":["Link (map, blog, IG)","連結（地圖、部落格、IG）","リンク（地図・ブログ・IG）","링크(지도·블로그·IG)","Tautan (peta, blog, IG)"],
+"idea.why":["Why","理由","理由","이유","Alasan"],
+"idea.whyph":["mung bean pancakes, cash only","綠豆煎餅，只收現金","緑豆チヂミ、現金のみ","녹두전, 현금만","bindaetteok, tunai saja"],
+"idea.add":["Add idea","加入","追加","추가","Tambah"],
+"idea.none":["Nothing here yet. Add the first place.","還沒有東西，加第一個吧。","まだ空です。最初の一件を。","아직 비어 있어요. 첫 장소를 추가하세요.","Masih kosong. Tambahkan yang pertama."],
+"idea.all":["all","全部","すべて","전체","semua"],
+"vote":["votes","票","票","표","suara"],
+"plan.h":["The day plan","每日行程","日程表","일정표","Rencana harian"],
+"plan.p":["nothing is fixed until we all see it","大家都看過才算數","全員が見て初めて確定","다 같이 봐야 확정","belum fix sampai semua lihat"],
+"plan.day":["Day","日","日","날짜","Hari"],
+"plan.time":["Time","時間","時刻","시간","Jam"],
+"plan.what":["What","做什麼","内容","무엇","Apa"],
+"plan.whatph":["Bukchon walk","北村散步","北村さんぽ","북촌 산책","Jalan-jalan Bukchon"],
+"plan.note":["Note (meeting point, booking, ₩)","備註（集合點、訂位、金額）","メモ（集合場所・予約・₩）","메모(집합 장소·예약·₩)","Catatan (titik kumpul, booking, ₩)"],
+"plan.noteph":["Meet at Anguk exit 2","安國站 2 號出口集合","安国駅2番出口集合","안국역 2번 출구","Kumpul di Anguk exit 2"],
+"plan.add":["Add to day","加入行程","日程に追加","일정에 추가","Tambah ke hari itu"],
+"plan.none":["Nothing planned for this day.","這天還空著。","この日はまだ空です。","이 날은 비어 있어요.","Hari ini masih kosong."],
+"sp.h":["Who paid what","誰付了什麼","誰が何を払ったか","누가 뭘 냈나","Siapa bayar apa"],
+"sp.p":["log it the moment you tap the card","刷完卡就記一筆","支払った瞬間に記録","결제한 순간 바로 기록","catat begitu selesai bayar"],
+"sp.what":["What for","項目","項目","항목","Untuk apa"],
+"sp.whatph":["Korean BBQ, Hongdae","弘大烤肉","ホンデの焼肉","홍대 고깃집","BBQ Korea, Hongdae"],
+"sp.amt":["Amount","金額","金額","금액","Jumlah"],
+"sp.cur":["Currency","幣別","通貨","통화","Mata uang"],
+"sp.payer":["Paid by","誰付的","支払った人","결제자","Dibayar oleh"],
+"sp.day":["Day","日期","日","날짜","Hari"],
+"sp.for":["Split between","分攤給","割り勘の相手","분담 대상","Dibagi ke"],
+"sp.all":["everyone","全選","全員","전체","semua"],
+"sp.add":["Add expense","記一筆","記録する","기록","Catat"],
+"sp.total":["Trip total","總支出","合計","총 지출","Total trip"],
+"sp.head":["Per person","每人平均","一人あたり","1인당","Per orang"],
+"sp.you":["You're owed","別人欠你","受取","받을 돈","Kamu ditagih"],
+"sp.youowe":["You owe","你欠別人","支払","낼 돈","Kamu utang"],
+"sp.bal":["Balances","結餘","収支","잔액","Saldo"],
+"sp.balp":["plus means the group owes you","正數是別人欠你","プラスは受け取り","플러스면 받을 돈","plus berarti kamu ditagih"],
+"sp.set":["Settle up","結清","精算","정산하기","Selesaikan"],
+"sp.setp":["fewest possible transfers","最少的轉帳次數","最少の送金回数","최소 송금 횟수","transfer sesedikit mungkin"],
+"sp.settled":["All square. Nobody owes anybody.","扯平了，誰都不欠誰。","精算済み。貸し借りなし。","정산 완료. 서로 빚 없음.","Impas. Tidak ada yang berutang."],
+"sp.pays":["pays","付給","→","→","bayar ke"],
+"sp.log":["Expense log","明細","明細","내역","Log pengeluaran"],
+"sp.none":["No expenses yet.","還沒有任何支出。","支出はまだありません。","아직 지출이 없습니다.","Belum ada pengeluaran."],
+"sp.paid":["paid","付了","支払","결제","bayar"],
+"sp.copy":["Copy summary for LINE","複製摘要貼 LINE","LINE用サマリーをコピー","LINE용 요약 복사","Salin ringkasan untuk LINE"],
+"sp.link":["Copy this link","複製連結","リンクをコピー","링크 복사","Salin tautan"],
+"copied":["Copied","已複製","コピーしました","복사됨","Tersalin"],
+"dlg.h":["Claim your seat","登記你的位子","席を登録","자리 등록","Ambil kursimu"],
+"dlg.p":["Your name shows up on votes, plans and every won you spend.","你的名字會出現在投票、行程和每一筆花費上。","名前は投票・日程・支出に表示されます。","이름은 투표·일정·지출에 표시됩니다.","Namamu muncul di voting, rencana, dan tiap pengeluaran."],
+"dlg.name":["Name","名字","名前","이름","Nama"],
+"dlg.flight":["Flights (optional)","航班（選填）","フライト（任意）","항공편(선택)","Penerbangan (opsional)"],
+"dlg.flightph":["BR160 17 Oct 09:20 → 20 Oct 21:00","BR160 10/17 09:20 → 10/20 21:00","BR160 10/17 09:20 → 10/20 21:00","BR160 10/17 09:20 → 10/20 21:00","BR160 17 Okt 09:20 → 20 Okt 21:00"],
+"dlg.cancel":["Cancel","取消","キャンセル","취소","Batal"],
+"dlg.save":["Save","儲存","保存","저장","Simpan"],
+"dlg.taken":["is sitting here already. Is that you?","已經登記在這裡了，這是你嗎？","が既に登録されています。あなたですか？","님이 이미 등록되어 있습니다. 본인인가요?","sudah duduk di sini. Ini kamu?"],
+"needseat":["Claim your seat first — top right.","先在右上角登記你的位子。","先に右上で席を登録してください。","먼저 오른쪽 위에서 자리를 등록하세요.","Ambil kursimu dulu — kanan atas."],
+"del":["Delete this?","要刪掉嗎？","削除しますか？","삭제할까요?","Hapus ini?"],
+"offline":["This page keeps your notes on this device. What the group edits together lives in the Notion boards below.","這一頁只把資料存在你這台裝置。大家一起編輯的東西在下面的 Notion。","このページの入力はこの端末に保存されます。みんなで編集するものは下の Notion に。","이 페이지 입력은 이 기기에만 저장됩니다. 함께 고치는 내용은 아래 Notion에 있습니다.","Halaman ini menyimpan catatanmu di perangkat ini. Yang diedit bersama ada di Notion di bawah."],
+"foot":["Shared notebook for 17–20 Oct. Everything typed here is visible to everyone with the link.","10/17–20 的共同筆記本。這裡打的東西，有連結的人都看得到。","10/17–20 の共有ノート。ここに書いたことはリンクを持つ全員に見えます。","10월 17–20일 공동 노트. 여기 적은 내용은 링크가 있는 모두에게 보입니다.","Catatan bersama 17–20 Okt. Semua yang ditulis terlihat oleh pemegang tautan."]
+};
+const ACTS=[["food","Food & street eats","美食小吃","グルメ・屋台","맛집·길거리 음식","Kuliner & jajanan"],
+["sight","Palaces & sights","宮殿景點","宮殿・名所","궁궐·명소","Istana & wisata"],
+["shop","Shopping","購物","ショッピング","쇼핑","Belanja"],
+["cafe","Cafés","咖啡廳","カフェ","카페","Kafe"],
+["night","Nightlife","夜生活","ナイトライフ","나이트라이프","Dunia malam"],
+["nature","Autumn leaves & nature","楓葉自然","紅葉・自然","단풍·자연","Daun gugur & alam"],
+["kpop","K-pop & culture","K-pop 文化","K-POP・カルチャー","K팝·문화","K-pop & budaya"],
+["spa","Jjimjilbang","汗蒸幕","チムジルバン","찜질방","Jjimjilbang"],
+["photo","Photo spots","拍照景點","撮影スポット","사진 명소","Spot foto"]];
+const AREAS=[["hongdae","Hongdae","弘大","ホンデ","홍대","Hongdae"],
+["myeongdong","Myeongdong","明洞","明洞","명동","Myeongdong"],
+["gangnam","Gangnam","江南","江南","강남","Gangnam"],
+["seongsu","Seongsu","聖水","ソンス","성수","Seongsu"],
+["ikseon","Ikseon-dong / Jongno","益善洞・鍾路","益善洞・鍾路","익선동·종로","Ikseon-dong / Jongno"]];
+const STAYS=[["hotel","Hotel","飯店","ホテル","호텔","Hotel"],
+["guesthouse","Guesthouse","民宿","ゲストハウス","게스트하우스","Guesthouse"],
+["airbnb","Whole apartment","整層公寓","一棟貸し","아파트 전체","Apartemen utuh"],
+["hostel","Hostel dorm","青旅床位","ドミトリー","호스텔 도미","Hostel dorm"]];
+const PACES=[["chill","Chill","慢慢走","のんびり","여유롭게","Santai"],
+["balanced","Balanced","鬆緊適中","バランス","적당히","Seimbang"],
+["packed","Packed","排好排滿","詰め込む","빡세게","Padat"]];
+const FOODS=[["halal","Halal only","只吃清真","ハラルのみ","할랄만","Halal saja"],
+["pork","No pork","不吃豬","豚肉なし","돼지고기 X","Tanpa babi"],
+["beef","No beef","不吃牛","牛肉なし","소고기 X","Tanpa sapi"],
+["veg","Vegetarian","素食","ベジタリアン","채식","Vegetarian"],
+["seafood","Seafood allergy","海鮮過敏","魚介アレルギー","해산물 알레르기","Alergi seafood"],
+["spicy","Not spicy","不吃辣","辛いのが苦手","매운 거 X","Tidak pedas"]];
+const CATS=[["food","Food","美食","グルメ","맛집","Kuliner"],
+["cafe","Café","咖啡","カフェ","카페","Kafe"],
+["sight","Sight","景點","名所","명소","Wisata"],
+["shop","Shop","購物","買い物","쇼핑","Belanja"],
+["night","Night","夜生活","夜","야간","Malam"],
+["other","Other","其他","その他","기타","Lainnya"]];
+const CUR={KRW:{s:"₩",d:0},TWD:{s:"NT$",d:0},JPY:{s:"¥",d:0},HKD:{s:"HK$",d:0},IDR:{s:"Rp",d:0},USD:{s:"$",d:0}};
+const RATES0={KRW:1,TWD:45,JPY:9.5,HKD:185,IDR:0.088,USD:1440};
+const SEATS=[{id:"tw",flag:"🇹🇼",c:"--l2",cur:"TWD"},{id:"jp",flag:"🇯🇵",c:"--l3",cur:"JPY"},
+{id:"kr",flag:"🇰🇷",c:"--l5",cur:"KRW"},{id:"hk",flag:"🇭🇰",c:"--l4",cur:"HKD"},
+{id:"id",flag:"🇮🇩",c:"--l1",cur:"IDR"}];
+const EXTRA_C=["--l6","--l7","--l8","--l9"];
+const DAYS=["2026-10-17","2026-10-18","2026-10-19","2026-10-20"];
+const LOCALE={en:"en-GB",zh:"zh-TW",ja:"ja-JP",ko:"ko-KR",id:"id-ID"};
+
+/* ───────────────────────── state ───────────────────────── */
+let lang=(localStorage.getItem("sl.lang")||(navigator.language||"en").slice(0,2).replace("in","id"));
+if(!LANGS.includes(lang)) lang = (navigator.language||"").startsWith("zh")?"zh":"en";
+let me=localStorage.getItem("sl.me")||"";
+let pane="trip", ideaFilter="all", pendingSeat=null;
+const D={members:{},prefs:{},ideas:{},slots:{},expenses:{}};
+let CFG={rates:Object.assign({},RATES0)};
+let DB=null, saveTimer=null;
+
+const t=k=>{const v=S[k];return v?(v[LANGS.indexOf(lang)]||v[0]):k;};
+const opt=(row)=>row[LANGS.indexOf(lang)+1]||row[1];
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const nf=(n,d=0)=>Number(n||0).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+const won=n=>"₩"+nf(Math.round(n||0));
+function inCur(krw,c){const r=CFG.rates[c]||1;const v=krw/r;const m=CUR[c]||CUR.KRW;
+  return m.s+nf(v, v<50&&c!=="KRW"?1:0);}
+const rate=c=>Number(CFG.rates[c])||RATES0[c]||1;
+
+/* ───────────────────────── persistence ───────────────────────── */
+const LS="sl.data.v1";
+function loadLocal(){try{const o=JSON.parse(localStorage.getItem(LS)||"{}");
+  for(const k of ["members","prefs","ideas","slots","expenses"]) if(o[k]) D[k]=o[k];
+  if(o.cfg) CFG=o.cfg;}catch(e){}}
+function saveLocal(){try{localStorage.setItem(LS,JSON.stringify({members:D.members,prefs:D.prefs,ideas:D.ideas,slots:D.slots,expenses:D.expenses,cfg:CFG}));}catch(e){}}
+function put(coll,id,obj){
+  D[coll][id]=obj; saveLocal(); render();
+  if(DB) DB.doc(coll+"/"+id).set(obj).catch(e=>toast(e.code||"error"));
+}
+function drop(coll,id){
+  delete D[coll][id]; saveLocal(); render();
+  if(DB) DB.doc(coll+"/"+id).delete().catch(()=>{});
+}
+function putCfg(){ saveLocal(); render();
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{ if(DB) DB.doc("config/main").set(CFG).catch(()=>{}); },500);
+}
+async function connect(){
+  if(!window.claude||!claude.use) return;
+  let db=null; try{ db=await claude.use("db"); }catch(e){}
+  if(!db) return;
+  DB=db;
+  for(const coll of ["members","prefs","ideas","slots","expenses"]){
+    DB.collection(coll).onSnapshot(snap=>{
+      const next={}; snap.docs.forEach(d=>{ if(d.exists) next[d.id]=d.data(); });
+      D[coll]=next; saveLocal(); render();
+    },()=>{});
+  }
+  DB.doc("config/main").onSnapshot(s=>{
+    if(s.exists){ const v=s.data(); if(v&&v.rates){ CFG={rates:Object.assign({},RATES0,v.rates)}; saveLocal(); render(); } }
+  },()=>{});
+}
+
+/* ───────────────────────── helpers ───────────────────────── */
+function seatOf(id){ const b=SEATS.find(s=>s.id===id); if(b) return b;
+  const m=D.members[id]||{}; return {id,flag:m.flag||"🌏",c:m.c||"--l6",cur:m.cur||"USD"}; }
+function allSeats(){ const ids=SEATS.map(s=>s.id);
+  Object.keys(D.members).forEach(id=>{ if(!ids.includes(id)) ids.push(id); }); return ids; }
+function joined(){ return allSeats().filter(id=>D.members[id]&&D.members[id].name); }
+function nameOf(id){ const m=D.members[id]; return m&&m.name?m.name:(t("seat.free")); }
+function myCur(){ const m=D.members[me]; return (m&&m.cur)||seatOf(me).cur||"KRW"; }
+function av(id,size){ const s=seatOf(id), n=nameOf(id);
+  return '<span class="av" style="background:var('+s.c+')'+(size?';width:'+size+'px;height:'+size+'px;font-size:'+(size*0.5)+'px':'')+'">'+esc(n.slice(0,1).toUpperCase())+'</span>'; }
+function toast(msg){ const el=document.createElement("div"); el.className="toast"; el.textContent=msg;
+  document.body.appendChild(el); setTimeout(()=>el.remove(),1900); }
+function fmtDay(i,opts){ const d=new Date(DAYS[i]+"T00:00:00");
+  return d.toLocaleDateString(LOCALE[lang]||"en-GB",opts||{month:"short",day:"numeric",weekday:"short"}); }
+function needMe(){ if(!me||!D.members[me]){ toast(t("needseat")); return true; } return false; }
+
+/* ───────────────────────── i18n plumbing ───────────────────────── */
+function fillSel(el,rows,val){ el.innerHTML=rows.map(r=>'<option value="'+r[0]+'">'+esc(opt(r))+'</option>').join("");
+  if(val!=null) el.value=val; }
+function fillCur(el,val){ el.innerHTML=Object.keys(CUR).map(c=>'<option value="'+c+'">'+c+'</option>').join(""); if(val) el.value=val; }
+function fillDays(el,val){ el.innerHTML=DAYS.map((d,i)=>'<option value="'+i+'">'+esc(fmtDay(i))+'</option>').join(""); if(val!=null) el.value=val; }
+function applyI18n(){
+  document.documentElement.setAttribute("lang",lang);
+  $$("[data-i]").forEach(el=>el.textContent=t(el.dataset.i));
+  $$("[data-ip]").forEach(el=>el.placeholder=t(el.dataset.ip));
+  $("#lang").value=lang;
+  const keep=id=>$(id).value;
+  const kStay=keep("#p_stay"),kPace=keep("#p_pace"),kCat=keep("#i_cat"),kSDay=keep("#s_day"),kEDay=keep("#e_day");
+  fillSel($("#p_stay"),STAYS,kStay||"hotel"); fillSel($("#p_pace"),PACES,kPace||"balanced");
+  fillSel($("#i_cat"),CATS,kCat||"food"); fillDays($("#s_day"),kSDay||0); fillDays($("#e_day"),kEDay||0);
+  $("#foot").textContent=t("foot");
+  chipset("#actchips",ACTS); chipset("#areachips",AREAS); chipset("#foodchips",FOODS);
+  const f=$("#ideafilter");
+  f.innerHTML='<button class="chip" data-f="all" aria-pressed="'+(ideaFilter==="all")+'">'+esc(t("idea.all"))+'</button>'+
+    CATS.map(c=>'<button class="chip" data-f="'+c[0]+'" aria-pressed="'+(ideaFilter===c[0])+'">'+esc(opt(c))+'</button>').join("");
+}
+function chipset(sel,rows){ const box=$(sel); const on=new Set([...box.querySelectorAll('[aria-pressed="true"]')].map(b=>b.dataset.v));
+  box.innerHTML=rows.map(r=>'<button type="button" class="chip" data-v="'+r[0]+'" aria-pressed="'+on.has(r[0])+'">'+esc(opt(r))+'</button>').join(""); }
+function setChips(sel,vals){ const v=new Set(vals||[]);
+  $$(sel+" .chip").forEach(b=>b.setAttribute("aria-pressed", v.has(b.dataset.v))); }
+function getChips(sel){ return $$(sel+' .chip[aria-pressed="true"]').map(b=>b.dataset.v); }
+
+/* ───────────────────────── render ───────────────────────── */
+let sigMembers="", prefFor=null;
+function render(){
+  renderTrip(); renderPrefs(); renderIdeas(); renderPlan(); renderSplit(); renderMeBtn();
+}
+function renderMeBtn(){
+  const m=D.members[me];
+  $("#melabel").textContent = m&&m.name ? m.name : t("whoami");
+  const a=$("#meav");
+  if(m&&m.name){ a.style.display="grid"; a.style.background="var("+seatOf(me).c+")"; a.textContent=m.name.slice(0,1).toUpperCase(); }
+  else a.style.display="none";
+}
+function renderTrip(){
+  const start=new Date(DAYS[0]+"T00:00:00"), end=new Date(DAYS[3]+"T23:59:59");
+  const d=new Date(DAYS[0]+"T00:00:00");
+  $("#d1").textContent="17"; $("#d2").textContent="20";
+  $("#mon").textContent=d.toLocaleDateString(LOCALE[lang]||"en-GB",{month:"short"}).toUpperCase();
+  $("#yr").textContent="2026";
+  $("#daystrip").innerHTML=DAYS.map((x,i)=>{const dd=new Date(x+"T00:00:00");
+    return '<div><b>'+dd.getDate()+'</b><span>'+esc(dd.toLocaleDateString(LOCALE[lang]||"en-GB",{weekday:"short"}))+'</span></div>';}).join("");
+  const left=Math.ceil((start-new Date())/864e5);
+  const ideas=Object.keys(D.ideas).length;
+  $("#cdown").innerHTML=
+    (left>0?'<div><b>'+left+'</b><span class="lbl">'+esc(t("cd.days"))+'</span></div>'
+           :'<div><b>·</b><span class="lbl">'+esc(t("cd.gone"))+'</span></div>')+
+    '<div><b>3</b><span class="lbl">'+esc(t("cd.nights"))+'</span></div>'+
+    '<div><b>'+joined().length+'</b><span class="lbl">'+esc(t("cd.people"))+'</span></div>'+
+    '<div><b>'+ideas+'</b><span class="lbl">'+esc(t("cd.ideas"))+'</span></div>';
+
+  $("#seats").innerHTML=allSeats().map(id=>{const s=seatOf(id),m=D.members[id];
+    return '<button class="seat'+(m&&m.name?"":" free")+(id===me?" isme":"")+'" data-seat="'+id+'" style="--ln:var('+s.c+')">'+
+      '<span class="nm">'+s.flag+' '+esc(m&&m.name?m.name:t("seat.free"))+'</span>'+
+      '<span class="fl">'+esc(m&&m.flight?m.flight:t("seat.noflight"))+'</span></button>';}).join("");
+
+  $("#essentials").innerHTML=["ess1","ess2","ess3","ess4","ess5","ess6"].map(k=>{
+    const p=t(k).split("|"); return '<li><span>'+p[0]+'</span><span><b>'+esc(p[1])+'</b> — '+esc(p[2])+'</span></li>';}).join("");
+
+  $("#rates").innerHTML=Object.keys(CUR).filter(c=>c!=="KRW").map(c=>
+    '<label>'+CUR[c].s+' 1 '+c+' =<input type="number" step="0.001" min="0" data-rate="'+c+'" value="'+rate(c)+'"></label>').join("");
+}
+function renderPrefs(){
+  const list=joined(), answered=list.filter(id=>D.prefs[id]);
+  if(prefFor!==me){ prefFor=me; const p=D.prefs[me]||{};
+    setChips("#actchips",p.acts); setChips("#areachips",p.areas); setChips("#foodchips",p.food);
+    $("#p_stay").value=p.stay||"hotel"; $("#p_pace").value=p.pace||"balanced";
+    $("#p_budget").value=p.budget||""; fillCur($("#p_cur"),p.cur||myCur()); $("#p_note").value=p.note||"";
+    budgetHint(); }
+  $("#anscount").textContent=answered.length+" / "+Math.max(list.length,answered.length)+" "+t("ans.n");
+
+  const agg=$("#aggcard");
+  if(!answered.length){ agg.innerHTML='<div class="empty">'+esc(t("agg.none"))+'</div>'; }
+  else{
+    const tally=(rows,field)=>{const c={};answered.forEach(id=>((D.prefs[id]||{})[field]||[]).forEach(v=>c[v]=(c[v]||0)+1));
+      return rows.filter(r=>c[r[0]]).sort((a,b)=>c[b[0]]-c[a[0]]).map(r=>[opt(r),c[r[0]]]);};
+    const bars=(arr)=>arr.map(([label,n])=>'<div class="bar"><div>'+esc(label)+
+      '<div class="track"><div class="fill" style="width:'+Math.round(n/answered.length*100)+'%"></div></div></div>'+
+      '<div class="n">'+n+'/'+answered.length+'</div></div>').join("");
+    const buds=answered.map(id=>{const p=D.prefs[id];return Number(p.budget||0)*rate(p.cur||"KRW");}).filter(v=>v>0);
+    const paceC={}; answered.forEach(id=>{const v=(D.prefs[id]||{}).pace; if(v) paceC[v]=(paceC[v]||0)+1;});
+    const foodC={}; answered.forEach(id=>((D.prefs[id]||{}).food||[]).forEach(v=>{(foodC[v]=foodC[v]||[]).push(nameOf(id));}));
+    agg.innerHTML=
+      '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.top"))+'</div><div class="bars">'+bars(tally(ACTS,"acts"))+'</div></div>'+
+      '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.area"))+'</div><div class="bars">'+bars(tally(AREAS,"areas"))+'</div></div>'+
+      (buds.length?'<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.budget"))+'</div><dl class="kv">'+
+        '<dt>'+esc(t("agg.low"))+'</dt><dd>'+won(Math.min(...buds))+'</dd>'+
+        '<dt>'+esc(t("agg.avg"))+'</dt><dd>'+won(buds.reduce((a,b)=>a+b,0)/buds.length)+'</dd>'+
+        '<dt>'+esc(t("agg.high"))+'</dt><dd>'+won(Math.max(...buds))+'</dd></dl></div>':"")+
+      '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.pace"))+'</div><div class="chipset">'+
+        PACES.filter(p=>paceC[p[0]]).map(p=>'<span class="tag">'+esc(opt(p))+' · '+paceC[p[0]]+'</span>').join("")+'</div></div>'+
+      (Object.keys(foodC).length?'<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.food"))+'</div><div class="chipset">'+
+        FOODS.filter(f=>foodC[f[0]]).map(f=>'<span class="tag" style="border-color:var(--warn);color:var(--warn)">'+esc(opt(f))+' · '+esc(foodC[f[0]].join(", "))+'</span>').join("")+'</div></div>':"");
+  }
+  const A=$("#answers");
+  A.innerHTML=answered.length? answered.map(id=>{const p=D.prefs[id];
+    const tags=(rows,vals)=>(vals||[]).map(v=>{const r=rows.find(x=>x[0]===v);return r?'<span class="tag">'+esc(opt(r))+'</span>':"";}).join("");
+    const st=STAYS.find(x=>x[0]===p.stay), pc=PACES.find(x=>x[0]===p.pace);
+    return '<div class="item"><div class="body">'+
+      '<div class="ttl"><span class="who">'+av(id)+esc(nameOf(id))+'</span></div>'+
+      '<div class="chipset">'+tags(ACTS,p.acts)+tags(AREAS,p.areas)+
+        (st?'<span class="tag">'+esc(opt(st))+'</span>':"")+(pc?'<span class="tag">'+esc(opt(pc))+'</span>':"")+
+        (p.budget?'<span class="tag">'+won(Number(p.budget)*rate(p.cur))+'</span>':"")+
+        tags(FOODS,p.food)+'</div>'+
+      (p.note?'<div class="sub" style="color:var(--ink2)">“'+esc(p.note)+'”</div>':"")+
+      '</div></div>';}).join("") : '<div class="empty">'+esc(t("agg.none"))+'</div>';
+}
+function renderIdeas(){
+  const ids=Object.keys(D.ideas).filter(k=>ideaFilter==="all"||D.ideas[k].cat===ideaFilter)
+    .sort((a,b)=>{const va=Object.keys(D.ideas[a].votes||{}).length, vb=Object.keys(D.ideas[b].votes||{}).length;
+      return vb-va||(D.ideas[a].ts||0)-(D.ideas[b].ts||0);});
+  $("#idealist").innerHTML= ids.length? ids.map(id=>{const it=D.ideas[id];
+    const vs=Object.keys(it.votes||{}), cat=CATS.find(c=>c[0]===it.cat);
+    return '<div class="item"><div class="body">'+
+      '<div class="ttl">'+(it.link?'<a href="'+esc(it.link)+'" target="_blank" rel="noopener" style="color:inherit">'+esc(it.title)+' ↗</a>':esc(it.title))+'</div>'+
+      '<div class="sub">'+(cat?'<span class="tag">'+esc(opt(cat))+'</span>':"")+
+        (it.note?'<span>'+esc(it.note)+'</span>':"")+'</div>'+
+      '<div class="sub"><span class="who">'+av(it.by)+esc(nameOf(it.by))+'</span>'+
+        (vs.length?'<span class="avstack">'+vs.map(v=>av(v)).join("")+'</span>':"")+'</div></div>'+
+      '<button class="vote" data-vote="'+id+'" aria-pressed="'+vs.includes(me)+'"><b>'+vs.length+'</b><small>'+esc(t("vote"))+'</small></button>'+
+      '<button class="x" data-del="ideas:'+id+'" aria-label="delete">✕</button></div>';}).join("")
+    : '<div class="empty">'+esc(t("idea.none"))+'</div>';
+}
+function renderPlan(){
+  $("#planlist").innerHTML=DAYS.map((d,i)=>{
+    const rows=Object.keys(D.slots).filter(k=>Number(D.slots[k].day)===i)
+      .sort((a,b)=>String(D.slots[a].time||"").localeCompare(String(D.slots[b].time||"")));
+    return '<div class="card" style="--ln:var(--l'+(i+2)+')"><div class="dayhead"><span class="n">'+(i+1)+'</span>'+
+      '<b>'+esc(fmtDay(i,{month:"short",day:"numeric"}))+'</b><span class="muted" style="font-size:12px">'+
+      esc(fmtDay(i,{weekday:"long"}))+'</span></div>'+
+      (rows.length? rows.map(id=>{const s=D.slots[id];
+        return '<div class="slot"><div class="tm">'+esc(s.time||"—")+'</div>'+
+          '<div><div style="font-weight:700;font-size:14.5px">'+esc(s.title)+'</div>'+
+          (s.note?'<div class="sub muted" style="font-size:12.5px">'+esc(s.note)+'</div>':"")+
+          '<div class="sub"><span class="who">'+av(s.by)+esc(nameOf(s.by))+'</span></div></div>'+
+          '<button class="x" data-del="slots:'+id+'" aria-label="delete">✕</button></div>';}).join("")
+        : '<div class="empty">'+esc(t("plan.none"))+'</div>')+'</div>';}).join("");
+}
+function renderSplit(){
+  const crew=joined(); const sig=crew.join(",");
+  if(sig!==sigMembers){ sigMembers=sig;
+    $("#e_payer").innerHTML=crew.map(id=>'<option value="'+id+'">'+esc(nameOf(id))+'</option>').join("");
+    if(me&&crew.includes(me)) $("#e_payer").value=me;
+    $("#e_with").innerHTML=crew.map(id=>'<button type="button" class="chip" data-w="'+id+'" aria-pressed="true">'+esc(nameOf(id))+'</button>').join("");
+    fillCur($("#e_cur"),myCur());
+  }
+  const exps=Object.keys(D.expenses).sort((a,b)=>(D.expenses[a].day-D.expenses[b].day)||(D.expenses[a].ts||0)-(D.expenses[b].ts||0));
+  const total=exps.reduce((s,k)=>s+Number(D.expenses[k].krw||0),0);
+  const bal={}; crew.forEach(id=>bal[id]=0);
+  exps.forEach(k=>{const e=D.expenses[k]; const w=(e.with||[]).filter(x=>bal[x]!==undefined);
+    if(!w.length) return; const each=Number(e.krw||0)/w.length;
+    if(bal[e.payer]!==undefined) bal[e.payer]+=Number(e.krw||0);
+    w.forEach(x=>bal[x]-=each);});
+  const mine=bal[me]||0;
+  $("#sptiles").innerHTML=
+    '<div class="tile"><span class="lbl">'+esc(t("sp.total"))+'</span><b>'+won(total)+'</b><small>'+inCur(total,myCur())+'</small></div>'+
+    '<div class="tile"><span class="lbl">'+esc(t("sp.head"))+'</span><b>'+won(crew.length?total/crew.length:0)+'</b><small>'+inCur(crew.length?total/crew.length:0,myCur())+'</small></div>'+
+    '<div class="tile"><span class="lbl">'+esc(mine>=0?t("sp.you"):t("sp.youowe"))+'</span><b class="'+(mine>=0?"pos":"neg")+'">'+won(Math.abs(mine))+'</b><small>'+inCur(Math.abs(mine),myCur())+'</small></div>';
+
+  $("#balances").innerHTML= crew.length? crew.map(id=>
+    '<div class="bal"><span class="who">'+av(id)+esc(nameOf(id))+'</span>'+
+    '<span class="amt '+(bal[id]>=0?"pos":"neg")+'">'+(bal[id]>=0?"+":"−")+won(Math.abs(bal[id]))+'</span></div>').join("")
+    : '<div class="empty">'+esc(t("crew.p"))+'</div>';
+
+  const cr=crew.filter(i=>bal[i]>1).map(i=>({i,v:bal[i]})).sort((a,b)=>b.v-a.v);
+  const de=crew.filter(i=>bal[i]<-1).map(i=>({i,v:-bal[i]})).sort((a,b)=>b.v-a.v);
+  const moves=[]; let ci=0,di=0;
+  while(ci<cr.length&&di<de.length){ const amt=Math.min(cr[ci].v,de[di].v);
+    if(amt>1) moves.push([de[di].i,cr[ci].i,amt]);
+    cr[ci].v-=amt; de[di].v-=amt; if(cr[ci].v<=1)ci++; if(de[di].v<=1)di++; }
+  $("#settle").innerHTML= moves.length? moves.map(([f,to,a])=>
+    '<div class="settle"><span class="who">'+av(f)+esc(nameOf(f))+'</span><span class="arrow">→</span>'+
+    '<span class="who">'+av(to)+esc(nameOf(to))+'</span><span class="grow"></span>'+
+    '<span class="amt mono" style="font-weight:500">'+won(a)+'</span>'+
+    '<span class="muted mono" style="font-size:11.5px">'+inCur(a,seatOf(f).cur)+'</span></div>').join("")
+    : '<div class="empty">'+esc(t("sp.settled"))+'</div>';
+
+  $("#explogp").textContent=exps.length+" · "+won(total);
+  $("#explist").innerHTML= exps.length? exps.map(k=>{const e=D.expenses[k];
+    return '<div class="item"><div class="body"><div class="ttl">'+esc(e.desc)+'</div>'+
+      '<div class="sub"><span class="tag">'+esc(fmtDay(Number(e.day)||0,{month:"short",day:"numeric"}))+'</span>'+
+      '<span class="who">'+av(e.payer)+esc(nameOf(e.payer))+' '+esc(t("sp.paid"))+'</span>'+
+      '<span class="avstack">'+(e.with||[]).map(x=>av(x)).join("")+'</span></div></div>'+
+      '<div style="text-align:right"><div class="mono" style="font-weight:500">'+won(e.krw)+'</div>'+
+      (e.cur!=="KRW"?'<div class="mono muted" style="font-size:11.5px">'+(CUR[e.cur]||CUR.KRW).s+nf(e.amt,0)+'</div>':"")+'</div>'+
+      '<button class="x" data-del="expenses:'+k+'" aria-label="delete">✕</button></div>';}).join("")
+    : '<div class="empty">'+esc(t("sp.none"))+'</div>';
+}
+function budgetHint(){ const v=Number($("#p_budget").value||0), c=$("#p_cur").value||"KRW";
+  $("#budgethint").textContent = v>0 ? "≈ "+won(v*rate(c)) : ""; }
+
+/* ───────────────────────── events ───────────────────────── */
+$("#rail").addEventListener("click",e=>{const b=e.target.closest(".stop"); if(!b)return;
+  pane=b.dataset.p;
+  $$(".stop").forEach(s=>s.setAttribute("aria-selected",s===b));
+  $$("section.pane").forEach(s=>s.hidden=(s.id!=="p-"+pane));
+  window.scrollTo({top:0,behavior:"instant"});});
+
+$("#lang").addEventListener("change",e=>{lang=e.target.value; localStorage.setItem("sl.lang",lang);
+  const p=D.prefs[me]||{}; applyI18n(); prefFor=null; sigMembers=""; render();
+  setChips("#actchips",p.acts); setChips("#areachips",p.areas); setChips("#foodchips",p.food);});
+
+document.addEventListener("click",e=>{
+  const chip=e.target.closest("#actchips .chip,#areachips .chip,#foodchips .chip,#e_with .chip");
+  if(chip){ chip.setAttribute("aria-pressed", chip.getAttribute("aria-pressed")!=="true"); return; }
+  const f=e.target.closest("#ideafilter .chip");
+  if(f){ ideaFilter=f.dataset.f; $$("#ideafilter .chip").forEach(c=>c.setAttribute("aria-pressed",c===f)); renderIdeas(); return; }
+  const seat=e.target.closest("[data-seat]"); if(seat){ openSeat(seat.dataset.seat); return; }
+  const v=e.target.closest("[data-vote]");
+  if(v){ if(needMe())return; const id=v.dataset.vote, it=Object.assign({},D.ideas[id]);
+    const votes=Object.assign({},it.votes||{});
+    if(votes[me]) delete votes[me]; else votes[me]=1;
+    it.votes=votes; put("ideas",id,it); return; }
+  const del=e.target.closest("[data-del]");
+  if(del){ const [c,id]=del.dataset.del.split(":"); if(confirm(t("del"))) drop(c,id); return; }
+});
+
+$("#mebtn").addEventListener("click",()=>{ if(me&&D.members[me]) openSeat(me);
+  else { toast(t("crew.p")); pane="trip"; $$(".stop").forEach(s=>s.setAttribute("aria-selected",s.dataset.p==="trip"));
+    $$("section.pane").forEach(s=>s.hidden=(s.id!=="p-trip")); window.scrollTo({top:0}); } });
+
+$("#addseat").addEventListener("click",()=>{
+  const id="x"+Math.random().toString(36).slice(2,6);
+  const used=allSeats().length-SEATS.length;
+  pendingSeat={id,flag:"🌏",c:EXTRA_C[used%EXTRA_C.length],cur:"USD",fresh:true};
+  $("#me_name").value=""; $("#me_flight").value=""; $("#medlg").showModal();});
+
+function openSeat(id){
+  const s=seatOf(id), m=D.members[id];
+  if(m&&m.name&&id!==me&&!confirm(m.name+" "+t("dlg.taken"))) return;
+  pendingSeat={id,flag:s.flag,c:s.c,cur:s.cur};
+  $("#me_name").value=m&&m.name?m.name:""; $("#me_flight").value=m&&m.flight?m.flight:"";
+  $("#medlg").showModal(); setTimeout(()=>$("#me_name").focus(),40);
+}
+$("#medlg").addEventListener("close",()=>{
+  if($("#medlg").returnValue!=="ok"||!pendingSeat) return;
+  const name=$("#me_name").value.trim(); if(!name) return;
+  const p=pendingSeat;
+  put("members",p.id,{name,flight:$("#me_flight").value.trim(),flag:p.flag,c:p.c,cur:p.cur});
+  me=p.id; localStorage.setItem("sl.me",me); prefFor=null; sigMembers=""; pendingSeat=null; render();});
+
+$("#rates").addEventListener("input",e=>{const c=e.target.dataset.rate; if(!c)return;
+  CFG.rates[c]=Number(e.target.value)||RATES0[c]; budgetHint(); saveLocal();
+  clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ if(DB) DB.doc("config/main").set(CFG).catch(()=>{}); renderSplit(); },400);});
+
+$("#p_budget").addEventListener("input",budgetHint);
+$("#p_cur").addEventListener("change",budgetHint);
+$("#savepref").addEventListener("click",()=>{ if(needMe())return;
+  put("prefs",me,{acts:getChips("#actchips"),areas:getChips("#areachips"),food:getChips("#foodchips"),
+    stay:$("#p_stay").value,pace:$("#p_pace").value,budget:Number($("#p_budget").value||0),
+    cur:$("#p_cur").value,note:$("#p_note").value.trim(),ts:Date.now()});
+  $("#prefsaved").textContent="✓ "+t("pref.saved"); setTimeout(()=>$("#prefsaved").textContent="",2400);});
+
+$("#addidea").addEventListener("click",()=>{ if(needMe())return;
+  const title=$("#i_title").value.trim(); if(!title){ $("#i_title").focus(); return; }
+  const id="i"+Date.now().toString(36);
+  put("ideas",id,{title,cat:$("#i_cat").value,link:$("#i_link").value.trim(),
+    note:$("#i_note").value.trim(),by:me,votes:{[me]:1},ts:Date.now()});
+  $("#i_title").value=""; $("#i_link").value=""; $("#i_note").value="";});
+
+$("#addslot").addEventListener("click",()=>{ if(needMe())return;
+  const title=$("#s_title").value.trim(); if(!title){ $("#s_title").focus(); return; }
+  put("slots","s"+Date.now().toString(36),{day:Number($("#s_day").value),time:$("#s_time").value,
+    title,note:$("#s_note").value.trim(),by:me,ts:Date.now()});
+  $("#s_title").value=""; $("#s_note").value="";});
+
+$("#e_all").addEventListener("click",()=>$$("#e_with .chip").forEach(c=>c.setAttribute("aria-pressed","true")));
+const ehint=()=>{const v=Number($("#e_amt").value||0),c=$("#e_cur").value;
+  $("#e_hint").textContent=v>0&&c!=="KRW"?"= "+won(v*rate(c)):"";};
+$("#e_amt").addEventListener("input",ehint); $("#e_cur").addEventListener("change",ehint);
+$("#addexp").addEventListener("click",()=>{ if(needMe())return;
+  const desc=$("#e_desc").value.trim(), amt=Number($("#e_amt").value||0);
+  if(!desc){ $("#e_desc").focus(); return; } if(!(amt>0)){ $("#e_amt").focus(); return; }
+  const w=$$('#e_with .chip[aria-pressed="true"]').map(c=>c.dataset.w);
+  if(!w.length){ toast(t("sp.for")); return; }
+  const cur=$("#e_cur").value;
+  put("expenses","e"+Date.now().toString(36),{desc,amt,cur,krw:amt*rate(cur),
+    payer:$("#e_payer").value||me,day:Number($("#e_day").value),with:w,by:me,ts:Date.now()});
+  $("#e_desc").value=""; $("#e_amt").value=""; ehint();});
+
+function summary(){
+  const crew=joined();
+  const top=Object.keys(D.ideas).sort((a,b)=>Object.keys(D.ideas[b].votes||{}).length-Object.keys(D.ideas[a].votes||{}).length).slice(0,5);
+  const exps=Object.keys(D.expenses); const total=exps.reduce((s,k)=>s+Number(D.expenses[k].krw||0),0);
+  const L=["🇰🇷 Seoul Loop — 17–20 Oct 2026",location.href,""];
+  L.push("👥 "+(crew.length?crew.map(id=>seatOf(id).flag+" "+nameOf(id)).join("  "):"—"));
+  if(top.length){ L.push(""); L.push("⭐ "+t("agg.top"));
+    top.forEach((k,i)=>L.push(" "+(i+1)+". "+D.ideas[k].title+"  ("+Object.keys(D.ideas[k].votes||{}).length+" "+t("vote")+")")); }
+  DAYS.forEach((d,i)=>{const rows=Object.keys(D.slots).filter(k=>Number(D.slots[k].day)===i)
+      .sort((a,b)=>String(D.slots[a].time||"").localeCompare(String(D.slots[b].time||"")));
+    if(rows.length){ L.push(""); L.push("📅 "+fmtDay(i));
+      rows.forEach(k=>L.push("  "+(D.slots[k].time||"—")+"  "+D.slots[k].title)); }});
+  if(total>0){ L.push(""); L.push("💰 "+t("sp.total")+" "+won(total)+" · "+t("sp.head")+" "+won(total/Math.max(crew.length,1))); }
+  return L.join("\n");
+}
+async function copy(text){ try{ await navigator.clipboard.writeText(text); toast(t("copied")); }
+  catch(e){ const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); toast(t("copied"));}catch(_){}
+    ta.remove(); } }
+$("#copyline").addEventListener("click",()=>copy(summary()));
+$("#copylink").addEventListener("click",()=>copy(location.href));
+$("#copylink2").addEventListener("click",()=>copy(location.href));
+
+/* ───────────────────────── boot ───────────────────────── */
+loadLocal(); applyI18n(); fillCur($("#p_cur"),myCur()); fillCur($("#e_cur"),myCur()); render();
+connect().then(()=>{ if(!DB){ const n=document.createElement("div"); n.className="notice";
+  n.textContent=t("offline"); $("#p-trip").insertBefore(n,$("#p-trip").firstChild); } });
+</script>
