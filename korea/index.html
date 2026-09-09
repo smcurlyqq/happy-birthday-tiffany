@@ -210,6 +210,50 @@ label.f{display:flex;flex-direction:column;gap:3px;flex:1;min-width:120px}
 .settle .amt{font-family:var(--disp);font-size:18px;font-variant-numeric:tabular-nums}
 .splitters{display:flex;flex-wrap:wrap;gap:6px}
 
+/* ── cover gate ───────────────────────────── */
+body.gated{overflow:hidden}
+.gate{position:fixed;inset:0;z-index:60;background:var(--paper);overflow-y:auto;
+  display:flex;flex-direction:column;justify-content:center}
+.gate[hidden]{display:none}
+.gate-in{width:100%;max-width:540px;margin:0 auto;padding:32px 22px 36px}
+.gcover{border-bottom:1.5px solid var(--ink);padding-bottom:14px;margin-bottom:20px}
+.gcover .gk{font-size:9.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3)}
+.gcover .gt{font-family:var(--disp);font-size:clamp(36px,11vw,54px);font-weight:400;line-height:.94;
+  letter-spacing:-.02em;margin-top:8px;display:flex;align-items:baseline;gap:0 12px;flex-wrap:wrap}
+#g_mon{font-style:italic;font-size:.74em}
+/* CJK reads month-first, and never in a faked oblique */
+:root[lang="zh"] #mon,:root[lang="ja"] #mon,:root[lang="ko"] #mon,
+:root[lang="zh"] #g_mon,:root[lang="ja"] #g_mon,:root[lang="ko"] #g_mon{
+  order:-1;font-style:normal;font-size:.5em;letter-spacing:.02em}
+.gcover .gt em{font-style:italic;color:var(--accent)}
+.gcover .gd{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);margin-top:9px}
+.glangs{display:flex;border:1px solid var(--rule2);margin-bottom:26px}
+.glang{flex:1;padding:9px 3px;border:0;border-right:1px solid var(--rule2);background:none;cursor:pointer;
+  font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--ink3);white-space:nowrap}
+.glang:last-child{border-right:0}
+.glang[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.gask{font-family:var(--disp);font-size:29px;font-weight:400;line-height:1.1;letter-spacing:-.01em}
+.gsub{font-size:12.5px;color:var(--ink3);margin:6px 0 20px;line-height:1.5}
+.gpick{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:12px;width:100%;
+  background:none;border:0;border-top:2px solid var(--ln);padding:12px 0 14px;cursor:pointer;
+  text-align:left;color:inherit;font:inherit}
+.gpick .gflag{font-size:17px;line-height:1}
+.gpick .gname{font-family:var(--disp);font-size:25px;font-weight:400;line-height:1}
+.gpick .gstate{font-size:8.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+.gpick:hover .gname,.gpick:focus-visible .gname{color:var(--accent)}
+.gpick.taken .gname{color:var(--ink3)}
+.gfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;
+  border-top:1px solid var(--rule);padding-top:14px;flex-wrap:wrap}
+.glink{background:none;border:0;padding:0;cursor:pointer;font-size:11px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);text-decoration:underline;text-underline-offset:3px}
+.glink:hover{color:var(--accent)}
+#gate2 .ghi{font-family:var(--disp);font-size:34px;font-weight:400;line-height:1.05;
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#gate2 .gfields{display:flex;flex-direction:column;gap:16px;margin:22px 0 24px}
+.gstep{animation:gin .3s ease both}
+@keyframes gin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.gstep{animation:none}}
+
 /* ── misc ─────────────────────────────────── */
 .notice{border-top:1px solid var(--accent);border-bottom:1px solid var(--accent);
   padding:11px 0;font-size:13px;color:var(--ink2)}
@@ -255,6 +299,42 @@ dialog::backdrop{background:rgba(20,18,15,.5)}
     </nav>
   </div>
 </header>
+
+<div class="gate" id="gate" hidden>
+  <div class="gate-in">
+    <div class="gcover">
+      <div class="gk">Seoul · Republic of Korea</div>
+      <div class="gt">17 <em>—</em> 20 <span id="g_mon">October</span></div>
+      <div class="gd" id="g_dates"></div>
+    </div>
+
+    <div id="gate1" class="gstep">
+      <div class="glangs" id="glangs"></div>
+      <h2 class="gask" data-i="gate.h">Who are you?</h2>
+      <p class="gsub" data-i="gate.p">Pick your name — votes, plans and every won you spend get filed under it.</p>
+      <div id="gatelist"></div>
+      <div class="gfoot">
+        <button class="glink" id="gate_other" data-i="gate.other">+ someone else</button>
+        <button class="glink" id="gate_skip" data-i="gate.skip">Just looking</button>
+      </div>
+    </div>
+
+    <div id="gate2" class="gstep" hidden>
+      <div class="ghi"><span id="g_flag"></span><span id="g_hi"></span></div>
+      <p class="gsub" data-i="gate.confirm">Check your name, and add your flights if you know them.</p>
+      <div class="gfields">
+        <label class="f"><span class="lbl" data-i="dlg.name">Name</span>
+          <input type="text" id="g_name" maxlength="24"></label>
+        <label class="f"><span class="lbl" data-i="dlg.flight">Flights (optional)</span>
+          <input type="text" id="g_flight" data-ip="dlg.flightph"></label>
+      </div>
+      <div class="row" style="justify-content:space-between">
+        <button class="glink" id="g_back" data-i="gate.back">Back</button>
+        <button class="btn" id="g_enter" data-i="gate.enter">Enter</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <main class="wrap">
 
@@ -421,7 +501,9 @@ dialog::backdrop{background:rgba(20,18,15,.5)}
   <p class="muted" style="font-size:13px;margin:0 0 12px" data-i="dlg.p">Your name shows up on votes, plans and every won you spend.</p>
   <label class="f" style="margin-bottom:12px"><span class="lbl" data-i="dlg.name">Name</span><input type="text" id="me_name" maxlength="24"></label>
   <label class="f" style="margin-bottom:12px"><span class="lbl" data-i="dlg.flight">Flights (optional)</span><input type="text" id="me_flight" data-ip="dlg.flightph"></label>
-  <div class="row" style="justify-content:flex-end">
+  <div class="row" style="justify-content:space-between">
+    <button type="submit" class="glink" id="me_notme" value="notme" data-i="dlg.notme">Not you?</button>
+    <span class="grow"></span>
     <button class="btn ghost" value="cancel" data-i="dlg.cancel">Cancel</button>
     <button class="btn" id="me_save" value="ok" data-i="dlg.save">Save</button>
   </div>
@@ -434,6 +516,16 @@ const LANGS=["en","zh","ja","ko","id"];
 const S={
 "tagline":["five passports · one october","五本護照 · 一個十月","5つのパスポート · ひとつの10月","여권 다섯 · 하나의 10월","lima paspor · satu oktober"],
 "whoami":["Who are you?","你是誰？","あなたは？","누구세요?","Kamu siapa?"],
+"gate.h":["Who are you?","你是誰？","あなたは誰？","당신은 누구세요?","Kamu siapa?"],
+"gate.p":["Pick your name — votes, plans and every won you spend get filed under it.","選你的名字 — 投票、行程、每一筆花費都會記在上面。","名前を選んでください。投票も日程も支出も、すべてここに紐づきます。","이름을 고르세요. 투표·일정·지출이 모두 여기에 기록됩니다.","Pilih namamu — voting, rencana, dan tiap pengeluaran tercatat di sana."],
+"gate.free":["not claimed","還沒人登記","未登録","미등록","belum diambil"],
+"gate.taken":["already here","已登記","登録済み","등록됨","sudah ada"],
+"gate.other":["+ someone else","+ 其他人","+ ほかの人","+ 다른 사람","+ orang lain"],
+"gate.skip":["Just looking","只是看看","見るだけ","그냥 둘러보기","Cuma lihat-lihat"],
+"gate.back":["Back","上一步","戻る","뒤로","Kembali"],
+"gate.enter":["Enter","進去","はじめる","들어가기","Masuk"],
+"gate.confirm":["Check your name, and add your flights if you know them.","確認一下名字，知道航班的話也填進去。","名前を確認して、便が決まっていれば入力を。","이름을 확인하고, 항공편을 알면 적어 주세요.","Cek namamu, isi penerbangan kalau sudah tahu."],
+"dlg.notme":["Not you?","不是你？","別の人？","본인이 아닌가요?","Bukan kamu?"],
 "t.trip":["Trip","行程","旅程","여행","Trip"],
 "t.prefs":["Taste","喜好","好み","취향","Selera"],
 "t.ideas":["Ideas","口袋名單","候補","아이디어","Ide"],
@@ -664,7 +756,7 @@ function toast(msg){ const el=document.createElement("div"); el.className="toast
   document.body.appendChild(el); setTimeout(()=>el.remove(),1900); }
 function fmtDay(i,opts){ const d=new Date(DAYS[i]+"T00:00:00");
   return d.toLocaleDateString(LOCALE[lang]||"en-GB",opts||{month:"short",day:"numeric",weekday:"short"}); }
-function needMe(){ if(!me||!D.members[me]){ toast(t("needseat")); return true; } return false; }
+function needMe(){ if(!me||!D.members[me]){ openGate(); return true; } return false; }
 
 /* ───────────────────────── i18n plumbing ───────────────────────── */
 function fillSel(el,rows,val){ el.innerHTML=rows.map(r=>'<option value="'+r[0]+'">'+esc(opt(r))+'</option>').join("");
@@ -695,7 +787,7 @@ function getChips(sel){ return $$(sel+' .chip[aria-pressed="true"]').map(b=>b.da
 /* ───────────────────────── render ───────────────────────── */
 let sigMembers="", prefFor=null;
 function render(){
-  renderTrip(); renderPrefs(); renderIdeas(); renderPlan(); renderSplit(); renderMeBtn();
+  renderTrip(); renderPrefs(); renderIdeas(); renderPlan(); renderSplit(); renderMeBtn(); renderGate();
 }
 function renderMeBtn(){
   const m=D.members[me];
@@ -861,6 +953,36 @@ function renderSplit(){
 function budgetHint(){ const v=Number($("#p_budget").value||0), c=$("#p_cur").value||"KRW";
   $("#budgethint").textContent = v>0 ? "≈ "+won(v*rate(c)) : ""; }
 
+/* ───────────────────────── cover gate ───────────────────────── */
+const LANGLBL={en:"EN",zh:"中文",ja:"日本語",ko:"한국어",id:"Indonesia"};
+function openGate(){ $("#gate").hidden=false; document.body.classList.add("gated");
+  $("#gate1").hidden=false; $("#gate2").hidden=true; renderGate(); }
+function closeGate(){ $("#gate").hidden=true; document.body.classList.remove("gated"); }
+function renderGate(){
+  if($("#gate").hidden) return;
+  const d=new Date(DAYS[0]+"T00:00:00");
+  $("#g_mon").textContent=d.toLocaleDateString(LOCALE[lang]||"en-GB",{month:"long"});
+  $("#g_dates").textContent=fmtDay(0)+" → "+fmtDay(3)+" · 2026";
+  $("#glangs").innerHTML=LANGS.map(L=>'<button class="glang" data-gl="'+L+'" aria-pressed="'+(L===lang)+'">'+LANGLBL[L]+'</button>').join("");
+  $("#gatelist").innerHTML=allSeats().map(id=>{const st=seatOf(id),m=D.members[id],taken=!!(m&&m.name);
+    return '<button class="gpick'+(taken?" taken":"")+'" data-g="'+id+'" style="--ln:var('+st.c+')">'+
+      '<span class="gflag">'+st.flag+'</span><span class="gname">'+esc(nameOf(id))+'</span>'+
+      '<span class="gstate">'+esc(taken?t("gate.taken"):t("gate.free"))+'</span></button>';}).join("");
+}
+function gateStep2(seat,name,flight){
+  pendingSeat=seat;
+  $("#g_flag").textContent=seat.flag; $("#g_hi").textContent=name||"";
+  $("#g_name").value=name||""; $("#g_flight").value=flight||"";
+  $("#gate1").hidden=true; $("#gate2").hidden=false;
+  $("#gate2").classList.remove("gstep"); void $("#gate2").offsetWidth; $("#gate2").classList.add("gstep");
+  setTimeout(()=>$("#g_name").focus(),80);
+}
+function gatePick(id){ const st=seatOf(id), m=D.members[id];
+  gateStep2({id,flag:st.flag,c:st.c,cur:st.cur},(m&&m.name)||st.n||"",(m&&m.flight)||""); }
+function setLang(L){ if(!LANGS.includes(L)) return; lang=L; localStorage.setItem("sl.lang",lang);
+  const pr=D.prefs[me]||{}; applyI18n(); prefFor=null; sigMembers=""; render();
+  setChips("#actchips",pr.acts); setChips("#areachips",pr.areas); setChips("#foodchips",pr.food); }
+
 /* ───────────────────────── events ───────────────────────── */
 $("#rail").addEventListener("click",e=>{const b=e.target.closest(".stop"); if(!b)return;
   pane=b.dataset.p;
@@ -868,11 +990,11 @@ $("#rail").addEventListener("click",e=>{const b=e.target.closest(".stop"); if(!b
   $$("section.pane").forEach(s=>s.hidden=(s.id!=="p-"+pane));
   window.scrollTo({top:0,behavior:"instant"});});
 
-$("#lang").addEventListener("change",e=>{lang=e.target.value; localStorage.setItem("sl.lang",lang);
-  const p=D.prefs[me]||{}; applyI18n(); prefFor=null; sigMembers=""; render();
-  setChips("#actchips",p.acts); setChips("#areachips",p.areas); setChips("#foodchips",p.food);});
+$("#lang").addEventListener("change",e=>setLang(e.target.value));
 
 document.addEventListener("click",e=>{
+  const gl=e.target.closest("[data-gl]"); if(gl){ setLang(gl.dataset.gl); return; }
+  const gp=e.target.closest("[data-g]"); if(gp){ gatePick(gp.dataset.g); return; }
   const chip=e.target.closest("#actchips .chip,#areachips .chip,#foodchips .chip,#e_with .chip");
   if(chip){ chip.setAttribute("aria-pressed", chip.getAttribute("aria-pressed")!=="true"); return; }
   const f=e.target.closest("#ideafilter .chip");
@@ -887,9 +1009,7 @@ document.addEventListener("click",e=>{
   if(del){ const [c,id]=del.dataset.del.split(":"); if(confirm(t("del"))) drop(c,id); return; }
 });
 
-$("#mebtn").addEventListener("click",()=>{ if(me&&D.members[me]) openSeat(me);
-  else { toast(t("crew.p")); pane="trip"; $$(".stop").forEach(s=>s.setAttribute("aria-selected",s.dataset.p==="trip"));
-    $$("section.pane").forEach(s=>s.hidden=(s.id!=="p-trip")); window.scrollTo({top:0}); } });
+$("#mebtn").addEventListener("click",()=>{ if(me&&D.members[me]) openSeat(me); else openGate(); });
 
 $("#addseat").addEventListener("click",()=>{
   const id="x"+Math.random().toString(36).slice(2,6);
@@ -905,6 +1025,8 @@ function openSeat(id){
   $("#medlg").showModal(); setTimeout(()=>$("#me_name").focus(),40);
 }
 $("#medlg").addEventListener("close",()=>{
+  if($("#medlg").returnValue==="notme"){ me=""; localStorage.removeItem("sl.me");
+    pendingSeat=null; prefFor=null; sigMembers=""; render(); openGate(); return; }
   if($("#medlg").returnValue!=="ok"||!pendingSeat) return;
   const name=$("#me_name").value.trim(); if(!name) return;
   const p=pendingSeat;
@@ -972,9 +1094,25 @@ async function copy(text){ try{ await navigator.clipboard.writeText(text); toast
 $("#copyline").addEventListener("click",()=>copy(summary()));
 $("#copylink").addEventListener("click",()=>copy(location.href));
 $("#copylink2").addEventListener("click",()=>copy(location.href));
+$("#g_name").addEventListener("input",()=>{ $("#g_hi").textContent=$("#g_name").value; });
+$("#g_back").addEventListener("click",()=>{ pendingSeat=null; $("#gate2").hidden=true; $("#gate1").hidden=false; });
+$("#gate_skip").addEventListener("click",closeGate);
+$("#gate_other").addEventListener("click",()=>{
+  const id="x"+Math.random().toString(36).slice(2,6), used=allSeats().length-SEATS.length;
+  gateStep2({id,flag:"🌏",c:EXTRA_C[used%EXTRA_C.length],cur:"USD"},"",""); });
+$("#g_enter").addEventListener("click",()=>{
+  const name=$("#g_name").value.trim(); if(!name){ $("#g_name").focus(); return; }
+  const seat=pendingSeat; if(!seat) return;
+  put("members",seat.id,{name,flight:$("#g_flight").value.trim(),flag:seat.flag,c:seat.c,cur:seat.cur});
+  me=seat.id; localStorage.setItem("sl.me",me);
+  prefFor=null; sigMembers=""; pendingSeat=null;
+  fillCur($("#p_cur"),myCur()); fillCur($("#e_cur"),myCur());
+  closeGate(); render(); });
 
 /* ───────────────────────── boot ───────────────────────── */
-loadLocal(); applyI18n(); fillCur($("#p_cur"),myCur()); fillCur($("#e_cur"),myCur()); render();
+loadLocal(); applyI18n(); fillCur($("#p_cur"),myCur()); fillCur($("#e_cur"),myCur());
+if(!me) openGate();
+render();
 connect().then(()=>{ if(!DB){ const n=document.createElement("div"); n.className="notice";
   n.textContent=t("offline"); $("#p-trip").insertBefore(n,$("#p-trip").firstChild); } });
 </script>
