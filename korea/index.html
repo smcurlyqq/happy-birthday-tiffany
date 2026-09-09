@@ -411,6 +411,7 @@ const S={
 "crew.add":["+ add someone","+ 新增成員","+ メンバー追加","+ 사람 추가","+ tambah orang"],
 "seat.free":["free seat","空位","空席","빈자리","kursi kosong"],
 "seat.noflight":["no flight yet","航班未定","便未定","항공편 미정","belum ada penerbangan"],
+"seat.claim":["tap to claim this seat","點一下登記這個位子","タップして登録","눌러서 등록","ketuk untuk ambil kursi"],
 "ess.h":["Before we fly","出發前","出発前に","출발 전","Sebelum terbang"],
 "ess.p":["five passports, five sets of rules","五本護照，五套規則","旅券5冊、規則も5通り","여권 다섯, 규정도 다섯","lima paspor, lima aturan"],
 "ess1":["🇮🇩|Indonesian passport|Korea isn't visa-free for Indonesia — start the tourist visa now, it takes weeks. Everyone else: check whether you need K-ETA.","🇮🇩|印尼護照|韓國對印尼不免簽，觀光簽要及早送件（需數週）。其他人請確認自己要不要 K-ETA。","🇮🇩|インドネシア旅券|韓国はインドネシアにビザ免除ではありません。観光ビザを今すぐ申請（数週間）。他の人は K-ETA の要否を確認。","🇮🇩|인도네시아 여권|한국은 인도네시아 무비자 대상이 아닙니다. 관광 비자를 지금 신청하세요(몇 주 소요). 나머지는 K-ETA 필요 여부 확인.","🇮🇩|Paspor Indonesia|Korea tidak bebas visa untuk Indonesia — ajukan visa turis sekarang, butuh berminggu-minggu. Yang lain: cek K-ETA."],
@@ -550,9 +551,9 @@ const CATS=[["food","Food","美食","グルメ","맛집","Kuliner"],
 ["other","Other","其他","その他","기타","Lainnya"]];
 const CUR={KRW:{s:"₩",d:0},TWD:{s:"NT$",d:0},JPY:{s:"¥",d:0},HKD:{s:"HK$",d:0},IDR:{s:"Rp",d:0},USD:{s:"$",d:0}};
 const RATES0={KRW:1,TWD:45,JPY:9.5,HKD:185,IDR:0.088,USD:1440};
-const SEATS=[{id:"tw",flag:"🇹🇼",c:"--l2",cur:"TWD"},{id:"jp",flag:"🇯🇵",c:"--l3",cur:"JPY"},
-{id:"kr",flag:"🇰🇷",c:"--l5",cur:"KRW"},{id:"hk",flag:"🇭🇰",c:"--l4",cur:"HKD"},
-{id:"id",flag:"🇮🇩",c:"--l1",cur:"IDR"}];
+const SEATS=[{id:"tw",flag:"🇹🇼",c:"--l2",cur:"TWD"},{id:"jp",flag:"🇯🇵",c:"--l3",cur:"JPY",n:"Akiha"},
+{id:"kr",flag:"🇰🇷",c:"--l5",cur:"KRW",n:"Hye Yeon"},{id:"hk",flag:"🇭🇰",c:"--l4",cur:"HKD",n:"Gigi"},
+{id:"id",flag:"🇮🇩",c:"--l1",cur:"IDR",n:"Nadia"}];
 const EXTRA_C=["--l6","--l7","--l8","--l9"];
 const DAYS=["2026-10-17","2026-10-18","2026-10-19","2026-10-20"];
 const LOCALE={en:"en-GB",zh:"zh-TW",ja:"ja-JP",ko:"ko-KR",id:"id-ID"};
@@ -616,7 +617,7 @@ function seatOf(id){ const b=SEATS.find(s=>s.id===id); if(b) return b;
 function allSeats(){ const ids=SEATS.map(s=>s.id);
   Object.keys(D.members).forEach(id=>{ if(!ids.includes(id)) ids.push(id); }); return ids; }
 function joined(){ return allSeats().filter(id=>D.members[id]&&D.members[id].name); }
-function nameOf(id){ const m=D.members[id]; return m&&m.name?m.name:(t("seat.free")); }
+function nameOf(id){ const m=D.members[id]; if(m&&m.name) return m.name; const s=seatOf(id); return s.n||t("seat.free"); }
 function myCur(){ const m=D.members[me]; return (m&&m.cur)||seatOf(me).cur||"KRW"; }
 function av(id,size){ const s=seatOf(id), n=nameOf(id);
   return '<span class="av" style="background:var('+s.c+')'+(size?';width:'+size+'px;height:'+size+'px;font-size:'+(size*0.5)+'px':'')+'">'+esc(n.slice(0,1).toUpperCase())+'</span>'; }
@@ -683,8 +684,8 @@ function renderTrip(){
 
   $("#seats").innerHTML=allSeats().map(id=>{const s=seatOf(id),m=D.members[id];
     return '<button class="seat'+(m&&m.name?"":" free")+(id===me?" isme":"")+'" data-seat="'+id+'" style="--ln:var('+s.c+')">'+
-      '<span class="nm">'+s.flag+' '+esc(m&&m.name?m.name:t("seat.free"))+'</span>'+
-      '<span class="fl">'+esc(m&&m.flight?m.flight:t("seat.noflight"))+'</span></button>';}).join("");
+      '<span class="nm">'+s.flag+' '+esc(nameOf(id))+'</span>'+
+      '<span class="fl">'+esc(m&&m.name?(m.flight||t("seat.noflight")):t("seat.claim"))+'</span></button>';}).join("");
 
   $("#essentials").innerHTML=["ess1","ess2","ess3","ess4","ess5","ess6"].map(k=>{
     const p=t(k).split("|"); return '<li><span>'+p[0]+'</span><span><b>'+esc(p[1])+'</b> — '+esc(p[2])+'</span></li>';}).join("");
@@ -861,7 +862,7 @@ function openSeat(id){
   const s=seatOf(id), m=D.members[id];
   if(m&&m.name&&id!==me&&!confirm(m.name+" "+t("dlg.taken"))) return;
   pendingSeat={id,flag:s.flag,c:s.c,cur:s.cur};
-  $("#me_name").value=m&&m.name?m.name:""; $("#me_flight").value=m&&m.flight?m.flight:"";
+  $("#me_name").value=m&&m.name?m.name:(s.n||""); $("#me_flight").value=m&&m.flight?m.flight:"";
   $("#medlg").showModal(); setTimeout(()=>$("#me_name").focus(),40);
 }
 $("#medlg").addEventListener("close",()=>{
