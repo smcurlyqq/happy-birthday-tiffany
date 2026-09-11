@@ -1,0 +1,41 @@
+name: Deploy LINE bot
+
+# 不需要終端機，也不需要在自己電腦上裝 Node。
+# 需要的四把金鑰放在 repo 的 Settings → Secrets and variables → Actions。
+# 只能手動觸發。等五個 secret 都設好之後，到 Actions 分頁按 Run workflow。
+# （不掛 push 觸發，是為了避免在 secret 還沒設好時，每次 push 都在 main 留一個紅叉。）
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: bot
+          # 這三個會被推上 Cloudflare 當 Worker 的祕密，不會留在 repo 裡
+          secrets: |
+            LINE_CHANNEL_SECRET
+            LINE_CHANNEL_ACCESS_TOKEN
+            NOTION_TOKEN
+        env:
+          LINE_CHANNEL_SECRET: ${{ secrets.LINE_CHANNEL_SECRET }}
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+
+      - name: Where it landed
+        run: |
+          echo "Worker 部署完成。"
+          echo "Webhook URL 要填："
+          echo "  https://seoul-loop-bot.<你的-cloudflare-子網域>.workers.dev/webhook"
+          echo "子網域在 Cloudflare dashboard → Workers & Pages → Overview 右側可以看到。"
