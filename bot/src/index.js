@@ -14,7 +14,7 @@
 
 import { classify, CONFIDENCE_FLOOR, seoulToday } from "./classify.js";
 import * as db from "./notion.js";
-import { reply, leave, text, card, HELP, BIND_FIRST, KINDS, kindKey } from "./line.js";
+import { reply, leave, text, card, HELP_MESSAGES, BIND_FIRST, KINDS, kindKey } from "./line.js";
 import { extractUrls, resolve, classifyLink, guessArea } from "./links.js";
 import { handleApi } from "./api.js";
 
@@ -54,10 +54,8 @@ async function handle(ev, env) {
   }
 
   if (ev.type === "join") {
-    console.log("joined group", gid);
-    const msgs = [text(HELP)];
-    if (setupMode) msgs.push(text(`Setup: this group's ID is ${gid}. Put it in ALLOWED_GROUP_IDS so I ignore every other group.`));
-    return reply(env, ev.replyToken, msgs);
+    console.log("joined group", gid, setupMode ? "(setup mode — add this id to ALLOWED_GROUP_IDS)" : "");
+    return reply(env, ev.replyToken, HELP_MESSAGES);
   }
   if (ev.type === "postback") return onPostback(ev, env);
   if (ev.type === "message" && ev.message?.type === "text") return onText(ev, env);
@@ -70,7 +68,7 @@ async function onText(ev, env) {
 
   // Fast paths that need no AI.
   if (/^(help|說明|使用說明|ヘルプ|도움말|bantuan)$/i.test(msg))
-    return reply(env, ev.replyToken, [text(HELP)]);
+    return reply(env, ev.replyToken, HELP_MESSAGES);
 
   const bind = msg.match(/^(?:i\s*am|i'm|我是|我叫|私は|저는|saya)\s*(.{1,24})$/i);
   if (bind) return onBind(bind[1].trim(), ev, env);
@@ -96,7 +94,7 @@ async function onText(ev, env) {
 
   try {
     switch (out.intent) {
-      case "help":      return reply(env, ev.replyToken, [text(HELP)]);
+      case "help":      return reply(env, ev.replyToken, HELP_MESSAGES);
       case "bind":      return onBind(out.bind?.name || "", ev, env);
       case "expense":   return onExpense(out.expense, me, ev, env);
       case "idea":      return onIdea(out.idea, me, ev, env);

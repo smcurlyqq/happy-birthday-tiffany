@@ -12,9 +12,9 @@ NOTION_EXPENSES_DB  = "e7220d9f26ef46008598a0e8583bcd0b"
 NOTION_STAYS_DB     = "d2986ee9b16b45c5b4db8938235fdfab"
 
 # Comma-separated LINE group IDs the bot is allowed to work in.
-# Empty = setup mode: the bot tells you the group ID when it joins.
+# Empty = setup mode: the bot logs the group ID (Cloudflare logs) when it joins.
 # Once set, it leaves any other group it is added to and never calls Claude for them.
-ALLOWED_GROUP_IDS = ""
+ALLOWED_GROUP_IDS = "C63d0fdf1c88d40f1d57005c728d6b16a"
 
 # Secrets are set by the deploy workflow (never write them here):
 #   LINE_CHANNEL_SECRET, LINE_CHANNEL_ACCESS_TOKEN, NOTION_TOKEN, ANTHROPIC_API_KEY
