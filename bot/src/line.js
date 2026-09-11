@@ -9,8 +9,8 @@ export const MEMBER_LIST = "Amber · Akiha · Hye Yeon · Gigi · Nadia";
 
 export const PAGE_URL = "https://smcurlyqq.github.io/happy-birthday/korea/";
 
-/* One welcome message: English first, then the same guide in Japanese, Korean and
-   Indonesian. Example messages stay in English everywhere — the group talks in English. */
+/* One welcome message: English first, then the same guide in Japanese, Korean,
+   Cantonese and Indonesian. Example messages stay in English everywhere — the group talks in English. */
 const EX = {
   link:  "https://www.airbnb.com/rooms/…",
   idea:  "“Let’s try Gwangjang Market”",
@@ -49,6 +49,14 @@ const HELP_TEXT = [
   `• ${EX.plan} → Itinerary`,
   `먼저 ${EX.iam} 을 한 번 보내 주세요. “help” 를 치면 이 안내를 다시 볼 수 있어요. 그 외엔 조용히 있을게요.`,
   "",
+  "🇭🇰 你喺度講嘅嘢全部會入晒去我哋個旅行網頁。照平時咁打就得：",
+  `• 貼 link → Ideas（酒店入 Stays）`,
+  `• ${EX.idea} → Ideas`,
+  `• ${EX.vote} 或者撳張卡上面嘅 I’m in → 投票`,
+  `• ${EX.paid} → Expenses（韓圜，唔寫名就五個人夾）`,
+  `• ${EX.plan} → Itinerary`,
+  `一開始先打一次 ${EX.iam}。打 “help” 可以再睇一次呢段。其他時候我唔會出聲。`,
+  "",
   "🇮🇩 Semua yang kamu tulis di sini masuk ke halaman trip kita. Tulis seperti biasa saja:",
   `• Tautan → Ideas (hotel masuk Stays)`,
   `• ${EX.idea} → Ideas`,
@@ -58,7 +66,7 @@ const HELP_TEXT = [
   `Pertama, ketik ${EX.iam} sekali. Ketik “help” untuk lihat ini lagi. Selain itu aku diam.`,
 ].join("\n");
 
-/** The welcome / help reply: one message, four languages, English examples. */
+/** The welcome / help reply: one message, five languages, English examples. */
 export const HELP_MESSAGES = [{ type: "text", text: HELP_TEXT }];
 export const HELP = HELP_TEXT;
 
