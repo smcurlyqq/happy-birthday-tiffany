@@ -26,3 +26,7 @@ jobs:
         working-directory: bot
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - run: node test/link.mjs
+        working-directory: bot
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

@@ -59,7 +59,7 @@ export function guessArea(text) {
 }
 
 export async function resolve(link) {
-  const out = { url: link, title: "", desc: "", host: "" };
+  const out = { url: link, title: "", desc: "", host: "", text: "" };
   try {
     const ctl = new AbortController();
     const timer = setTimeout(() => ctl.abort(), 7000);
@@ -74,6 +74,7 @@ export async function resolve(link) {
       const m = metaTags(html);
       out.title = m["og:title"] || m["twitter:title"] || htmlTitle(html) || "";
       out.desc = m["og:description"] || m["description"] || "";
+      out.text = visibleText(html);
     }
   } catch (e) {
     console.log("resolve failed", link, String(e));   // blocked or slow — the buttons cover us
@@ -97,15 +98,46 @@ async function naverPlace(out) {
       signal: ctl.signal, headers: { "User-Agent": UA, "Accept-Language": "ko,en;q=0.8" },
     });
     clearTimeout(timer);
-    const html = (await r.text()).slice(0, 200000);
-    const meta = metaTags(html);
+    const html = await r.text();                     // ~600 KB; the facts we want are in embedded JSON
+    const meta = metaTags(html.slice(0, 100000));
     const name = (meta["og:title"] || "").replace(/\s*:\s*네이버\s*$/, "").trim();
     if (name) out.title = name;
     if (meta["og:description"]) out.desc = meta["og:description"];
+    out.text = naverFacts(html);                     // the rendered body is JS-only, so skip visibleText
     out.host = "map.naver.com";
   } catch (e) {
     console.log("naver place lookup failed", String(e));
   }
+}
+
+/* Roughly what a person would see: tags stripped, scripts/styles dropped, whitespace folded. */
+function visibleText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<noscript[\s\S]*?<\/noscript>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/[^\s{}]+\{[^{}]*\}/g, " ")          // stray CSS rules some pages leave in the body
+    .replace(/(?:^|\s)[.#][\w-]+(?:\[[^\]]*\])?(?=\s|$)/g, " ")   // bare selectors
+    .replace(/@[a-z-]+[^{]*\{[^{}]*\}/g, " ")
+    .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 3500);
+}
+
+/* Naver's place page embeds its data as JSON; pull the few fields that matter. */
+function naverFacts(html) {
+  const all = key => [...html.matchAll(new RegExp('"' + key + '":"([^"]{1,200})"', "g"))].map(m => m[1]);
+  const first = (key, skip = []) => all(key).find(v => !skip.includes(v)) || "";
+  const facts = {
+    category: first("category"),
+    address: first("roadAddress") || first("address", ["주소"]),
+    phone: first("phone") || first("virtualPhone"),
+    hours: first("businessHours"),
+  };
+  // review tags like "뷰가 좋아요" — the quickest read on what a place is like
+  const tags = [...new Set(all("name").filter(v => /요$/.test(v) && v.length <= 14))].slice(0, 6);
+  if (tags.length) facts.people_say = tags.join(", ");
+  return Object.entries(facts).filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`).join(" · ");
 }
 
 function metaTags(html) {

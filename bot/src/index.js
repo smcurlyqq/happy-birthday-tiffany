@@ -12,7 +12,7 @@
  * /api/* is the web page's data layer (see api.js) — same Notion boards.
  */
 
-import { classify, classifyImage, CONFIDENCE_FLOOR, seoulToday } from "./classify.js";
+import { classify, classifyImage, describeLink, CONFIDENCE_FLOOR, seoulToday } from "./classify.js";
 import * as db from "./notion.js";
 import { reply, leave, text, card, imageContent, HELP_MESSAGES, BIND_FIRST, KINDS, kindKey, PAGE_URL } from "./line.js";
 import { extractUrls, resolve, classifyLink, guessArea } from "./links.js";
@@ -126,18 +126,29 @@ async function onBind(name, ev, env) {
 /* ── links (no AI) ──────────────────────────────────────────── */
 async function collectLink(link, note, ev, env) {
   const page = await resolve(link);
-  const { kind, sure } = classifyLink(page, note);
+  const [dupeIdeas, dupeStays, me, cands] = await Promise.all([
+    db.findByUrl(env, env.NOTION_IDEAS_DB, page.url), db.findByUrl(env, env.NOTION_STAYS_DB, page.url),
+    db.memberByLineId(env, ev.source?.userId), db.candidates(env),
+  ]);
+  if (dupeIdeas || dupeStays) return reply(env, ev.replyToken, [text(`Already on the list → ${PAGE_URL}`)]);
+
+  // Let Claude read what the page says (name in Korean, category, address…); fall back to the host/word rules.
+  const tidy = await describeLink(env, { page, note, candidates: cands });
+  if (tidy?.duplicate_of) return reply(env, ev.replyToken, [text(`Already on the list → ${PAGE_URL}`)]);
+
+  let kind, sure, title, area, rowNote;
+  if (tidy) {
+    kind = tidy.kind === "Stay" ? "stay" : kindKey(tidy.kind);
+    sure = true; title = tidy.title || page.title; area = tidy.area; rowNote = tidy.note;
+  } else {
+    ({ kind, sure } = classifyLink(page, note));
+    title = page.title; area = guessArea(`${page.title} ${page.desc} ${note}`); rowNote = note;
+  }
   const conf = KINDS[kind];
-
-  const dupe = await db.findByUrl(env, conf.board === "stays" ? env.NOTION_STAYS_DB : env.NOTION_IDEAS_DB, page.url);
-  if (dupe) return reply(env, ev.replyToken, [text(`Already on the list → ${PAGE_URL}`)]);
-
-  const me = await db.memberByLineId(env, ev.source?.userId);
-  const area = guessArea(`${page.title} ${page.desc} ${note}`);
-  const row = { title: page.title, url: page.url, note, area, byId: me?.id, kind: conf.select };
+  const row = { title, url: page.url, note: rowNote, area, byId: me?.id, kind: conf.select };
   const created = conf.board === "stays" ? await db.createStay(env, row) : await db.createIdea(env, row);
 
-  return reply(env, ev.replyToken, [card({ title: page.title, host: page.host, kind, sure, pageId: created.id })]);
+  return reply(env, ev.replyToken, [card({ title, host: page.host, kind, sure, pageId: created.id })]);
 }
 
 /* ── screenshots ────────────────────────────────────────────── */

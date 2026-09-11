@@ -161,3 +161,53 @@ export async function classifyImage(env, { data, mediaType, senderName, candidat
     return null;
   }
 }
+
+
+/* ── links: turn what the page says into a tidy row ─────────── */
+
+export const LinkIntent = z.object({
+  title: z.string(),
+  kind: z.enum(["Food", "Cafe", "Sight", "Shop", "Night", "Stay", "Other"]),
+  area: Area.nullable(),
+  note: z.string(),
+  duplicate_of: z.string().nullable(),
+});
+
+function linkPrompt(candidates) {
+  const list = candidates.length ? candidates.map(c => `${c.id} | ${c.board} | ${c.title}`).join("\n") : "(none yet)";
+  return [
+    "You tidy up a link someone dropped in a LINE group for a five-person trip to Seoul, 2026-10-17 to 2026-10-20.",
+    "You get the page's title, description and some of its visible text, plus what the sender typed next to the link.",
+    "Return one row for the trip's Ideas list:",
+    "- title: “English (Korean)” — e.g. “Cheonggye Plaza (청계광장)”. Copy the Korean exactly as the page shows it; never invent it. If the place has no Korean name, English only.",
+    "- kind: Food, Cafe, Sight, Shop, Night, Stay (hotels, guesthouses, apartments) or Other.",
+    "- area: one of the listed areas if the address or text places it there, else null.",
+    "- note: the useful facts you can actually read — category, address, nearest station, hours, price range, what it is known for, what the sender said. Short. Never guess.",
+    "- duplicate_of: the id of a candidate that is clearly the same place, else null.",
+    "Every string in English except the Korean name in the title and in the address.",
+    "",
+    "Current candidates (id | board | title):",
+    list,
+  ].join("\n");
+}
+
+export async function describeLink(env, { page, note, candidates }) {
+  const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, timeout: 20_000, maxRetries: 1 });
+  try {
+    const res = await client.messages.parse({
+      model: MODEL,
+      max_tokens: 800,
+      system: linkPrompt(candidates),
+      messages: [{ role: "user", content: [
+        `URL: ${page.url}`, `Host: ${page.host}`, `Title: ${page.title}`, `Description: ${page.desc}`,
+        `Sender said: ${note || "(nothing)"}`, "", "Visible text:", page.text || "(none)",
+      ].join("\n") }],
+      output_config: { format: zodOutputFormat(LinkIntent) },
+    });
+    if (res.stop_reason === "refusal") return null;
+    return res.parsed_output ?? null;
+  } catch (err) {
+    console.error("describeLink failed", String(err));
+    return null;
+  }
+}
