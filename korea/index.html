@@ -657,6 +657,7 @@ const S={
 "plan.note":["Note (meeting point, booking, ₩)","備註（集合點、訂位、金額）","メモ（集合場所・予約・₩）","메모(집합 장소·예약·₩)","Catatan (titik kumpul, booking, ₩)"],
 "plan.noteph":["Meet at Anguk exit 2","安國站 2 號出口集合","安国駅2番出口集合","안국역 2번 출구","Kumpul di Anguk exit 2"],
 "plan.add":["Add to day","加入行程","日程に追加","일정에 추가","Tambah ke hari itu"],
+"plan.lands":["lands in Seoul","抵達首爾","ソウル到着","서울 도착","tiba di Seoul"],
 "plan.none":["Nothing planned for this day.","這天還空著。","この日はまだ空です。","이 날은 비어 있어요.","Hari ini masih kosong."],
 "sp.h":["Who paid what","誰付了什麼","誰が何を払ったか","누가 뭘 냈나","Siapa bayar apa"],
 "sp.p":["log it the moment you tap the card","刷完卡就記一筆","支払った瞬間に記録","결제한 순간 바로 기록","catat begitu selesai bayar"],
@@ -985,19 +986,25 @@ function renderIdeas(){
       '<button class="x" data-del="ideas:'+id+'" aria-label="delete">✕</button></div>';}).join("")
     : '<div class="empty">'+esc(t("idea.none"))+'</div>';
 }
+function arrivalSlots(i){   // everyone's landing time shows up on that day, derived from Crew
+  return joined().map(id=>{const m=D.members[id]; if(!m||!m.arrive) return null;
+    const a=String(m.arrive); if(a.slice(0,10)!==DAYS[i]) return null;
+    return {virtual:true,time:a.slice(11,16),title:"✈ "+nameOf(id)+" "+t("plan.lands"),note:m.flight||"",by:id};}).filter(Boolean);
+}
 function renderPlan(){
   $("#planlist").innerHTML=DAYS.map((d,i)=>{
-    const rows=Object.keys(D.slots).filter(k=>Number(D.slots[k].day)===i)
-      .sort((a,b)=>String(D.slots[a].time||"").localeCompare(String(D.slots[b].time||"")));
+    const rows=Object.keys(D.slots).filter(k=>Number(D.slots[k].day)===i).map(k=>Object.assign({id:k},D.slots[k]))
+      .concat(arrivalSlots(i))
+      .sort((a,b)=>String(a.time||"").localeCompare(String(b.time||"")));
     return '<div class="card"><div class="dayhead"><span class="n">'+String(i+1).padStart(2,"0")+'</span>'+
       '<b>'+esc(fmtDay(i,{month:"short",day:"numeric"}))+'</b><span class="muted" style="font-size:12px">'+
       esc(fmtDay(i,{weekday:"long"}))+'</span></div>'+
-      (rows.length? rows.map(id=>{const s=D.slots[id];
+      (rows.length? rows.map(s=>{const id=s.id;
         return '<div class="slot"><div class="tm">'+esc(s.time||"—")+'</div>'+
           '<div><div class="st">'+esc(s.title)+'</div>'+
           (s.note?'<div class="sub muted" style="font-size:12.5px">'+esc(s.note)+'</div>':"")+
           (s.by?'<div class="sub"><span class="who">'+av(s.by)+esc(nameOf(s.by))+'</span></div>':"")+'</div>'+
-          '<button class="x" data-del="slots:'+id+'" aria-label="delete">✕</button></div>';}).join("")
+          (s.virtual?'<span></span>':'<button class="x" data-del="slots:'+id+'" aria-label="delete">✕</button>')+'</div>';}).join("")
         : '<div class="empty">'+esc(t("plan.none"))+'</div>')+'</div>';}).join("");
 }
 function renderSplit(){
