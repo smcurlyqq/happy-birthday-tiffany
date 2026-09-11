@@ -87,14 +87,19 @@ async function handle(ev, env) {
 
 /* ── text messages ──────────────────────────────────────────── */
 const HELP = [
-  "🇰🇷 Seoul Loop 收集機器人",
+  "🇰🇷 Seoul Loop",
   "",
-  "把連結貼進群裡就好，我會自動收到 Notion：",
-  "  住宿 → 住宿候選　其他 → 口袋名單",
-  "猜錯的話按一下卡片上的按鈕就能改。",
+  "🇹🇼 把連結貼進群裡就好，我會自動收進 Notion（住宿→住宿候選，其他→口袋名單）。猜錯按卡片上的按鈕改。打「我是 你的名字」綁定一次；打「說明」再看這段。",
   "",
-  "打「我是 你的名字」綁定一次，之後你貼的連結會記上提案人。",
-  "打「說明」可以再看到這段。",
+  "🇯🇵 リンクを貼るだけで Notion に自動保存します（宿泊→Stays、その他→Ideas）。分類が違えばカードのボタンで変更。「私は 名前」で一度ひも付け。「ヘルプ」でこの説明を再表示。",
+  "",
+  "🇰🇷 링크만 붙여 넣으면 Notion에 자동 저장돼요 (숙소→Stays, 나머지→Ideas). 분류가 틀리면 카드 버튼으로 바꾸세요. 「저는 이름」으로 한 번만 연결. 「도움말」로 이 안내 다시 보기.",
+  "",
+  "🇭🇰 Paste a link and I'll file it in Notion (stays → Stays, everything else → Ideas). Wrong category? Tap the button on the card. Type “I am <your name>” once to link yourself; “help” shows this again.",
+  "",
+  "🇮🇩 Tempel tautan saja, aku simpan otomatis ke Notion (penginapan → Stays, lainnya → Ideas). Salah kategori? Tekan tombol di kartu. Ketik “saya <nama>” sekali untuk menautkan diri; “bantuan” menampilkan ini lagi.",
+  "",
+  "Names / 名字: Amber · Akiha · Hye Yeon · Gigi · Nadia",
 ].join("\n");
 
 async function onText(ev, env) {
@@ -116,15 +121,15 @@ async function onText(ev, env) {
 
 async function onBind(name, ev, env) {
   const userId = ev.source?.userId;
-  if (!userId) return reply(env, ev.replyToken, [{ type: "text", text: "抓不到你的 LINE ID，可能是群組設定擋住了。" }]);
+  if (!userId) return reply(env, ev.replyToken, [{ type: "text", text: "抓不到你的 LINE ID，可能是群組設定擋住了。\nCouldn't read your LINE ID — a group setting may be blocking it." }]);
 
   const page = await findMemberByName(env, name);
-  if (!page) return reply(env, ev.replyToken, [{ type: "text", text: `Notion 的成員表裡沒有「${name}」。先去成員表把名字改好，再打一次。` }]);
+  if (!page) return reply(env, ev.replyToken, [{ type: "text", text: `Notion 的成員表裡沒有「${name}」。\nNo member named “${name}” in Notion. Use: Amber · Akiha · Hye Yeon · Gigi · Nadia` }]);
 
   await notion(env, `/pages/${page.id}`, "PATCH", {
     properties: { "LINE ID": { rich_text: [{ text: { content: userId } }] } },
   });
-  return reply(env, ev.replyToken, [{ type: "text", text: `✓ 綁好了，${name}。之後你貼的連結會記上你。` }]);
+  return reply(env, ev.replyToken, [{ type: "text", text: `✓ 綁好了，${name}。之後你貼的連結會記上你。\nLinked, ${name}. Links you paste will be credited to you.` }]);
 }
 
 /* ── the actual job ─────────────────────────────────────────── */
