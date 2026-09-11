@@ -79,8 +79,33 @@ export async function resolve(link) {
     console.log("resolve failed", link, String(e));   // blocked or slow — the buttons cover us
   }
   try { out.host = new URL(out.url).hostname.replace(/^www\./, ""); } catch {}
+  await naverPlace(out);
   if (!out.title) out.title = out.host || link;
   return out;
+}
+
+/* Naver Map links (naver.me/… → map.naver.com/p/entry/place/<id>) land on a JS-only page
+   with no title. The mobile place page is server-rendered and carries the name. */
+async function naverPlace(out) {
+  const m = out.url.match(/(?:map|place)\.naver\.com\/(?:p\/entry\/place|place|v5\/entry\/place)\/(\d+)/)
+         || out.url.match(/m\.place\.naver\.com\/(?:place|restaurant|cafe|accommodation|hairshop|hospital)\/(\d+)/);
+  if (!m) return;
+  try {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 7000);
+    const r = await fetch(`https://m.place.naver.com/place/${m[1]}/home`, {
+      signal: ctl.signal, headers: { "User-Agent": UA, "Accept-Language": "ko,en;q=0.8" },
+    });
+    clearTimeout(timer);
+    const html = (await r.text()).slice(0, 200000);
+    const meta = metaTags(html);
+    const name = (meta["og:title"] || "").replace(/\s*:\s*네이버\s*$/, "").trim();
+    if (name) out.title = name;
+    if (meta["og:description"]) out.desc = meta["og:description"];
+    out.host = "map.naver.com";
+  } catch (e) {
+    console.log("naver place lookup failed", String(e));
+  }
 }
 
 function metaTags(html) {
@@ -88,7 +113,7 @@ function metaTags(html) {
   for (const tag of html.match(/<meta\b[^>]*>/gi) || []) {
     const k = (tag.match(/(?:property|name)\s*=\s*["']([^"']+)["']/i) || [])[1];
     const v = (tag.match(/content\s*=\s*["']([^"']*)["']/i) || [])[1];
-    if (k && v != null && out[k.toLowerCase()] === undefined) out[k.toLowerCase()] = decode(v.trim());
+    if (k && v != null && out[k.toLowerCase()] === undefined) out[k.toLowerCase()] = decode(v).replace(/[\x00-\x1F\x7F]+/g, "").trim();
   }
   return out;
 }
