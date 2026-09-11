@@ -111,7 +111,7 @@ async function state(env) {
     out.members[id] = {
       name: plainTitle(P["Name"]),
       flight: plainText(P["Flights"]),
-      arrive: P["Arrival"]?.date?.start || "",
+      arrive: (P["Arrival"]?.date?.start || "").slice(0, 16),   // wall-clock Seoul time, no zone
       flag: seatDef?.flag || flagOf(P["From"]?.select?.name) || "🌏",
       c: seatDef?.c || EXTRA_C[extra++ % EXTRA_C.length],
       cur: P["Currency"]?.select?.name || DEFAULT_CUR,
@@ -247,7 +247,7 @@ async function putMember(env, id, m) {
   const props = {
     "Name": { title: title(m.name || SEATS[id]?.name || "") },
     "Flights": { rich_text: rich(m.flight) },
-    "Arrival": m.arrive ? { date: { start: m.arrive } } : { date: null },
+    "Arrival": m.arrive ? { date: { start: String(m.arrive).slice(0, 16) } } : { date: null },
   };
   if (m.cur) props["Currency"] = sel(m.cur);
   await notion(env, `/pages/${pid}`, "PATCH", { properties: props });
