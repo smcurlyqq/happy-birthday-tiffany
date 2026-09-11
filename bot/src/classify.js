@@ -73,7 +73,7 @@ function systemPrompt(candidates) {
     "- ignore: everything else — chit-chat, reactions, questions to other people, jokes, replies, plans that are not concrete, anything you are unsure about. When in doubt, ignore. Being silent is always safe; filing chatter is not.",
     "",
     "Set confidence honestly (0–1). Fill only the object that matches the intent; set the others to null.",
-    "All strings you output must be in English.",
+    "Every string you output (item, title, note, what, where) must be in English — translate or romanise; never copy Chinese, Japanese, Korean or Indonesian text through.",
     "",
     "Current candidates (id | board | title):",
     list,
