@@ -126,6 +126,7 @@ function imagePrompt(candidates) {
     "- A map pin, a shop / restaurant / cafe / bar page, a hotel or Airbnb listing, a screenshot of a review or a social post about a venue → idea. Extract the place name as the title (English or romanised; keep the original script in note). kind: Food, Cafe, Sight, Shop, Night, Stay (hotels, guesthouses, apartments) or Other. Put the address, station, price or anything useful you can read in note.",
     "- If the place is already in the candidate list below → vote for it instead (use its id).",
     "- A selfie, a meme, a chat screenshot without a venue, a photo with no identifiable place, a flight ticket, a generic landscape → ignore.",
+    "Only write down what you can actually read in the image — never guess an address, station or price. If the name is legible but nothing else is, a short note is fine. Romanise Korean names carefully, character by character.",
     "When in doubt, ignore. Every string you output must be in English (romanise Korean names).",
     "",
     "Current candidates (id | board | title):",

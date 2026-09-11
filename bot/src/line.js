@@ -74,9 +74,10 @@ export const BIND_FIRST = `Tell me who you are first — type “I am <your name
 
 export const text = t => ({ type: "text", text: t });
 
-/** Download an image someone sent. Prefers LINE's smaller preview rendition. */
+/** Download an image someone sent. The full rendition first (screenshots need legible text);
+    LINE's small preview only as a fallback when the original is over Claude's 5 MB cap. */
 export async function imageContent(env, messageId) {
-  for (const path of [`/message/${messageId}/content/preview`, `/message/${messageId}/content`]) {
+  for (const path of [`/message/${messageId}/content`, `/message/${messageId}/content/preview`]) {
     const r = await fetch("https://api-data.line.me/v2/bot" + path, {
       headers: { Authorization: `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}` },
     });
