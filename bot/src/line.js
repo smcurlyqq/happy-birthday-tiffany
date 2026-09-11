@@ -9,77 +9,58 @@ export const MEMBER_LIST = "Amber · Akiha · Hye Yeon · Gigi · Nadia";
 
 export const PAGE_URL = "https://smcurlyqq.github.io/happy-birthday/korea/";
 
-const HELP_EN = [
+/* One welcome message: English first, then the same guide in Japanese, Korean and
+   Indonesian. Example messages stay in English everywhere — the group talks in English. */
+const EX = {
+  link:  "https://www.airbnb.com/rooms/…",
+  idea:  "“Let’s try Gwangjang Market”",
+  vote:  "“I’m in for Gwangjang”",
+  paid:  "“Paid 45,000 for dinner”",
+  plan:  "“Oct 18 2pm Gyeongbokgung, meet at exit 5”",
+  iam:   "“I am <your name>”",
+};
+
+const HELP_TEXT = [
   "🇰🇷 Seoul Loop bot",
-  "",
   "Everything you tell me lands on our trip page:",
   PAGE_URL,
   "",
   "Just type normally — I pick up:",
-  "• A link → Ideas (hotels go to Stays)",
-  "• “Let’s try Gwangjang Market” → Ideas",
-  "• “I’m in for Gwangjang”, or tap I’m in on a card → your vote",
-  "• “Paid 45,000 for dinner” → Expenses, in won, split 5 ways unless you name people",
-  "• “Oct 18 2pm Gyeongbokgung, meet at exit 5” → Itinerary",
+  `• A link → Ideas (hotels go to Stays)`,
+  `• ${EX.idea} → Ideas`,
+  `• ${EX.vote}, or tap I’m in on a card → your vote`,
+  `• ${EX.paid} → Expenses, in won, split 5 ways unless you name people`,
+  `• ${EX.plan} → Itinerary`,
+  `First, type ${EX.iam} once (${MEMBER_LIST}). Type “help” to see this again. Otherwise I stay quiet.`,
   "",
-  `First, type “I am <your name>” once (${MEMBER_LIST}).`,
-  "Type “help” to see this again. Otherwise I stay quiet.",
+  "🇯🇵 ここで伝えたことは旅のページにまとまります。普通に書くだけでOK：",
+  `• リンク → Ideas（ホテルは Stays）`,
+  `• ${EX.idea} → Ideas`,
+  `• ${EX.vote} またはカードの I’m in → 投票`,
+  `• ${EX.paid} → Expenses（ウォン。名前を書かなければ5人で割り勘）`,
+  `• ${EX.plan} → Itinerary`,
+  `最初に一度 ${EX.iam} と送ってください。「help」でこの説明を再表示。それ以外は黙っています。`,
+  "",
+  "🇰🇷 여기서 말한 건 전부 여행 페이지에 정리돼요. 평소처럼 쓰면 돼요:",
+  `• 링크 → Ideas (호텔은 Stays)`,
+  `• ${EX.idea} → Ideas`,
+  `• ${EX.vote} 또는 카드의 I’m in → 투표`,
+  `• ${EX.paid} → Expenses (원화, 이름을 안 쓰면 5명이 나눔)`,
+  `• ${EX.plan} → Itinerary`,
+  `먼저 ${EX.iam} 을 한 번 보내 주세요. “help” 를 치면 이 안내를 다시 볼 수 있어요. 그 외엔 조용히 있을게요.`,
+  "",
+  "🇮🇩 Semua yang kamu tulis di sini masuk ke halaman trip kita. Tulis seperti biasa saja:",
+  `• Tautan → Ideas (hotel masuk Stays)`,
+  `• ${EX.idea} → Ideas`,
+  `• ${EX.vote}, atau tekan I’m in di kartu → vote kamu`,
+  `• ${EX.paid} → Expenses, dalam won, dibagi 5 kecuali kamu sebut nama`,
+  `• ${EX.plan} → Itinerary`,
+  `Pertama, ketik ${EX.iam} sekali. Ketik “help” untuk lihat ini lagi. Selain itu aku diam.`,
 ].join("\n");
 
-const HELP_JA = [
-  "🇰🇷 Seoul Loop bot",
-  "",
-  "ここで伝えたことは、旅のページにまとまります：",
-  PAGE_URL,
-  "",
-  "普通に書くだけでOK。拾うのはこれ：",
-  "• リンク → Ideas（ホテルは Stays）",
-  "• 「広蔵市場行きたい」→ Ideas",
-  "• 「広蔵市場、私も行く」またはカードの I’m in → 投票",
-  "• 「夕食 45,000 払った」→ Expenses（ウォン。名前を書かなければ5人で割り勘）",
-  "• 「10/18 14:00 景福宮、5番出口集合」→ Itinerary",
-  "",
-  `最初に一度「私は 名前」と送ってください（${MEMBER_LIST}）。`,
-  "「ヘルプ」でこの説明を再表示。それ以外は黙っています。",
-].join("\n");
-
-const HELP_KO = [
-  "🇰🇷 Seoul Loop bot",
-  "",
-  "여기서 말한 건 전부 여행 페이지에 정리돼요:",
-  PAGE_URL,
-  "",
-  "그냥 평소처럼 쓰면 돼요. 제가 챙기는 것:",
-  "• 링크 → Ideas (호텔은 Stays)",
-  "• “광장시장 가보자” → Ideas",
-  "• “광장시장 나도 갈래” 또는 카드의 I’m in → 투표",
-  "• “저녁 45,000원 내가 냈어” → Expenses (원화, 이름을 안 쓰면 5명이 나눔)",
-  "• “10/18 2시 경복궁, 5번 출구에서 만나” → Itinerary",
-  "",
-  `먼저 “저는 이름” 을 한 번 보내 주세요 (${MEMBER_LIST}).`,
-  "“도움말” 을 치면 이 안내를 다시 볼 수 있어요. 그 외엔 조용히 있을게요.",
-].join("\n");
-
-const HELP_ID = [
-  "🇰🇷 Seoul Loop bot",
-  "",
-  "Semua yang kamu tulis di sini masuk ke halaman trip kita:",
-  PAGE_URL,
-  "",
-  "Tulis seperti biasa saja. Yang aku tangkap:",
-  "• Tautan → Ideas (hotel masuk Stays)",
-  "• “Ayo coba Gwangjang Market” → Ideas",
-  "• “Aku ikut ke Gwangjang”, atau tekan I’m in di kartu → vote kamu",
-  "• “Aku bayar makan malam 45.000” → Expenses, dalam won, dibagi 5 kecuali kamu sebut nama",
-  "• “18 Okt jam 2 Gyeongbokgung, kumpul di exit 5” → Itinerary",
-  "",
-  `Pertama, ketik “saya <nama>” sekali (${MEMBER_LIST}).`,
-  "Ketik “bantuan” untuk lihat ini lagi. Selain itu aku diam.",
-].join("\n");
-
-/** The welcome / help reply: four messages, one per language. */
-export const HELP_MESSAGES = [HELP_EN, HELP_JA, HELP_KO, HELP_ID].map(t => ({ type: "text", text: t }));
-export const HELP = HELP_EN;
+/** The welcome / help reply: one message, four languages, English examples. */
+export const HELP_MESSAGES = [{ type: "text", text: HELP_TEXT }];
+export const HELP = HELP_TEXT;
 
 export const BIND_FIRST = `Tell me who you are first — type “I am <your name>” (${MEMBER_LIST}).`;
 
