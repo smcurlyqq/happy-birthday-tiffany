@@ -423,16 +423,11 @@ dialog{border:1px solid var(--rule);border-radius:18px}
   <div class="seats" id="seats"></div>
   <div class="row"><button class="btn ghost tiny" id="addseat" data-i="crew.add">+ add someone</button></div>
 
-  <div class="head"><h2 data-i="ess.h">Before we fly</h2><p data-i="ess.p">five passports, five sets of rules</p></div>
+  <div class="head"><h2 data-i="ess.h">Before we fly</h2></div>
   <div class="card" style="padding:13px 14px">
     <ul class="checklist" id="essentials"></ul>
   </div>
 
-  <div class="head"><h2 data-i="fx.h">Exchange rates</h2><p data-i="fx.p">KRW per 1 unit — edit before we go</p></div>
-  <div class="card" style="padding:13px 14px;display:flex;flex-direction:column;gap:10px">
-    <div class="rates" id="rates"></div>
-    <div class="muted" style="font-size:12px" data-i="fx.note">Everything in Split is stored in won and shown in your own currency.</div>
-  </div>
 </section>
 
 <!-- ========== PREFS ========== -->
@@ -522,6 +517,7 @@ dialog{border:1px solid var(--rule);border-radius:18px}
 <section class="pane" id="p-split" hidden>
   <div class="head"><h2 data-i="sp.h">Who paid what</h2><p data-i="sp.p">log it the moment you tap the card</p></div>
   <div class="tiles" id="sptiles"></div>
+  <div class="muted" id="fxline" style="font-size:12px;margin-top:-10px"></div>
 
   <div class="card" style="padding:13px 14px;display:flex;flex-direction:column;gap:10px">
     <div class="row">
@@ -615,7 +611,7 @@ const S={
 "ess1":["🇮🇩|Indonesian passport|Korea isn't visa-free for Indonesia — start the tourist visa now, it takes weeks. Everyone else: check whether you need K-ETA.","🇮🇩|印尼護照|韓國對印尼不免簽，觀光簽要及早送件（需數週）。其他人請確認自己要不要 K-ETA。","🇮🇩|インドネシア旅券|韓国はインドネシアにビザ免除ではありません。観光ビザを今すぐ申請（数週間）。他の人は K-ETA の要否を確認。","🇮🇩|인도네시아 여권|한국은 인도네시아 무비자 대상이 아닙니다. 관광 비자를 지금 신청하세요(몇 주 소요). 나머지는 K-ETA 필요 여부 확인.","🇮🇩|Paspor Indonesia|Korea tidak bebas visa untuk Indonesia — ajukan visa turis sekarang, butuh berminggu-minggu. Yang lain: cek K-ETA."],
 "ess2":["📱|Maps|Google Maps barely navigates in Korea. Install Naver Map or KakaoMap before you land.","📱|地圖|Google 地圖在韓國幾乎不能導航。落地前先裝 Naver Map 或 KakaoMap。","📱|地図|韓国では Google マップがほぼ案内できません。着陸前に Naver Map か KakaoMap を。","📱|지도|외국 번호로는 구글 지도 길찾기가 제한됩니다. 네이버 지도·카카오맵을 미리 받아 두세요.","📱|Peta|Google Maps nyaris tak bisa navigasi di Korea. Pasang Naver Map atau KakaoMap sebelum mendarat."],
 "ess3":["💳|T-money|One card for subway, buses and most taxis. Any convenience store sells and tops it up — cash.","💳|T-money 卡|地鐵、公車、多數計程車都能用。超商就能買和加值，收現金。","💳|T-money|地下鉄・バス・多くのタクシーで使用可。コンビニで購入とチャージ（現金）。","💳|티머니|지하철·버스·대부분 택시에서 사용. 편의점에서 구매·충전(현금).","💳|T-money|Satu kartu untuk subway, bus, dan hampir semua taksi. Beli & isi ulang di minimarket, tunai."],
-"ess4":["📶|Data|Decide as a group: five eSIMs, or one pocket wifi we share. Book before the trip, not at the airport.","📶|網路|群組先決定：各自 eSIM，還是共用一台 WiFi 機。出發前訂好，別到機場才買。","📶|通信|各自 eSIM か、みんなで WiFi ルーター1台か。空港ではなく事前に予約。","📶|데이터|각자 eSIM 쓸지, 포켓 와이파이 하나를 나눌지 미리 정하기. 공항 말고 사전 예약.","📶|Data|Putuskan bersama: eSIM masing-masing atau satu pocket wifi patungan. Pesan sebelum berangkat."],
+"ess4":["📶|Data|Everyone buys their own eSIM. Do it before the trip, not at the airport.","📶|網路|各自買自己的 eSIM。出發前先弄好，別到機場才買。","📶|通信|各自で eSIM を購入。空港ではなく事前に。","📶|데이터|각자 eSIM을 준비하세요. 공항 말고 미리.","📶|Data|Beli eSIM masing-masing. Sebelum berangkat, bukan di bandara."],
 "ess5":["🍁|Mid-October|Roughly 10–20 °C and genuinely cold after dark. Bring a real jacket — the leaves are just turning.","🍁|十月中|大約 10–20°C，入夜真的冷。帶件像樣的外套，楓葉正要轉紅。","🍁|10月中旬|およそ10〜20℃、夜はかなり冷えます。上着は本気のものを。紅葉は色づき始め。","🍁|10월 중순|10–20℃, 해 지면 꽤 춥습니다. 제대로 된 외투 필수. 단풍 들기 시작할 때.","🍁|Pertengahan Oktober|Sekitar 10–20 °C dan benar-benar dingin setelah gelap. Bawa jaket tebal."],
 "ess6":["🧾|Tax refund|Over ₩15,000 in one shop: keep the receipt and your passport, claim it at the airport.","🧾|退稅|同一間店超過 ₩15,000：收據和護照留著，機場辦退稅。","🧾|税金還付|1店舗₩15,000超：レシートとパスポートを保管し空港で還付。","🧾|택스 리펀드|한 매장 ₩15,000 초과 시 영수증·여권 보관, 공항에서 환급.","🧾|Tax refund|Di atas ₩15.000 dalam satu toko: simpan struk dan paspor, klaim di bandara."],
 "link.h":["Shared boards","共同編輯的表格","共同編集","같이 쓰는 표","Papan bersama"],
@@ -824,6 +820,7 @@ function remoteDB(base){
   async function pull(){ if(busy) return; busy=true;
     try{ const r=await fetch(base+"/state",{cache:"no-store"}); if(!r.ok) throw new Error(r.status);
       const st=await r.json();
+      if(st.rates&&st.rates.THB){ CFG={rates:Object.assign({},RATES0,st.rates)}; saveLocal(); }
       for(const c in subs){ const docs=Object.entries(st[c]||{}).map(([id,d])=>({id,exists:true,data:()=>d})); subs[c]({docs}); }
     }catch(e){ console.warn("sync failed",e); } finally{ busy=false; } }
   function schedule(ms){ clearTimeout(timer); timer=setTimeout(async()=>{ await pull(); schedule(15000); },ms); }
@@ -933,11 +930,9 @@ function renderTrip(){
       '<span class="nm">'+s.flag+' '+esc(nameOf(id))+'</span>'+
       '<span class="fl">'+esc(m&&m.name?arriveText(m):t("seat.claim"))+'</span></button>';}).join("");
 
-  $("#essentials").innerHTML=["ess1","ess2","ess3","ess4","ess5","ess6"].map(k=>{
+  $("#essentials").innerHTML=["ess1","ess2","ess3","ess4","ess5"].map(k=>{
     const p=t(k).split("|"); return '<li><span>'+p[0]+'</span><span><b>'+esc(p[1])+'</b> — '+esc(p[2])+'</span></li>';}).join("");
 
-  $("#rates").innerHTML=Object.keys(CUR).filter(c=>c!=="KRW").map(c=>
-    '<label>'+CUR[c].s+' 1 '+c+' =<input type="number" step="0.001" min="0" data-rate="'+c+'" value="'+rate(c)+'"></label>').join("");
 }
 function renderPrefs(){
   const list=joined(), answered=list.filter(id=>D.prefs[id]);
@@ -1019,6 +1014,7 @@ function renderPlan(){
         : '<div class="empty">'+esc(t("plan.none"))+'</div>')+'</div>';}).join("");
 }
 function renderSplit(){
+  if($("#fxline")) $("#fxline").textContent=t("fx.note")+" · ₩"+nf(rate("THB"),1)+" = ฿1";
   const crew=joined(); const sig=crew.join(",");
   if(sig!==sigMembers){ sigMembers=sig;
     $("#e_payer").innerHTML=crew.map(id=>'<option value="'+id+'">'+esc(nameOf(id))+'</option>').join("");
@@ -1151,9 +1147,6 @@ $("#medlg").addEventListener("close",()=>{
   put("members",p.id,{name,flight:$("#me_flight").value.trim(),arrive:$("#me_arrive").value||"",flag:p.flag,c:p.c,cur:(D.members[p.id]||{}).cur||p.cur});
   me=p.id; localStorage.setItem("sl.me",me); prefFor=null; sigMembers=""; pendingSeat=null; render();});
 
-$("#rates").addEventListener("input",e=>{const c=e.target.dataset.rate; if(!c)return;
-  CFG.rates[c]=Number(e.target.value)||RATES0[c]; budgetHint(); saveLocal();
-  clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ if(DB) DB.doc("config/main").set(CFG).catch(()=>{}); renderSplit(); },400);});
 
 $("#p_budget").addEventListener("input",budgetHint);
 $("#p_cur").addEventListener("change",budgetHint);

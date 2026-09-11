@@ -91,6 +91,26 @@ const json = (o, status = 200, extra = {}) =>
 /* ── read ───────────────────────────────────────────────────── */
 let cache = { at: 0, data: null };
 const CACHE_MS = 8000;
+
+/* Live exchange rates, KRW per 1 unit of each currency, refreshed twice a day.
+   Source: open.er-api.com (free, no key). Falls back to the seeds if it is down. */
+const RATE_SEED = { KRW: 1, THB: 42, TWD: 45, JPY: 9.5, HKD: 185, IDR: 0.088, USD: 1440 };
+let rateCache = { at: 0, data: RATE_SEED, live: false };
+async function rates() {
+  if (Date.now() - rateCache.at < 12 * 3600 * 1000) return rateCache;
+  try {
+    const r = await fetch("https://open.er-api.com/v6/latest/KRW", { cf: { cacheTtl: 3600 } });
+    const j = await r.json();
+    if (j.result !== "success" || !j.rates?.THB) throw new Error("bad payload");
+    const out = { KRW: 1 };
+    for (const c of Object.keys(RATE_SEED)) if (j.rates[c]) out[c] = 1 / j.rates[c];   // 1 THB = out.THB KRW
+    rateCache = { at: Date.now(), data: out, live: true, asOf: j.time_last_update_utc };
+  } catch (err) {
+    console.error("rates", String(err));
+    rateCache = { ...rateCache, at: Date.now() - 11 * 3600 * 1000 };   // retry in an hour
+  }
+  return rateCache;
+}
 const invalidate = () => { cache = { at: 0, data: null }; };
 
 async function state(env) {
@@ -102,7 +122,8 @@ async function state(env) {
   const crewIx = crewIndex(crew);                      // notionPageId → docId
   const seat = pid => crewIx[pid] || null;
 
-  const out = { members: {}, prefs: {}, ideas: {}, slots: {}, expenses: {}, ts: Date.now() };
+  const fx = await rates();
+  const out = { members: {}, prefs: {}, ideas: {}, slots: {}, expenses: {}, rates: fx.data, ratesLive: fx.live, ratesAsOf: fx.asOf || null, ts: Date.now() };
 
   let extra = 0;
   for (const p of crew) {
