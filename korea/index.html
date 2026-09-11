@@ -336,6 +336,8 @@ select{background-position:calc(100% - 12px) 16px,calc(100% - 8px) 16px}
 .cdown{border-top:0}
 .checklist li{border-bottom:1px solid var(--rule)}
 .av{font-weight:800}
+.x{border:1px solid var(--rule2);border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--card);line-height:1;flex:none;align-self:flex-start}
+.x:hover{border-color:var(--bad);color:var(--bad);background:var(--tint)}
 .empty{font-style:normal;font-weight:600;color:var(--ink3)}
 dialog{border:1px solid var(--rule);border-radius:18px}
 .card[style*="border-top:1.5px solid var(--ink)"]{border-top:1px solid var(--rule)!important}
@@ -465,7 +467,7 @@ dialog{border:1px solid var(--rule);border-radius:18px}
     </div>
     <label class="f"><span class="lbl" data-i="pref.note">One thing I really don't want to miss</span>
       <textarea id="p_note" data-ip="pref.noteph"></textarea></label>
-    <div class="row"><button class="btn" id="savepref" data-i="pref.save">Save</button><span class="muted" id="prefsaved" style="font-size:12px"></span></div>
+    <div class="row"><button class="btn" id="savepref" data-i="pref.save">Save</button><button class="btn ghost" id="clearpref" data-i="pref.clear">Clear my answers</button><span class="muted" id="prefsaved" style="font-size:12px"></span></div>
   </div>
 
   <div class="head"><h2 data-i="agg.h">Where we agree</h2><p data-i="agg.p">live tally</p></div>
@@ -622,6 +624,8 @@ const S={
 "pref.food":["Food I can't eat","飲食禁忌","食べられないもの","못 먹는 음식","Yang tidak bisa kumakan"],
 "pref.note":["One thing I really don't want to miss","絕對不想錯過的一件事","絶対に外せないこと","절대 놓치기 싫은 것","Satu hal yang wajib"],
 "pref.noteph":["Gwangjang market at night, a proper jjimjilbang, …","廣藏市場的夜晚、正統汗蒸幕⋯","夜の広蔵市場、本格チムジルバン…","밤의 광장시장, 제대로 된 찜질방…","Pasar Gwangjang malam hari, jjimjilbang…"],
+"pref.clear":["Clear my answers","清空我的答案","回答をクリア","내 답변 지우기","Hapus jawabanku"],
+"pref.cleared":["Cleared","已清空","クリアしました","지웠어요","Sudah dihapus"],
 "pref.save":["Save","儲存","保存","저장","Simpan"],
 "pref.saved":["saved","已儲存","保存しました","저장됨","tersimpan"],
 "agg.h":["Where we agree","共識","一致点","우리의 공통점","Titik temu"],
@@ -1140,6 +1144,10 @@ $("#savepref").addEventListener("click",()=>{ if(needMe())return;
     stays:getChips("#staychips"),habits:getChips("#habitchips"),pace:$("#p_pace").value,budget:getChips("#budgetchips")[0]||"",
     cur:"THB",note:$("#p_note").value.trim(),ts:Date.now()});
   $("#prefsaved").textContent="✓ "+t("pref.saved"); setTimeout(()=>$("#prefsaved").textContent="",2400);});
+
+$("#clearpref").addEventListener("click",()=>{ if(needMe())return; if(!confirm(t("del")))return;
+  put("prefs",me,{acts:[],areas:[],food:[],stays:[],habits:[],pace:"",budget:"",cur:"THB",note:"",ts:Date.now()});
+  prefFor=null; render(); $("#prefsaved").textContent="✓ "+t("pref.cleared"); setTimeout(()=>$("#prefsaved").textContent="",2400);});
 
 $("#addidea").addEventListener("click",()=>{ if(needMe())return;
   const title=$("#i_title").value.trim(); if(!title){ $("#i_title").focus(); return; }
