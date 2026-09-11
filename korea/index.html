@@ -996,7 +996,7 @@ function renderPlan(){
         return '<div class="slot"><div class="tm">'+esc(s.time||"—")+'</div>'+
           '<div><div class="st">'+esc(s.title)+'</div>'+
           (s.note?'<div class="sub muted" style="font-size:12.5px">'+esc(s.note)+'</div>':"")+
-          '<div class="sub"><span class="who">'+av(s.by)+esc(nameOf(s.by))+'</span></div></div>'+
+          (s.by?'<div class="sub"><span class="who">'+av(s.by)+esc(nameOf(s.by))+'</span></div>':"")+'</div>'+
           '<button class="x" data-del="slots:'+id+'" aria-label="delete">✕</button></div>';}).join("")
         : '<div class="empty">'+esc(t("plan.none"))+'</div>')+'</div>';}).join("");
 }
