@@ -102,3 +102,61 @@ export async function classify(env, { text, senderName, candidates }) {
     return null;
   }
 }
+
+
+/* ── screenshots ─────────────────────────────────────────────── */
+
+export const ImageIntent = z.object({
+  intent: z.enum(["idea", "vote", "ignore"]),
+  confidence: z.number().min(0).max(1),
+  idea: z.object({
+    title: z.string(),
+    kind: z.enum(["Food", "Cafe", "Sight", "Shop", "Night", "Stay", "Other"]),
+    area: Area.nullable(),
+    note: z.string(),
+  }).nullable(),
+  vote: z.object({ target_id: z.string(), board: z.enum(["ideas", "stays"]) }).nullable(),
+});
+
+function imagePrompt(candidates) {
+  const list = candidates.length ? candidates.map(c => `${c.id} | ${c.board} | ${c.title}`).join("\n") : "(none yet)";
+  return [
+    "You are the quiet collector bot in a LINE group chat for a five-person trip to Seoul, 2026-10-17 to 2026-10-20.",
+    "Someone shared an image. Decide whether it shows ONE specific place worth saving for the trip:",
+    "- A map pin, a shop / restaurant / cafe / bar page, a hotel or Airbnb listing, a screenshot of a review or a social post about a venue → idea. Extract the place name as the title (English or romanised; keep the original script in note). kind: Food, Cafe, Sight, Shop, Night, Stay (hotels, guesthouses, apartments) or Other. Put the address, station, price or anything useful you can read in note.",
+    "- If the place is already in the candidate list below → vote for it instead (use its id).",
+    "- A selfie, a meme, a chat screenshot without a venue, a photo with no identifiable place, a flight ticket, a generic landscape → ignore.",
+    "When in doubt, ignore. Every string you output must be in English (romanise Korean names).",
+    "",
+    "Current candidates (id | board | title):",
+    list,
+  ].join("\n");
+}
+
+/**
+ * @param opts { data: base64 string, mediaType: "image/jpeg" | "image/png" | …, senderName, candidates }
+ * @returns parsed ImageIntent, or null on failure
+ */
+export async function classifyImage(env, { data, mediaType, senderName, candidates }) {
+  const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, timeout: 25_000, maxRetries: 1 });
+  try {
+    const res = await client.messages.parse({
+      model: MODEL,
+      max_tokens: 1024,
+      system: imagePrompt(candidates),
+      messages: [{
+        role: "user",
+        content: [
+          { type: "image", source: { type: "base64", media_type: mediaType, data } },
+          { type: "text", text: `Shared by: ${senderName || "unknown (not bound yet)"}` },
+        ],
+      }],
+      output_config: { format: zodOutputFormat(ImageIntent) },
+    });
+    if (res.stop_reason === "refusal") return null;
+    return res.parsed_output ?? null;
+  } catch (err) {
+    console.error("classifyImage failed", String(err));
+    return null;
+  }
+}

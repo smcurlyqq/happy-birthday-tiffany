@@ -12,9 +12,9 @@
  * /api/* is the web page's data layer (see api.js) — same Notion boards.
  */
 
-import { classify, CONFIDENCE_FLOOR, seoulToday } from "./classify.js";
+import { classify, classifyImage, CONFIDENCE_FLOOR, seoulToday } from "./classify.js";
 import * as db from "./notion.js";
-import { reply, leave, text, card, HELP_MESSAGES, BIND_FIRST, KINDS, kindKey, PAGE_URL } from "./line.js";
+import { reply, leave, text, card, imageContent, HELP_MESSAGES, BIND_FIRST, KINDS, kindKey, PAGE_URL } from "./line.js";
 import { extractUrls, resolve, classifyLink, guessArea } from "./links.js";
 import { handleApi } from "./api.js";
 
@@ -59,6 +59,7 @@ async function handle(ev, env) {
   }
   if (ev.type === "postback") return onPostback(ev, env);
   if (ev.type === "message" && ev.message?.type === "text") return onText(ev, env);
+  if (ev.type === "message" && ev.message?.type === "image") return onImage(ev, env);
 }
 
 /* ── text messages ──────────────────────────────────────────── */
@@ -137,6 +138,31 @@ async function collectLink(link, note, ev, env) {
   const created = conf.board === "stays" ? await db.createStay(env, row) : await db.createIdea(env, row);
 
   return reply(env, ev.replyToken, [card({ title: page.title, host: page.host, kind, sure, pageId: created.id })]);
+}
+
+/* ── screenshots ────────────────────────────────────────────── */
+async function onImage(ev, env) {
+  const img = await imageContent(env, ev.message.id);
+  if (!img) return;
+  const [me, cands] = await Promise.all([db.memberByLineId(env, ev.source?.userId), db.candidates(env)]);
+  const out = await classifyImage(env, { ...img, senderName: me?.name, candidates: cands });
+  if (!out || out.intent === "ignore" || out.confidence < CONFIDENCE_FLOOR) {
+    console.log("image ignored", JSON.stringify({ intent: out?.intent, c: out?.confidence }));
+    return;
+  }
+  console.log("image intent", out.intent, out.confidence, out.idea?.title);
+  try {
+    if (out.intent === "vote") return onVote(out.vote?.target_id, me, ev, env);
+    const x = out.idea; if (!x) return;
+    if (x.kind === "Stay") {
+      const created = await db.createStay(env, { title: x.title, note: x.note, area: x.area, byId: me?.id });
+      return reply(env, ev.replyToken, [card({ title: x.title, host: "", kind: "stay", sure: true, pageId: created.id })]);
+    }
+    return onIdea(x, me, ev, env);
+  } catch (err) {
+    console.error("image handler failed", String(err));
+    return reply(env, ev.replyToken, [text("Couldn't save that — try again in a minute.")]);
+  }
 }
 
 /* ── AI-classified intents ──────────────────────────────────── */

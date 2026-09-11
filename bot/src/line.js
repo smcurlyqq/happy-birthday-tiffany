@@ -26,7 +26,7 @@ const HELP_TEXT = [
   PAGE_URL,
   "",
   "Just type normally — I pick up:",
-  `• A link → Ideas (hotels go to Stays)`,
+  `• A link or a screenshot of a place → Ideas (hotels go to Stays)`,
   `• ${EX.idea} → Ideas`,
   `• ${EX.vote}, or tap I’m in on a card → your vote`,
   `• ${EX.paid} → Expenses, in won, split 5 ways unless you name people`,
@@ -34,7 +34,7 @@ const HELP_TEXT = [
   `First, type ${EX.iam} once (${MEMBER_LIST}). Type “help” to see this again. Otherwise I stay quiet.`,
   "",
   "🇯🇵 ここで伝えたことは旅のページにまとまります。普通に書くだけでOK：",
-  `• リンク → Ideas（ホテルは Stays）`,
+  `• リンクや店のスクショ → Ideas（ホテルは Stays）`,
   `• ${EX.idea} → Ideas`,
   `• ${EX.vote} またはカードの I’m in → 投票`,
   `• ${EX.paid} → Expenses（ウォン。名前を書かなければ5人で割り勘）`,
@@ -42,7 +42,7 @@ const HELP_TEXT = [
   `最初に一度 ${EX.iam} と送ってください。「help」でこの説明を再表示。それ以外は黙っています。`,
   "",
   "🇰🇷 여기서 말한 건 전부 여행 페이지에 정리돼요. 평소처럼 쓰면 돼요:",
-  `• 링크 → Ideas (호텔은 Stays)`,
+  `• 링크나 장소 스크린샷 → Ideas (호텔은 Stays)`,
   `• ${EX.idea} → Ideas`,
   `• ${EX.vote} 또는 카드의 I’m in → 투표`,
   `• ${EX.paid} → Expenses (원화, 이름을 안 쓰면 5명이 나눔)`,
@@ -50,7 +50,7 @@ const HELP_TEXT = [
   `먼저 ${EX.iam} 을 한 번 보내 주세요. “help” 를 치면 이 안내를 다시 볼 수 있어요. 그 외엔 조용히 있을게요.`,
   "",
   "🇭🇰 你喺度講嘅嘢全部會入晒去我哋個旅行網頁。照平時咁打就得：",
-  `• 貼 link → Ideas（酒店入 Stays）`,
+  `• 貼 link 或者店嘅 screenshot → Ideas（酒店入 Stays）`,
   `• ${EX.idea} → Ideas`,
   `• ${EX.vote} 或者撳張卡上面嘅 I’m in → 投票`,
   `• ${EX.paid} → Expenses（韓圜，唔寫名就五個人夾）`,
@@ -58,7 +58,7 @@ const HELP_TEXT = [
   `一開始先打一次 ${EX.iam}。打 “help” 可以再睇一次呢段。其他時候我唔會出聲。`,
   "",
   "🇮🇩 Semua yang kamu tulis di sini masuk ke halaman trip kita. Tulis seperti biasa saja:",
-  `• Tautan → Ideas (hotel masuk Stays)`,
+  `• Tautan atau screenshot tempat → Ideas (hotel masuk Stays)`,
   `• ${EX.idea} → Ideas`,
   `• ${EX.vote}, atau tekan I’m in di kartu → vote kamu`,
   `• ${EX.paid} → Expenses, dalam won, dibagi 5 kecuali kamu sebut nama`,
@@ -73,6 +73,22 @@ export const HELP = HELP_TEXT;
 export const BIND_FIRST = `Tell me who you are first — type “I am <your name>” (${MEMBER_LIST}).`;
 
 export const text = t => ({ type: "text", text: t });
+
+/** Download an image someone sent. Prefers LINE's smaller preview rendition. */
+export async function imageContent(env, messageId) {
+  for (const path of [`/message/${messageId}/content/preview`, `/message/${messageId}/content`]) {
+    const r = await fetch("https://api-data.line.me/v2/bot" + path, {
+      headers: { Authorization: `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}` },
+    });
+    if (!r.ok) { console.error("line content", path, r.status); continue; }
+    const type = (r.headers.get("content-type") || "image/jpeg").split(";")[0];
+    const buf = new Uint8Array(await r.arrayBuffer());
+    if (buf.byteLength > 4_500_000) continue;                // Claude's per-image cap is 5 MB
+    let bin = ""; for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000));
+    return { data: btoa(bin), mediaType: type };
+  }
+  return null;
+}
 
 export async function reply(env, replyToken, messages) {
   if (!replyToken) return;
