@@ -30,11 +30,12 @@ const ACT  = { food: "Food", sight: "Sights", shop: "Shopping", cafe: "Cafes", n
 const AREA = { hongdae: "Hongdae", yeonnam: "Yeonnam / Hapjeong", myeongdong: "Myeongdong", insadong: "Insadong", ikseon: "Ikseon", bukchon: "Bukchon / Samcheong", dongdaemun: "Dongdaemun", itaewon: "Itaewon / Hannam", yongsan: "Yongsan / Seoul Station", seongsu: "Seongsu", gangnam: "Gangnam", apgujeong: "Apgujeong / Cheongdam", jamsil: "Jamsil" };
 const STAY = { hotel: "Hotel", guesthouse: "Guesthouse", airbnb: "Apartment", hostel: "Hostel" };
 const PACE = { chill: "Chill", balanced: "Balanced", packed: "Packed" };
+const BUDGET = { b0: "≤ ฿1000", b1: "฿1000–2000", b2: "฿2000–3000", b3: "฿3000–4500", b4: "฿4500+" };   // Notion select names can't contain commas
 const HABIT = { solo: "Need alone time", together: "Move as a group", early: "Early riser", late: "Night owl", walk: "Happy to walk", taxi: "Taxi over subway", plan: "Fixed plan", flow: "Go with the flow", photo: "Stops for photos", queue: "Queues for food" };
 const FOOD = { halal: "Halal", pork: "No pork", beef: "No beef", veg: "Vegetarian", seafood: "Seafood allergy", spicy: "Not spicy" };
 const CAT  = { food: "Food", cafe: "Cafe", sight: "Sight", shop: "Shop", night: "Night", other: "Other" };
 const inv = m => Object.fromEntries(Object.entries(m).map(([k, v]) => [v, k]));
-const ACT_R = inv(ACT), AREA_R = inv(AREA), STAY_R = inv(STAY), PACE_R = inv(PACE), FOOD_R = inv(FOOD), CAT_R = inv(CAT), HABIT_R = inv(HABIT);
+const ACT_R = inv(ACT), AREA_R = inv(AREA), STAY_R = inv(STAY), PACE_R = inv(PACE), FOOD_R = inv(FOOD), CAT_R = inv(CAT), HABIT_R = inv(HABIT), BUDGET_R = inv(BUDGET);
 
 const ALLOWED_ORIGINS = [/^https:\/\/smcurlyqq\.github\.io$/, /^http:\/\/localhost(:\d+)?$/, /^http:\/\/127\.0\.0\.1(:\d+)?$/];
 
@@ -144,7 +145,7 @@ async function state(env) {
       stays: (P["Stay type"]?.multi_select || []).map(o => STAY_R[o.name]).filter(Boolean),
       habits: (P["Habits"]?.multi_select || []).map(o => HABIT_R[o.name]).filter(Boolean),
       pace:  PACE_R[P["Pace"]?.select?.name] || "",
-      budget: P["Stay budget / night"]?.number || 0,
+      budget: BUDGET_R[P["Stay budget / night"]?.select?.name] || "",
       cur:   P["Currency"]?.select?.name || DEFAULT_CUR,
       note:  plainText(P["Must-do"]),
       ts:    Date.parse(p.last_edited_time) || 0,
@@ -285,7 +286,7 @@ async function putPrefs(env, id, p) {
     "Stay type":  multi((p.stays || (p.stay ? [p.stay] : [])).map(k => STAY[k]).filter(Boolean)),
     "Habits":     multi((p.habits || []).map(k => HABIT[k]).filter(Boolean)),
     "Pace":       sel(PACE[p.pace]),
-    "Stay budget / night": { number: Number(p.budget) || null },
+    "Stay budget / night": sel(BUDGET[p.budget]),
     "Must-do":    { rich_text: rich(p.note) },
   };
   if (p.cur) props["Currency"] = sel(p.cur);

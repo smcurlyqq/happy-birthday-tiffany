@@ -446,13 +446,11 @@ dialog{border:1px solid var(--rule);border-radius:18px}
       <div class="lbl" style="margin-bottom:7px" data-i="pref.stay">Stay type (pick any)</div>
       <div class="chipset" id="staychips"></div>
     </div>
-    <div class="row">
-      <label class="f"><span class="lbl" data-i="pref.budget">Stay budget · per person per night</span>
-        <input type="number" id="p_budget" min="0" step="10" placeholder="0"></label>
-      <label class="f" style="max-width:120px;display:none"><span class="lbl" data-i="pref.cur">Currency</span>
-        <select id="p_cur"></select></label>
+    <div>
+      <div class="lbl" style="margin-bottom:7px" data-i="pref.budget">Stay budget · per person per night</div>
+      <div class="chipset" id="budgetchips" data-single="1"></div>
+      <select id="p_cur" hidden></select>
     </div>
-    <div class="muted mono" id="budgethint" style="font-size:12px"></div>
     <div>
       <div class="lbl" style="margin-bottom:7px" data-i="pref.habits">How I travel</div>
       <div class="chipset" id="habitchips"></div>
@@ -576,7 +574,6 @@ dialog{border:1px solid var(--rule);border-radius:18px}
 /* ───────────────────────── strings: en · zh · ja · ko · id ───────────────────────── */
 const LANGS=["en","zh","ja","ko","id"];
 const S={
-"tagline":["five passports · one october","五本護照 · 一個十月","5つのパスポート · ひとつの10月","여권 다섯 · 하나의 10월","lima paspor · satu oktober"],
 "whoami":["Who are you?","你是誰？","あなたは？","누구세요?","Kamu siapa?"],
 "gate.h":["Who are you?","你是誰？","あなたは誰？","당신은 누구세요?","Kamu siapa?"],
 "gate.p":["Pick your name — votes, plans and every won you spend get filed under it.","選你的名字 — 投票、行程、每一筆花費都會記在上面。","名前を選んでください。投票も日程も支出も、すべてここに紐づきます。","이름을 고르세요. 투표·일정·지출이 모두 여기에 기록됩니다.","Pilih namamu — voting, rencana, dan tiap pengeluaran tercatat di sana."],
@@ -607,20 +604,11 @@ const S={
 "seat.arrives":["Arrives","抵達","到着","도착","Tiba"],
 "seat.claim":["tap to claim this seat","點一下登記這個位子","タップして登録","눌러서 등록","ketuk untuk ambil kursi"],
 "ess.h":["Before we fly","出發前","出発前に","출발 전","Sebelum terbang"],
-"ess.p":["five passports, five sets of rules","五本護照，五套規則","旅券5冊、規則も5通り","여권 다섯, 규정도 다섯","lima paspor, lima aturan"],
 "ess1":["🇮🇩|Indonesian passport|Korea isn't visa-free for Indonesia — start the tourist visa now, it takes weeks. Everyone else: check whether you need K-ETA.","🇮🇩|印尼護照|韓國對印尼不免簽，觀光簽要及早送件（需數週）。其他人請確認自己要不要 K-ETA。","🇮🇩|インドネシア旅券|韓国はインドネシアにビザ免除ではありません。観光ビザを今すぐ申請（数週間）。他の人は K-ETA の要否を確認。","🇮🇩|인도네시아 여권|한국은 인도네시아 무비자 대상이 아닙니다. 관광 비자를 지금 신청하세요(몇 주 소요). 나머지는 K-ETA 필요 여부 확인.","🇮🇩|Paspor Indonesia|Korea tidak bebas visa untuk Indonesia — ajukan visa turis sekarang, butuh berminggu-minggu. Yang lain: cek K-ETA."],
 "ess2":["📱|Maps|Google Maps barely navigates in Korea. Install Naver Map or KakaoMap before you land.","📱|地圖|Google 地圖在韓國幾乎不能導航。落地前先裝 Naver Map 或 KakaoMap。","📱|地図|韓国では Google マップがほぼ案内できません。着陸前に Naver Map か KakaoMap を。","📱|지도|외국 번호로는 구글 지도 길찾기가 제한됩니다. 네이버 지도·카카오맵을 미리 받아 두세요.","📱|Peta|Google Maps nyaris tak bisa navigasi di Korea. Pasang Naver Map atau KakaoMap sebelum mendarat."],
 "ess3":["💳|T-money|One card for subway, buses and most taxis. Any convenience store sells and tops it up — cash.","💳|T-money 卡|地鐵、公車、多數計程車都能用。超商就能買和加值，收現金。","💳|T-money|地下鉄・バス・多くのタクシーで使用可。コンビニで購入とチャージ（現金）。","💳|티머니|지하철·버스·대부분 택시에서 사용. 편의점에서 구매·충전(현금).","💳|T-money|Satu kartu untuk subway, bus, dan hampir semua taksi. Beli & isi ulang di minimarket, tunai."],
 "ess4":["📶|Data|Everyone buys their own eSIM. Do it before the trip, not at the airport.","📶|網路|各自買自己的 eSIM。出發前先弄好，別到機場才買。","📶|通信|各自で eSIM を購入。空港ではなく事前に。","📶|데이터|각자 eSIM을 준비하세요. 공항 말고 미리.","📶|Data|Beli eSIM masing-masing. Sebelum berangkat, bukan di bandara."],
 "ess5":["🍁|Mid-October|Roughly 10–20 °C and genuinely cold after dark. Bring a real jacket — the leaves are just turning.","🍁|十月中|大約 10–20°C，入夜真的冷。帶件像樣的外套，楓葉正要轉紅。","🍁|10月中旬|およそ10〜20℃、夜はかなり冷えます。上着は本気のものを。紅葉は色づき始め。","🍁|10월 중순|10–20℃, 해 지면 꽤 춥습니다. 제대로 된 외투 필수. 단풍 들기 시작할 때.","🍁|Pertengahan Oktober|Sekitar 10–20 °C dan benar-benar dingin setelah gelap. Bawa jaket tebal."],
-"ess6":["🧾|Tax refund|Over ₩15,000 in one shop: keep the receipt and your passport, claim it at the airport.","🧾|退稅|同一間店超過 ₩15,000：收據和護照留著，機場辦退稅。","🧾|税金還付|1店舗₩15,000超：レシートとパスポートを保管し空港で還付。","🧾|택스 리펀드|한 매장 ₩15,000 초과 시 영수증·여권 보관, 공항에서 환급.","🧾|Tax refund|Di atas ₩15.000 dalam satu toko: simpan struk dan paspor, klaim di bandara."],
-"link.h":["Shared boards","共同編輯的表格","共同編集","같이 쓰는 표","Papan bersama"],
-"link.p":["Notion holds what we edit together","一起改的東西放在 Notion","一緒に編集するものは Notion に","같이 고치는 건 Notion에","Yang diedit bersama ada di Notion"],
-"link.go":["Open the Notion boards →","打開 Notion 共同計畫 →","Notion を開く →","Notion 열기 →","Buka Notion →"],
-"link.what":["Crew & taste · Ideas & votes · Itinerary · Expenses","成員喜好 · 口袋名單投票 · 每日行程 · 記帳","メンバー · 候補と投票 · 日程 · 精算","멤버 · 아이디어 · 일정 · 정산","Anggota · Ide & voting · Jadwal · Patungan"],
-"link.copy":["Copy the link for LINE","複製連結貼到 LINE","LINE用にリンクをコピー","LINE에 붙일 링크 복사","Salin tautan untuk LINE"],
-"fx.h":["Exchange rates","匯率","為替レート","환율","Kurs"],
-"fx.p":["KRW per 1 unit — edit before we go","1 單位兌韓元 — 出發前更新","1単位あたりのウォン — 出発前に更新","1단위당 원 — 출발 전 수정","KRW per 1 unit — ubah sebelum pergi"],
 "fx.note":["Everything in Split is stored in won and shown in baht.","記帳一律以韓元儲存，再換算成泰銖顯示。","精算はウォンで保存し、バーツで表示します。","정산은 원화로 저장하고 바트로 보여 줍니다.","Semua di Patungan disimpan dalam won lalu ditampilkan dalam baht."],
 "pref.h":["What you want","你的喜好","あなたの希望","당신의 취향","Maumu apa"],
 "pref.p":["visible to the whole group","全員都看得到","全員に公開されます","모두에게 보입니다","terlihat oleh semua"],
@@ -629,7 +617,7 @@ const S={
 "pref.stay":["Stay type (pick any)","住宿型態（可複選）","宿の種類（複数可）","숙소 형태(복수 선택)","Jenis penginapan (boleh banyak)"],
 "pref.habits":["How I travel","旅行習慣","旅のスタイル","여행 습관","Cara aku traveling"],
 "pref.pace":["Pace","步調","ペース","일정 강도","Tempo"],
-"pref.budget":["Stay budget · per person per night (THB)","住宿預算 · 每人每晚（泰銖）","宿の予算・1人1泊（バーツ）","숙소 예산 · 1인 1박(바트)","Budget penginapan · per orang per malam (THB)"],
+"pref.budget":["Stay budget · per person per night","住宿預算 · 每人每晚","宿の予算・1人1泊","숙소 예산 · 1인 1박","Budget penginapan · per orang per malam"],
 "pref.cur":["Currency","幣別","通貨","통화","Mata uang"],
 "pref.food":["Food I can't eat","飲食禁忌","食べられないもの","못 먹는 음식","Yang tidak bisa kumakan"],
 "pref.note":["One thing I really don't want to miss","絕對不想錯過的一件事","絶対に外せないこと","절대 놓치기 싫은 것","Satu hal yang wajib"],
@@ -640,14 +628,11 @@ const S={
 "agg.p":["live tally","即時統計","リアルタイム集計","실시간 집계","hitungan langsung"],
 "agg.top":["Most wanted","最多人想要","人気","최다 선택","Paling diminati"],
 "agg.area":["Where to stay","住宿區域","エリア","숙소 지역","Area menginap"],
-"agg.budget":["Stay budget per night, in won","住宿預算 每人每晚（韓元）","宿の予算 1人1泊（ウォン）","숙소 예산 1인 1박(원)","Budget penginapan per malam, dalam won"],
+"agg.budget":["Stay budget per night","住宿預算 每人每晚","宿の予算 1人1泊","숙소 예산 1인 1박","Budget penginapan per malam"],
 "agg.stay":["Stay type","住宿型態","宿の種類","숙소 형태","Jenis penginapan"],
 "agg.habits":["How we travel","旅行習慣","旅のスタイル","여행 습관","Cara kami traveling"],
 "agg.pace":["Pace","步調","ペース","일정 강도","Tempo"],
 "agg.food":["Watch out for","要注意","注意","주의","Perhatikan"],
-"agg.low":["lowest","最低","最低","최저","terendah"],
-"agg.avg":["average","平均","平均","평균","rata-rata"],
-"agg.high":["highest","最高","最高","최고","tertinggi"],
 "agg.none":["Nobody has filled this in yet — you go first.","還沒有人填，你先來。","まだ誰も入力していません。最初の一人に。","아직 아무도 안 썼어요. 먼저 해 보세요.","Belum ada yang mengisi — kamu duluan."],
 "ans.h":["Everyone's answers","每個人的答案","みんなの回答","모두의 답변","Jawaban semua orang"],
 "ans.n":["of us answered","人已填","人が回答","명 응답","orang menjawab"],
@@ -751,6 +736,11 @@ const HABITS=[["solo","Need some alone time","喜歡有個人空間","一人の�
 ["flow","Go with the flow","隨興就好","気分で決めたい","즉흥적으로","Ikut arus aja"],
 ["photo","Will stop for photos","會停下來拍照","写真で止まる","사진 찍느라 멈춰요","Sering berhenti foto"],
 ["queue","Will queue for good food","願意為美食排隊","行列でも食べたい","맛집이면 줄 서도 OK","Mau antre demi makanan"]];
+const BUDGETS=[["b0","≤ ฿1,000","≤ ฿1,000","≤ ฿1,000","≤ ฿1,000","≤ ฿1,000"],
+["b1","฿1,000–2,000","฿1,000–2,000","฿1,000–2,000","฿1,000–2,000","฿1,000–2,000"],
+["b2","฿2,000–3,000","฿2,000–3,000","฿2,000–3,000","฿2,000–3,000","฿2,000–3,000"],
+["b3","฿3,000–4,500","฿3,000–4,500","฿3,000–4,500","฿3,000–4,500","฿3,000–4,500"],
+["b4","฿4,500+","฿4,500+","฿4,500+","฿4,500+","฿4,500+"]];
 const PACES=[["chill","Chill","慢慢走","のんびり","여유롭게","Santai"],
 ["balanced","Balanced","鬆緊適中","バランス","적당히","Seimbang"],
 ["packed","Packed","排好排滿","詰め込む","빡세게","Padat"]];
@@ -885,7 +875,7 @@ function applyI18n(){
   fillSel($("#p_pace"),PACES,kPace||"balanced");
   fillSel($("#i_cat"),CATS,kCat||"food"); fillDays($("#s_day"),kSDay||0); fillDays($("#e_day"),kEDay||0);
   $("#foot").textContent=t("foot");
-  chipset("#actchips",ACTS); chipset("#areachips",AREAS); chipset("#foodchips",FOODS); chipset("#staychips",STAYS); chipset("#habitchips",HABITS);
+  chipset("#actchips",ACTS); chipset("#areachips",AREAS); chipset("#foodchips",FOODS); chipset("#staychips",STAYS); chipset("#habitchips",HABITS); chipset("#budgetchips",BUDGETS);
   const f=$("#ideafilter");
   f.innerHTML='<button class="chip" data-f="all" aria-pressed="'+(ideaFilter==="all")+'">'+esc(t("idea.all"))+'</button>'+
     CATS.map(c=>'<button class="chip" data-f="'+c[0]+'" aria-pressed="'+(ideaFilter===c[0])+'">'+esc(opt(c))+'</button>').join("");
@@ -940,19 +930,19 @@ function renderPrefs(){
     setChips("#actchips",p.acts); setChips("#areachips",p.areas); setChips("#foodchips",p.food);
     setChips("#staychips",p.stays||(p.stay?[p.stay]:[])); setChips("#habitchips",p.habits);
     $("#p_pace").value=p.pace||"balanced";
-    $("#p_budget").value=p.budget||""; fillCur($("#p_cur"),"THB"); $("#p_note").value=p.note||"";
-    budgetHint(); }
+    setChips("#budgetchips",typeof p.budget==="string"?[p.budget]:[]); $("#p_note").value=p.note||""; }
   $("#anscount").textContent=answered.length+" / "+Math.max(list.length,answered.length)+" "+t("ans.n");
 
   const agg=$("#aggcard");
   if(!answered.length){ agg.innerHTML='<div class="empty">'+esc(t("agg.none"))+'</div>'; }
   else{
-    const tally=(rows,field)=>{const c={};answered.forEach(id=>{const pp=D.prefs[id]||{}; const vals=pp[field]||(field==="stays"&&pp.stay?[pp.stay]:[]); vals.forEach(v=>c[v]=(c[v]||0)+1);});
+    const tally=(rows,field)=>{const c={};answered.forEach(id=>{const pp=D.prefs[id]||{}; const vals=field==="budgetArr"?(typeof pp.budget==="string"&&pp.budget?[pp.budget]:[]):(pp[field]||(field==="stays"&&pp.stay?[pp.stay]:[])); vals.forEach(v=>c[v]=(c[v]||0)+1);});
       return rows.filter(r=>c[r[0]]).sort((a,b)=>c[b[0]]-c[a[0]]).map(r=>[opt(r),c[r[0]]]);};
     const bars=(arr)=>arr.map(([label,n])=>'<div class="bar"><div>'+esc(label)+
       '<div class="track"><div class="fill" style="width:'+Math.round(n/answered.length*100)+'%"></div></div></div>'+
       '<div class="n">'+n+'/'+answered.length+'</div></div>').join("");
-    const buds=answered.map(id=>{const p=D.prefs[id];return Number(p.budget||0)*rate(p.cur||"KRW");}).filter(v=>v>0);
+    const buds=[];
+
     const paceC={}; answered.forEach(id=>{const v=(D.prefs[id]||{}).pace; if(v) paceC[v]=(paceC[v]||0)+1;});
     const foodC={}; answered.forEach(id=>((D.prefs[id]||{}).food||[]).forEach(v=>{(foodC[v]=foodC[v]||[]).push(nameOf(id));}));
     agg.innerHTML=
@@ -960,10 +950,7 @@ function renderPrefs(){
       '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.area"))+'</div><div class="bars">'+bars(tally(AREAS,"areas"))+'</div></div>'+
       '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.stay"))+'</div><div class="bars">'+bars(tally(STAYS,"stays"))+'</div></div>'+
       '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.habits"))+'</div><div class="bars">'+bars(tally(HABITS,"habits"))+'</div></div>'+
-      (buds.length?'<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.budget"))+'</div><dl class="kv">'+
-        '<dt>'+esc(t("agg.low"))+'</dt><dd>'+won(Math.min(...buds))+'</dd>'+
-        '<dt>'+esc(t("agg.avg"))+'</dt><dd>'+won(buds.reduce((a,b)=>a+b,0)/buds.length)+'</dd>'+
-        '<dt>'+esc(t("agg.high"))+'</dt><dd>'+won(Math.max(...buds))+'</dd></dl></div>':"")+
+      '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.budget"))+'</div><div class="bars">'+bars(tally(BUDGETS,"budgetArr"))+'</div></div>'+
       '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.pace"))+'</div><div class="chipset">'+
         PACES.filter(p=>paceC[p[0]]).map(p=>'<span class="tag">'+esc(opt(p))+' · '+paceC[p[0]]+'</span>').join("")+'</div></div>'+
       (Object.keys(foodC).length?'<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.food"))+'</div><div class="chipset">'+
@@ -977,7 +964,7 @@ function renderPrefs(){
       '<div class="ttl"><span class="who">'+av(id)+esc(nameOf(id))+'</span></div>'+
       '<div class="chipset">'+tags(ACTS,p.acts)+tags(AREAS,p.areas)+tags(STAYS,p.stays||(p.stay?[p.stay]:[]))+tags(HABITS,p.habits)+
         (pc?'<span class="tag">'+esc(opt(pc))+'</span>':"")+
-        (p.budget?'<span class="tag">'+won(Number(p.budget)*rate(p.cur))+'</span>':"")+
+        tags(BUDGETS,typeof p.budget==="string"&&p.budget?[p.budget]:[])+
         tags(FOODS,p.food)+'</div>'+
       (p.note?'<div class="sub" style="color:var(--ink2)">“'+esc(p.note)+'”</div>':"")+
       '</div></div>';}).join("") : '<div class="empty">'+esc(t("agg.none"))+'</div>';
@@ -1064,8 +1051,6 @@ function renderSplit(){
       '<button class="x" data-del="expenses:'+k+'" aria-label="delete">✕</button></div>';}).join("")
     : '<div class="empty">'+esc(t("sp.none"))+'</div>';
 }
-function budgetHint(){ const v=Number($("#p_budget").value||0), c=$("#p_cur").value||"KRW";
-  $("#budgethint").textContent = v>0 ? "≈ "+won(v*rate(c)) : ""; }
 
 /* ───────────────────────── cover gate ───────────────────────── */
 const LANGLBL={en:"EN",zh:"中文",ja:"日本語",ko:"한국어",id:"Indonesia"};
@@ -1109,8 +1094,10 @@ $("#lang").addEventListener("change",e=>setLang(e.target.value));
 document.addEventListener("click",e=>{
   const gl=e.target.closest("[data-gl]"); if(gl){ setLang(gl.dataset.gl); return; }
   const gp=e.target.closest("[data-g]"); if(gp){ gatePick(gp.dataset.g); return; }
-  const chip=e.target.closest("#actchips .chip,#areachips .chip,#foodchips .chip,#staychips .chip,#habitchips .chip,#e_with .chip");
-  if(chip){ chip.setAttribute("aria-pressed", chip.getAttribute("aria-pressed")!=="true"); return; }
+  const chip=e.target.closest("#actchips .chip,#areachips .chip,#foodchips .chip,#staychips .chip,#habitchips .chip,#budgetchips .chip,#e_with .chip");
+  if(chip){ const on=chip.getAttribute("aria-pressed")!=="true";
+    if(chip.parentElement.dataset.single) chip.parentElement.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed","false"));
+    chip.setAttribute("aria-pressed", on); return; }
   const f=e.target.closest("#ideafilter .chip");
   if(f){ ideaFilter=f.dataset.f; $$("#ideafilter .chip").forEach(c=>c.setAttribute("aria-pressed",c===f)); renderIdeas(); return; }
   const seat=e.target.closest("[data-seat]"); if(seat){ openSeat(seat.dataset.seat); return; }
@@ -1148,11 +1135,9 @@ $("#medlg").addEventListener("close",()=>{
   me=p.id; localStorage.setItem("sl.me",me); prefFor=null; sigMembers=""; pendingSeat=null; render();});
 
 
-$("#p_budget").addEventListener("input",budgetHint);
-$("#p_cur").addEventListener("change",budgetHint);
 $("#savepref").addEventListener("click",()=>{ if(needMe())return;
   put("prefs",me,{acts:getChips("#actchips"),areas:getChips("#areachips"),food:getChips("#foodchips"),
-    stays:getChips("#staychips"),habits:getChips("#habitchips"),pace:$("#p_pace").value,budget:Number($("#p_budget").value||0),
+    stays:getChips("#staychips"),habits:getChips("#habitchips"),pace:$("#p_pace").value,budget:getChips("#budgetchips")[0]||"",
     cur:"THB",note:$("#p_note").value.trim(),ts:Date.now()});
   $("#prefsaved").textContent="✓ "+t("pref.saved"); setTimeout(()=>$("#prefsaved").textContent="",2400);});
 
