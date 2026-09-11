@@ -992,7 +992,7 @@ function renderIdeas(){
       '<div class="sub">'+(cat?'<span class="tag">'+esc(opt(cat))+'</span>':"")+
         (it.note?'<span>'+esc(it.note)+'</span>':"")+'</div>'+
       '<div class="sub">'+(it.by?'<span class="who">'+av(it.by)+esc(nameOf(it.by))+'</span>':"")+
-        (vs.length?'<span class="avstack">'+vs.map(v=>av(v)).join("")+'</span>':"")+'</div></div>'+
+        (vs.filter(v=>v!==it.by).length?'<span class="avstack">'+vs.filter(v=>v!==it.by).map(v=>av(v)).join("")+'</span>':"")+'</div></div>'+
       '<button class="vote" data-vote="'+id+'" aria-pressed="'+vs.includes(me)+'"><b>'+vs.length+'</b><small>'+esc(t("vote"))+'</small></button>'+
       '<button class="x" data-del="ideas:'+id+'" aria-label="delete">✕</button></div>';}).join("")
     : '<div class="empty">'+esc(t("idea.none"))+'</div>';
