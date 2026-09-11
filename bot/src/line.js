@@ -125,8 +125,11 @@ export function card({ title, host, kind, sure, pageId }) {
   const pid = pageId.replace(/-/g, "");
   const targets = BUTTON_ORDER.filter(k => k !== kind);
 
+  // Small tappable chips: Flex "button" components can't go below ~40px tall.
   const btn = k => ({
-    type: "button", style: "secondary", height: "sm", flex: 1,
+    type: "box", layout: "vertical", flex: 1, backgroundColor: "#F1EADF", cornerRadius: "999px",
+    paddingTop: "5px", paddingBottom: "5px", paddingStart: "4px", paddingEnd: "4px",
+    contents: [{ type: "text", text: KINDS[k].short, size: "xs", align: "center", color: "#4A423B" }],
     action: { type: "postback", label: KINDS[k].short, data: `a=rc&s=${board}&p=${pid}&k=${k}`, displayText: `Change to ${KINDS[k].short}` },
   });
 
@@ -151,8 +154,7 @@ export function card({ title, host, kind, sure, pageId }) {
           { type: "button", style: "primary", height: "sm", color: "#8C1D18",
             action: { type: "postback", label: "I’m in", data: `a=in&b=${board}&p=${pid}`, displayText: "I’m in" } },
           { type: "text", text: "Wrong kind? Change to:", size: "xxs", color: "#8E877D", margin: "md" },
-          { type: "box", layout: "horizontal", spacing: "xs", contents: targets.slice(0, 3).map(btn) },
-          { type: "box", layout: "horizontal", spacing: "xs", contents: targets.slice(3).map(btn) },
+          { type: "box", layout: "horizontal", spacing: "xs", contents: targets.map(btn) },
         ],
       },
     },
