@@ -66,6 +66,12 @@ async function onText(ev, env) {
   const msg = (ev.message.text || "").trim();
   if (!msg) return;
 
+  // Setup only: reveal the group id so it can go into ALLOWED_GROUP_IDS. Dead once the list is set.
+  if (/^(group ?id|群組 ?id)$/i.test(msg)) {
+    const allowed = (env.ALLOWED_GROUP_IDS || "").trim();
+    return allowed ? undefined : reply(env, ev.replyToken, [text(`Group ID: ${ev.source?.groupId || ev.source?.roomId}`)]);
+  }
+
   // Fast paths that need no AI.
   if (/^(help|說明|使用說明|ヘルプ|도움말|bantuan)$/i.test(msg))
     return reply(env, ev.replyToken, HELP_MESSAGES);
