@@ -1,0 +1,112 @@
+/**
+ * LINE Messaging API: replies, the help text, the Flex card, leaving groups.
+ * Everything user-facing is English.
+ */
+
+const LINE = "https://api.line.me/v2/bot";
+
+export const MEMBER_LIST = "Amber · Akiha · Hye Yeon · Gigi · Nadia";
+
+export const HELP = [
+  "🇰🇷 Seoul Loop bot",
+  "",
+  "Just talk — I file trip stuff into Notion:",
+  "• Paste a link → Ideas or Stays",
+  "• “Paid 45,000 for dinner” → Expenses (split 5 ways unless you name people)",
+  "• “Let’s do Gwangjang Market” → Ideas",
+  "• “Oct 18 2pm Gyeongbokgung, meet at exit 5” → Itinerary",
+  "• “I’m in for Gwangjang” or tap I’m in on a card → your vote",
+  "",
+  "Type “I am <your name>” once so I know who you are.",
+  `Names: ${MEMBER_LIST}`,
+  "Type “help” to see this again. Otherwise I stay quiet.",
+].join("\n");
+
+export const BIND_FIRST = `Tell me who you are first — type “I am <your name>” (${MEMBER_LIST}).`;
+
+export const text = t => ({ type: "text", text: t });
+
+export async function reply(env, replyToken, messages) {
+  if (!replyToken) return;
+  const r = await fetch(LINE + "/message/reply", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ replyToken, messages }),
+  });
+  if (!r.ok) console.error("line reply", r.status, await r.text());
+}
+
+/** Leave a group or room we were not invited to. */
+export async function leave(env, source) {
+  const path = source.groupId ? `/group/${source.groupId}/leave`
+             : source.roomId  ? `/room/${source.roomId}/leave` : null;
+  if (!path) return;
+  const r = await fetch(LINE + path, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}` },
+  });
+  if (!r.ok) console.error("line leave", r.status, await r.text());
+}
+
+/* ── the card ───────────────────────────────────────────────── */
+
+export const KINDS = {
+  stay:  { emoji: "🏠", label: "Stays",  short: "Stay",  board: "stays" },
+  food:  { emoji: "🍽", label: "Food",   short: "Food",  board: "ideas", select: "Food" },
+  cafe:  { emoji: "☕️", label: "Cafe",   short: "Cafe",  board: "ideas", select: "Cafe" },
+  sight: { emoji: "⛩", label: "Sight",  short: "Sight", board: "ideas", select: "Sight" },
+  shop:  { emoji: "🛍", label: "Shop",   short: "Shop",  board: "ideas", select: "Shop" },
+  night: { emoji: "🍶", label: "Night",  short: "Night", board: "ideas", select: "Night" },
+  other: { emoji: "📌", label: "Other",  short: "Other", board: "ideas", select: "Other" },
+};
+export const BUTTON_ORDER = ["stay", "food", "cafe", "sight", "shop", "night"];
+
+/** Kind key from a Notion select name ("Food" → "food"). */
+export const kindKey = name => Object.keys(KINDS).find(k => KINDS[k].select === name) || "other";
+
+/**
+ * Flex card confirming a filed Idea/Stay, with an "I'm in" vote button and
+ * one-tap recategorisation.
+ */
+export function card({ title, host, kind, sure, pageId, notionUrl }) {
+  const conf = KINDS[kind];
+  const board = conf.board;
+  const head = !sure ? "📥 Got it — which kind is this?"
+             : board === "stays" ? "🏠 Filed under Stays"
+             : `${conf.emoji} Filed under Ideas › ${conf.label}`;
+  const pid = pageId.replace(/-/g, "");
+  const targets = BUTTON_ORDER.filter(k => k !== kind);
+
+  const btn = k => ({
+    type: "button", style: "secondary", height: "sm", flex: 1,
+    action: { type: "postback", label: KINDS[k].short, data: `a=rc&s=${board}&p=${pid}&k=${k}`, displayText: `Change to ${KINDS[k].short}` },
+  });
+
+  return {
+    type: "flex",
+    altText: `${head}: ${title}`,
+    contents: {
+      type: "bubble",
+      body: {
+        type: "box", layout: "vertical", spacing: "sm",
+        contents: [
+          { type: "text", text: head, size: "xs", color: sure ? "#8C1D18" : "#A67C2E", weight: "bold" },
+          { type: "text", text: title.slice(0, 120), wrap: true, weight: "bold", size: "md" },
+          ...(host ? [{ type: "text", text: host, size: "xs", color: "#8E877D" }] : []),
+          { type: "text", text: "Open in Notion →", size: "xs", color: "#2B4562",
+            action: { type: "uri", uri: notionUrl } },
+        ],
+      },
+      footer: {
+        type: "box", layout: "vertical", spacing: "xs",
+        contents: [
+          { type: "button", style: "primary", height: "sm", color: "#8C1D18",
+            action: { type: "postback", label: "I’m in", data: `a=in&b=${board}&p=${pid}`, displayText: "I’m in" } },
+          { type: "text", text: "Wrong kind? Change to:", size: "xxs", color: "#8E877D", margin: "md" },
+          { type: "box", layout: "horizontal", spacing: "xs", contents: targets.slice(0, 3).map(btn) },
+          { type: "box", layout: "horizontal", spacing: "xs", contents: targets.slice(3).map(btn) },
+        ],
+      },
+    },
+  };
+}

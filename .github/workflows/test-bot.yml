@@ -1,0 +1,24 @@
+name: Test bot classifier
+
+# Runs the classifier against ~25 sample messages with the real API key.
+# Manual only — each run costs a few cents. Read the log to see how each
+# message was classified.
+on:
+  workflow_dispatch:
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+        working-directory: bot
+      - run: node --check src/index.js && node --check src/classify.js && node --check src/notion.js && node --check src/line.js && node --check src/links.js
+        working-directory: bot
+      - run: node test/classify.mjs
+        working-directory: bot
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

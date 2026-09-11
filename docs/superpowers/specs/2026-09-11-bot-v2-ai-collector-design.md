@@ -62,7 +62,13 @@ All user-facing strings English only. Join/help message is English only. Command
 
 ## 6. Configuration
 
-New secret `ANTHROPIC_API_KEY` (GitHub Actions secret → Worker secret via `deploy-bot.yml`). New `wrangler.toml` vars: `NOTION_ITINERARY_DB`, `NOTION_EXPENSES_DB`. `bot/package.json` gains `@anthropic-ai/sdk` and `zod` as dependencies.
+New secret `ANTHROPIC_API_KEY` (GitHub Actions secret → Worker secret via `deploy-bot.yml`). New `wrangler.toml` vars: `NOTION_ITINERARY_DB`, `NOTION_EXPENSES_DB`, `ALLOWED_GROUP_IDS`. `bot/package.json` gains `@anthropic-ai/sdk` and `zod` as dependencies; the deploy workflow runs `npm ci` before wrangler.
+
+### Group allow-list (added after Amber asked how to stop strangers using her API key)
+
+`ALLOWED_GROUP_IDS` is a comma-separated list of LINE group/room IDs. Empty = setup mode: the bot works anywhere and, on join, replies with the group's ID so it can be pasted into the var. Once set, the bot leaves any other group it is added to (`POST /group/{id}/leave`) and ignores every event from them — no Notion or Claude call is ever made for an unlisted group. One-to-one chats are ignored regardless.
+
+Code layout: `src/index.js` (routing + handlers), `src/classify.js` (Claude), `src/notion.js`, `src/line.js` (replies, help, card), `src/links.js` (URL path).
 
 ## 7. Errors
 
@@ -72,7 +78,7 @@ New secret `ANTHROPIC_API_KEY` (GitHub Actions secret → Worker secret via `dep
 
 ## 8. Testing
 
-- `node --check` and a local unit script that feeds ~20 sample messages (five languages, including chatter that must be ignored) through the classifier and prints intents — run once with a real key before deploy.
+- `node --check` on every file, plus `bot/test/classify.mjs`: ~25 sample messages in five languages (including chatter that must be ignored) through the real classifier, printing intent, confidence and latency. The key lives only in GitHub secrets, so this runs as the manual workflow `.github/workflows/test-bot.yml`.
 - Deploy via Actions, then in the real group: one link, one expense, one idea, one itinerary, one vote, one piece of chatter.
 
 ## Out of scope

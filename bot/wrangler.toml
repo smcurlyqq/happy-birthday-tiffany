@@ -1,14 +1,20 @@
 name = "seoul-loop-bot"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
 
-# 這三個不是祕密，是 Notion 資料庫的 ID，可以直接寫在這裡
+# Not secrets — Notion database IDs and the group allow-list.
 [vars]
-NOTION_IDEAS_DB   = "883484141f0c4f3c85e713cbbc6a51cb"
-NOTION_STAYS_DB   = "d2986ee9b16b45c5b4db8938235fdfab"
-NOTION_MEMBERS_DB = "c730a79cc4694546942f11785f80cb66"
+NOTION_MEMBERS_DB   = "c730a79cc4694546942f11785f80cb66"
+NOTION_IDEAS_DB     = "883484141f0c4f3c85e713cbbc6a51cb"
+NOTION_ITINERARY_DB = "31a197b2431b43d29e66018af9e01086"
+NOTION_EXPENSES_DB  = "e7220d9f26ef46008598a0e8583bcd0b"
+NOTION_STAYS_DB     = "d2986ee9b16b45c5b4db8938235fdfab"
 
-# 祕密用指令設定，不要寫進檔案：
-#   npx wrangler secret put LINE_CHANNEL_SECRET
-#   npx wrangler secret put LINE_CHANNEL_ACCESS_TOKEN
-#   npx wrangler secret put NOTION_TOKEN
+# Comma-separated LINE group IDs the bot is allowed to work in.
+# Empty = setup mode: the bot tells you the group ID when it joins.
+# Once set, it leaves any other group it is added to and never calls Claude for them.
+ALLOWED_GROUP_IDS = ""
+
+# Secrets are set by the deploy workflow (never write them here):
+#   LINE_CHANNEL_SECRET, LINE_CHANNEL_ACCESS_TOKEN, NOTION_TOKEN, ANTHROPIC_API_KEY

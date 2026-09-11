@@ -1,122 +1,101 @@
-# Seoul Loop — LINE 收集機器人
+# Seoul Loop — LINE collector bot
 
-把連結貼進 LINE 群，它就自動收進 Notion。住宿去「住宿候選」，其他去「口袋名單」並選好類型。猜錯按一下卡片上的按鈕就改掉。
-
-其他訊息一律不理，所以群裡不會被洗版。
+Lives in the trip's LINE group and files things into Notion so nobody has to open Notion mid-conversation.
 
 ```
-Gigi：  這間看起來不錯 https://www.airbnb.com/rooms/12345
-bot：   🏠 已收進「住宿候選 Stays」
-        Sunny Hanok Stay
-        airbnb.com
-        在 Notion 打開 →
-        不對的話改成： [美食] [咖啡] [景點] [購物] [夜生活]
+Gigi:   this one looks nice https://www.airbnb.com/rooms/12345
+bot:    🏠 Filed under Stays · Sunny Hanok Stay · airbnb.com
+        [I’m in]  Wrong kind? [Food] [Cafe] [Sight] [Shop] [Night]
+
+Nadia:  we should try Gwangjang Market!! the mung bean pancakes
+bot:    🍽 Filed under Ideas › Food · Gwangjang Market
+        [I’m in] …
+
+Akiha:  廣藏市場行きたい！
+bot:    ✓ Akiha is in · Gwangjang Market · 2 votes
+
+Gigi:   paid 45000 for dinner at Mangwon
+bot:    💸 45,000 KRW · dinner at Mangwon · paid by Gigi · split 5 ways
+
+Amber:  10/18 下午兩點景福宮，5號出口集合
+bot:    📅 Sun, Oct 18 · 14:00 · Gyeongbokgung Palace · meet at exit 5
+
+Hye Yeon: ㅋㅋㅋㅋ 사진 보내줘
+bot:    (nothing — it stays out of the conversation)
 ```
 
----
+## How it decides
 
-## 一、申請 LINE 機器人（只有你能做，約 5 分鐘）
-
-### 1. 建 Provider 和 Channel
-1. 開 <https://developers.line.biz/console/> → 用你的 LINE 帳號登入
-2. **Create a new provider** → 隨便取個名字（例如 `Seoul Loop`）
-3. 在 provider 裡 **Create a Messaging API channel**
-   - Channel name：`Seoul Loop`（這會是群裡顯示的名字）
-   - Category / Subcategory：隨便選
-4. 建好之後在 **Basic settings** 分頁找到 **Channel secret** → 記下來
-5. 到 **Messaging API** 分頁 → 最下面 **Channel access token (long-lived)** → **Issue** → 記下來
-
-### 2. 開三個開關
-還在 **Messaging API** 分頁：
-- ✅ **Allow bot to join group chats** → 開啟
-
-點該頁的 **Edit** 連到 LINE Official Account Manager，在「回應設定」：
-- 聊天模式 → **Bot**　⚠️ 留在「聊天」的話 webhook 完全不會觸發
-- Webhook → **開啟**
-- 自動回應訊息 → **關閉**（不然每句話都被罐頭訊息洗版）
-
----
-
-## 二、Notion 授權
-
-1. 開 <https://www.notion.so/profile/integrations> → **New integration**
-   - Name：`Seoul Loop bot`
-   - Associated workspace：選你的
-   - Capabilities：勾 **Read content**、**Update content**、**Insert content**
-2. 建好後複製 **Internal Integration Secret**（`ntn_` 或 `secret_` 開頭）
-3. **這步一定要做**：回到 Notion 打開「首爾 Seoul Loop」那一頁 → 右上 **⋯** → **Connections** → **Connect to** → 選 `Seoul Loop bot`
-   底下的五個資料庫會一起繼承權限。沒做這步的話 bot 會一直拿到 404。
-
----
-
-## 三、部署
-
-```bash
-cd bot
-npm install
-
-# 三個祕密，一個一個貼進去（不會存進 git）
-npx wrangler secret put LINE_CHANNEL_SECRET
-npx wrangler secret put LINE_CHANNEL_ACCESS_TOKEN
-npx wrangler secret put NOTION_TOKEN
-
-npx wrangler deploy
-```
-
-部署完會印出網址，像 `https://seoul-loop-bot.<你的帳號>.workers.dev`。
-
-回 LINE Developers → **Messaging API** 分頁 → **Webhook URL** 填：
-
-```
-https://seoul-loop-bot.<你的帳號>.workers.dev/webhook
-```
-
-按 **Verify**，顯示 Success 就通了。
-
-## 四、拉進群組
-
-1. 在 **Messaging API** 分頁掃 QR code，把官方帳號加成好友
-2. 到你們的 LINE 群 → 邀請 → 選這個官方帳號
-3. 它會自己跳出使用說明
-
-群組成員**不需要**加它好友也能用。
-
----
-
-## 指令
-
-| 打什麼 | 會發生什麼 |
+| Message | Path |
 |---|---|
-| 任何含連結的訊息 | 自動分類收進 Notion |
-| `我是 Amber` | 綁定一次，之後你貼的連結會記上提案人 |
-| `說明` | 再看一次使用說明 |
+| Has a link | Deterministic: host rules (Airbnb → Stays, Tabelog → Food…), then the page's og tags, then whatever you typed next to the link. No AI, no cost. |
+| No link | Claude Haiku 4.5 classifies it as expense / idea / itinerary / vote / bind / help / ignore. Anything unclear → ignore, silently. |
 
-`我是` 後面的名字要跟 Notion 成員表裡的一致（Amber / Akiha / Hye Yeon / Gigi / Nadia）。
+The classifier sees today's date (Seoul), the trip dates, the five names, and the current Ideas/Stays titles, so "I'm in for Gwangjang" resolves to the right row.
 
----
+Every card has an **I'm in** button — that is the vote. Wrong category? Tap the right one.
 
-## 它怎麼判斷類別
+## Commands (any of the five languages)
 
-依序：
-
-1. **網域** — airbnb / booking / agoda / trip.com → 住宿；tabelog / mangoplate → 美食；klook → 景點（權重最高）
-2. **網頁標題與描述** — 五種語言的關鍵字（民宿／ホテル／숙소／hotel／penginapan…）
-3. **你順手打的那句話** — 權重跟標題一樣高，所以「這間民宿不錯」比連結本身還準
-
-**IG、小紅書、抖音會擋機器人抓資料**，很可能只拿得到網址。這就是為什麼每張卡片都有改分類的按鈕 —— 猜錯一鍵改掉，比追求猜到 100% 準實際得多。同一個連結貼第二次會被擋下，不會重複收。
-
-順帶一提：`區域` 也會自動猜（弘大／明洞／江南／聖水／益善洞），從標題或你打的字裡面抓。
-
-## 排錯
-
-```bash
-npx wrangler tail      # 即時看 log
-```
-
-| 症狀 | 原因 |
+| Type | Effect |
 |---|---|
-| bot 完全沒反應 | 聊天模式沒改成 Bot，或 Webhook 沒開 |
-| Verify 失敗 | 網址結尾少了 `/webhook` |
-| log 出現 notion 404 | 忘了把整合 Connect 到 Notion 那一頁 |
-| log 出現 notion 401 | NOTION_TOKEN 貼錯 |
-| 收進去但標題是一串網址 | 那個網站擋爬蟲（IG 最常見），手動改標題就好 |
+| `I am Gigi` · `我是 Gigi` · `私は Gigi` · `저는 Gigi` · `saya Gigi` | Links your LINE account to the Crew row, once. Needed before expenses and votes are credited to you. |
+| `help` · `說明` · `ヘルプ` · `도움말` · `bantuan` | Shows the help text again. |
+
+Names must match the Crew table: Amber · Akiha · Hye Yeon · Gigi · Nadia.
+
+## What gets written where
+
+| Intent | Notion board | Fields |
+|---|---|---|
+| link / idea | Ideas (or Stays) | Place, Link, Kind, Area, Note, Added by, Status = Idea |
+| expense | Expenses | Item, Amount, Currency (default KRW), Category, Date (today, Seoul), Paid by = you, Split with (everyone unless you name people) |
+| itinerary | Itinerary | What, Date (10/17–20 only), Time, Where, Kind, Owner |
+| vote | Ideas / Stays | adds you to Who's in |
+
+## Only your group
+
+`ALLOWED_GROUP_IDS` in `wrangler.toml` lists the LINE group IDs the bot serves. Leave it empty the first time: when the bot joins a group it replies with that group's ID. Paste the ID in, redeploy, and from then on the bot leaves any other group it is added to and never calls Claude or Notion for them. One-to-one chats are always ignored.
+
+## Setup
+
+Secrets in the repo (Settings → Secrets and variables → Actions):
+
+| Secret | From |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | dash.cloudflare.com/profile/api-tokens → "Edit Cloudflare Workers" template. Account Resources and Zone Resources must both be filled in. |
+| `CLOUDFLARE_ACCOUNT_ID` | the 32-char id in the dashboard URL |
+| `LINE_CHANNEL_SECRET` | LINE Developers → channel → Basic settings |
+| `LINE_CHANNEL_ACCESS_TOKEN` | LINE Developers → Messaging API → Issue |
+| `NOTION_TOKEN` | notion.so/profile/integrations → the integration's secret. The integration must be connected to the Seoul Loop page. |
+| `ANTHROPIC_API_KEY` | console.anthropic.com → API keys |
+
+Then Actions → **Deploy LINE bot** → Run workflow. The Worker lands at `https://seoul-loop-bot.<account>.workers.dev`; the LINE webhook URL is that plus `/webhook`.
+
+LINE side: Messaging API → Use webhook on, Allow bot to join group chats on, Auto-reply messages off, and in the Official Account Manager the chat mode must be **Bot**.
+
+## Testing
+
+Actions → **Test bot classifier** → Run workflow. Feeds ~25 messages in five languages through the real classifier and prints intent, confidence and latency for each. Costs a few cents.
+
+## Code
+
+- `src/index.js` — webhook entry, routing, the intent handlers
+- `src/classify.js` — the Claude call and the output schema
+- `src/notion.js` — reads and writes for the five boards (English property names)
+- `src/line.js` — replies, help text, the Flex card, leaving groups
+- `src/links.js` — URL extraction, page metadata, host/word rules
+
+## Troubleshooting
+
+| Symptom | Likely cause |
+|---|---|
+| Bot never answers | Chat mode isn't Bot, or Use webhook is off |
+| Verify fails | Webhook URL is missing `/webhook` |
+| `notion 404` in logs | Integration not connected to the page |
+| `notion 401` | Wrong NOTION_TOKEN |
+| `classify failed` in logs | Wrong ANTHROPIC_API_KEY, or no credits |
+| Filed but the title is a bare URL | That site blocks crawlers (Instagram, mostly). Fix the title in Notion. |
+| Expense/vote answered "Tell me who you are first" | Type `I am <name>` once |
+
+Logs: Cloudflare dashboard → Workers & Pages → seoul-loop-bot → Logs, or `npx wrangler tail` locally.
