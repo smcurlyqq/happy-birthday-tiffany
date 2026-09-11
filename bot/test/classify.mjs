@@ -45,6 +45,10 @@ const cases = [
   ["Hye Yeon", "ㅋㅋㅋㅋ 사진 보내줘",                                       "ignore"],
   ["Gigi",     "maybe we should think about where to stay at some point",   "ignore"],
   ["Nadia",    "omg the exchange rate went up again",                       "ignore"],
+  ["Amber",    "do you guys wanna go grab coffee on oct 18th?",             "ignore"],
+  ["Gigi",     "should we do Bukchon on Sunday morning?",                   "ignore"],
+  ["Akiha",    "18日の午後、カフェ行かない？",                               "ignore"],
+  ["Amber",    "ok confirmed: Oct 18 3pm Onion Seongsu, meet at the entrance", "itinerary"],
 ];
 
 const env = { ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY };
