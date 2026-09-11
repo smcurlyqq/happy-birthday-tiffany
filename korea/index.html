@@ -864,10 +864,10 @@ function av(id,size){ const s=seatOf(id), n=nameOf(id);
   return '<span class="av" style="background:var('+s.c+')'+(size?';width:'+size+'px;height:'+size+'px;font-size:'+(size*0.5)+'px':'')+'">'+esc(n.slice(0,1).toUpperCase())+'</span>'; }
 function toast(msg){ const el=document.createElement("div"); el.className="toast"; el.textContent=msg;
   document.body.appendChild(el); setTimeout(()=>el.remove(),1900); }
-function fmtDay(i,opts){ const d=new Date(DAYS[i]+"T00:00:00");
-  return d.toLocaleDateString(LOCALE[lang]||"en-GB",opts||{month:"short",day:"numeric",weekday:"short"}); }
+function fmtDay(i,opts){ const d=new Date(DAYS[i]+"T12:00:00+09:00");
+  return d.toLocaleDateString(LOCALE[lang]||"en-GB",Object.assign({timeZone:"Asia/Seoul"},opts||{month:"short",day:"numeric",weekday:"short"})); }
 function arriveText(m){ if(!m.arrive) return m.flight||t("seat.noflight");
-  const d=new Date(m.arrive); const when=isNaN(d)?m.arrive:d.toLocaleString(LOCALE[lang]||"en-GB",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+  const d=new Date(m.arrive.slice(0,16)+":00+09:00"); const when=isNaN(d)?m.arrive:d.toLocaleString(LOCALE[lang]||"en-GB",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Seoul"});
   return "✈ "+t("seat.arrives")+" "+when+(m.flight?" · "+m.flight:""); }
 function needMe(){ if(!me||!D.members[me]){ openGate(); return true; } return false; }
 
@@ -910,13 +910,13 @@ function renderMeBtn(){
   else a.style.display="none";
 }
 function renderTrip(){
-  const start=new Date(DAYS[0]+"T00:00:00"), end=new Date(DAYS[3]+"T23:59:59");
-  const d=new Date(DAYS[0]+"T00:00:00");
+  const start=new Date(DAYS[0]+"T00:00:00+09:00"), end=new Date(DAYS[3]+"T23:59:59");
+  const d=new Date(DAYS[0]+"T00:00:00+09:00");
   $("#d1").textContent="17"; $("#d2").textContent="20";
-  $("#mon").textContent=d.toLocaleDateString(LOCALE[lang]||"en-GB",{month:"long"});
+  $("#mon").textContent=d.toLocaleDateString(LOCALE[lang]||"en-GB",{month:"long",timeZone:"Asia/Seoul"});
   $("#yr").textContent="2026";
-  $("#daystrip").innerHTML=DAYS.map((x,i)=>{const dd=new Date(x+"T00:00:00");
-    return '<div><b>'+dd.getDate()+'</b><span>'+esc(dd.toLocaleDateString(LOCALE[lang]||"en-GB",{weekday:"short"}))+'</span></div>';}).join("");
+  $("#daystrip").innerHTML=DAYS.map((x,i)=>{const dd=new Date(x+"T12:00:00+09:00");
+    return '<div><b>'+dd.toLocaleDateString("en-GB",{day:"numeric",timeZone:"Asia/Seoul"})+'</b><span>'+esc(dd.toLocaleDateString(LOCALE[lang]||"en-GB",{weekday:"short",timeZone:"Asia/Seoul"}))+'</span></div>';}).join("");
   const left=Math.ceil((start-new Date())/864e5);
   const ideas=Object.keys(D.ideas).length;
   $("#cdown").innerHTML=
@@ -1076,8 +1076,8 @@ function openGate(){ $("#gate").hidden=false; document.body.classList.add("gated
 function closeGate(){ $("#gate").hidden=true; document.body.classList.remove("gated"); }
 function renderGate(){
   if($("#gate").hidden) return;
-  const d=new Date(DAYS[0]+"T00:00:00");
-  $("#g_mon").textContent=d.toLocaleDateString(LOCALE[lang]||"en-GB",{month:"long"});
+  const d=new Date(DAYS[0]+"T00:00:00+09:00");
+  $("#g_mon").textContent=d.toLocaleDateString(LOCALE[lang]||"en-GB",{month:"long",timeZone:"Asia/Seoul"});
   $("#g_dates").textContent=fmtDay(0)+" → "+fmtDay(3)+" · 2026";
   $("#glangs").innerHTML=LANGS.map(L=>'<button class="glang" data-gl="'+L+'" aria-pressed="'+(L===lang)+'">'+LANGLBL[L]+'</button>').join("");
   $("#gatelist").innerHTML=allSeats().map(id=>{const st=seatOf(id),m=D.members[id],taken=!!(m&&m.name);

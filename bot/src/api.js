@@ -14,7 +14,7 @@
 
 import { notion, plainTitle, plainText } from "./notion.js";
 
-const DAYS = ["2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20"];
+const DAYS = ["2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20"];   // all dates/times in this app are Asia/Seoul
 const SEATS = {
   tw: { name: "Amber",    flag: "🇹🇼", c: "--p1" },
   jp: { name: "Akiha",    flag: "🇯🇵", c: "--p2" },
@@ -247,7 +247,7 @@ async function putMember(env, id, m) {
   const props = {
     "Name": { title: title(m.name || SEATS[id]?.name || "") },
     "Flights": { rich_text: rich(m.flight) },
-    "Arrival": m.arrive ? { date: { start: String(m.arrive).slice(0, 16) } } : { date: null },
+    "Arrival": m.arrive ? { date: { start: String(m.arrive).slice(0, 16), time_zone: "Asia/Seoul" } } : { date: null },
   };
   if (m.cur) props["Currency"] = sel(m.cur);
   await notion(env, `/pages/${pid}`, "PATCH", { properties: props });
