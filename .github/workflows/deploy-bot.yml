@@ -2,10 +2,9 @@ name: Deploy LINE bot
 
 # 不需要終端機，也不需要在自己電腦上裝 Node。
 # 需要的四把金鑰放在 repo 的 Settings → Secrets and variables → Actions。
+# 只能手動觸發。等五個 secret 都設好之後，到 Actions 分頁按 Run workflow。
+# （不掛 push 觸發，是為了避免在 secret 還沒設好時，每次 push 都在 main 留一個紅叉。）
 on:
-  push:
-    branches: [main, claude/korea-trip-planner-tou9gc]
-    paths: ['bot/**', '.github/workflows/deploy-bot.yml']
   workflow_dispatch:
 
 jobs:
