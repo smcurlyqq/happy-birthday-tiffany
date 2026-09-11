@@ -71,7 +71,7 @@ https://smcurlyqq.github.io/happy-birthday/korea/
 `bot/` — Cloudflare Worker。設計文件：`docs/superpowers/specs/2026-09-11-bot-v2-ai-collector-design.md`，使用說明：`bot/README.md`。
 
 **行為**：
-- 有連結的訊息 → 規則判斷（網域 > og 標題 > 使用者打的字），住宿進 Stays，其他進 Ideas。不用 AI。
+- 有連結的訊息 → 抓網頁（Naver 短網址轉 m.place，從內嵌 JSON 拿類別／地址／評論標籤）→ Claude 整理成「英文（韓文）」標題、類別、區域、備註。Claude 掛掉才退回網域規則。
 - 沒有連結的訊息 → 全部丟給 Claude Haiku 4.5（結構化輸出），判成 expense / idea / itinerary / vote / bind / help / ignore。ignore 或信心 < 0.7 就完全不回。
 - 每張卡片有「I'm in」按鈕 = 投票；打錯類別按一下改。
 - 歡迎／說明是一則訊息五段（en/ja/ko/粵/id），範例句一律英文，附旅行網頁網址，不提 Notion。其他回覆純英文；指令字五語都認（我是／私は／저는／saya／I am；說明／ヘルプ／도움말／bantuan／help）。

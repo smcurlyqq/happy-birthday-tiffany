@@ -28,7 +28,7 @@ bot:    (nothing — it stays out of the conversation)
 
 | Message | Path |
 |---|---|
-| Has a link | Deterministic: host rules (Airbnb → Stays, Tabelog → Food…), then the page's og tags, then whatever you typed next to the link. Naver Map links are resolved through the mobile place page for the name. No AI, no cost. |
+| Has a link | The page is fetched (Naver Map links via the mobile place page, whose embedded JSON gives category, address and review tags), then Claude turns title + description + visible text into an “English (Korean)” title, kind, area and a short note. If Claude is unavailable, host/word rules take over. |
 | Is an image | Claude Haiku 4.5 looks at it: a shop / map / listing / review screenshot becomes an idea (or stay, or a vote if it's already listed); selfies, memes and chat screenshots are ignored. |
 | No link | Claude Haiku 4.5 classifies it as expense / idea / itinerary / vote / bind / help / ignore. Anything unclear → ignore, silently. |
 
