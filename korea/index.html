@@ -452,7 +452,7 @@ dialog{border:1px solid var(--rule);border-radius:18px}
     <div class="row">
       <label class="f"><span class="lbl" data-i="pref.budget">Stay budget · per person per night</span>
         <input type="number" id="p_budget" min="0" step="10" placeholder="0"></label>
-      <label class="f" style="max-width:120px" hidden><span class="lbl" data-i="pref.cur">Currency</span>
+      <label class="f" style="max-width:120px;display:none"><span class="lbl" data-i="pref.cur">Currency</span>
         <select id="p_cur"></select></label>
     </div>
     <div class="muted mono" id="budgethint" style="font-size:12px"></div>
@@ -525,7 +525,7 @@ dialog{border:1px solid var(--rule);border-radius:18px}
     <div class="row">
       <label class="f" style="min-width:160px"><span class="lbl" data-i="sp.what">What for</span><input type="text" id="e_desc" data-ip="sp.whatph"></label>
       <label class="f" style="max-width:130px"><span class="lbl" data-i="sp.amt">Amount</span><input type="number" id="e_amt" min="0" step="0.01" placeholder="0"></label>
-      <label class="f" style="max-width:110px" hidden><span class="lbl" data-i="sp.cur">Currency</span><select id="e_cur"></select></label>
+      <label class="f" style="max-width:110px;display:none"><span class="lbl" data-i="sp.cur">Currency</span><select id="e_cur"></select></label>
     </div>
     <div class="row">
       <label class="f" style="max-width:170px"><span class="lbl" data-i="sp.payer">Paid by</span><select id="e_payer"></select></label>
