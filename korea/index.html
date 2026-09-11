@@ -452,7 +452,7 @@ dialog{border:1px solid var(--rule);border-radius:18px}
     <div class="row">
       <label class="f"><span class="lbl" data-i="pref.budget">Stay budget · per person per night</span>
         <input type="number" id="p_budget" min="0" step="10" placeholder="0"></label>
-      <label class="f" style="max-width:120px"><span class="lbl" data-i="pref.cur">Currency</span>
+      <label class="f" style="max-width:120px" hidden><span class="lbl" data-i="pref.cur">Currency</span>
         <select id="p_cur"></select></label>
     </div>
     <div class="muted mono" id="budgethint" style="font-size:12px"></div>
@@ -525,7 +525,7 @@ dialog{border:1px solid var(--rule);border-radius:18px}
     <div class="row">
       <label class="f" style="min-width:160px"><span class="lbl" data-i="sp.what">What for</span><input type="text" id="e_desc" data-ip="sp.whatph"></label>
       <label class="f" style="max-width:130px"><span class="lbl" data-i="sp.amt">Amount</span><input type="number" id="e_amt" min="0" step="0.01" placeholder="0"></label>
-      <label class="f" style="max-width:110px"><span class="lbl" data-i="sp.cur">Currency</span><select id="e_cur"></select></label>
+      <label class="f" style="max-width:110px" hidden><span class="lbl" data-i="sp.cur">Currency</span><select id="e_cur"></select></label>
     </div>
     <div class="row">
       <label class="f" style="max-width:170px"><span class="lbl" data-i="sp.payer">Paid by</span><select id="e_payer"></select></label>
@@ -623,7 +623,7 @@ const S={
 "link.copy":["Copy the link for LINE","複製連結貼到 LINE","LINE用にリンクをコピー","LINE에 붙일 링크 복사","Salin tautan untuk LINE"],
 "fx.h":["Exchange rates","匯率","為替レート","환율","Kurs"],
 "fx.p":["KRW per 1 unit — edit before we go","1 單位兌韓元 — 出發前更新","1単位あたりのウォン — 出発前に更新","1단위당 원 — 출발 전 수정","KRW per 1 unit — ubah sebelum pergi"],
-"fx.note":["Everything in Split is stored in won and shown in your own currency.","記帳一律以韓元儲存，再換算成你的幣別顯示。","精算はウォンで保存し、各自の通貨で表示します。","정산은 원화로 저장하고 각자 통화로 보여 줍니다.","Semua di Patungan disimpan dalam won lalu ditampilkan dalam mata uangmu."],
+"fx.note":["Everything in Split is stored in won and shown in baht.","記帳一律以韓元儲存，再換算成泰銖顯示。","精算はウォンで保存し、バーツで表示します。","정산은 원화로 저장하고 바트로 보여 줍니다.","Semua di Patungan disimpan dalam won lalu ditampilkan dalam baht."],
 "pref.h":["What you want","你的喜好","あなたの希望","당신의 취향","Maumu apa"],
 "pref.p":["visible to the whole group","全員都看得到","全員に公開されます","모두에게 보입니다","terlihat oleh semua"],
 "pref.act":["I'm here for…","我最想要…","目的は…","나는 이걸 하러 간다…","Aku ke sana untuk…"],
@@ -631,7 +631,7 @@ const S={
 "pref.stay":["Stay type (pick any)","住宿型態（可複選）","宿の種類（複数可）","숙소 형태(복수 선택)","Jenis penginapan (boleh banyak)"],
 "pref.habits":["How I travel","旅行習慣","旅のスタイル","여행 습관","Cara aku traveling"],
 "pref.pace":["Pace","步調","ペース","일정 강도","Tempo"],
-"pref.budget":["Stay budget · per person per night","住宿預算 · 每人每晚","宿の予算・1人1泊","숙소 예산 · 1인 1박","Budget penginapan · per orang per malam"],
+"pref.budget":["Stay budget · per person per night (THB)","住宿預算 · 每人每晚（泰銖）","宿の予算・1人1泊（バーツ）","숙소 예산 · 1인 1박(바트)","Budget penginapan · per orang per malam (THB)"],
 "pref.cur":["Currency","幣別","通貨","통화","Mata uang"],
 "pref.food":["Food I can't eat","飲食禁忌","食べられないもの","못 먹는 음식","Yang tidak bisa kumakan"],
 "pref.note":["One thing I really don't want to miss","絕對不想錯過的一件事","絶対に外せないこと","절대 놓치기 싫은 것","Satu hal yang wajib"],
@@ -679,7 +679,7 @@ const S={
 "sp.p":["log it the moment you tap the card","刷完卡就記一筆","支払った瞬間に記録","결제한 순간 바로 기록","catat begitu selesai bayar"],
 "sp.what":["What for","項目","項目","항목","Untuk apa"],
 "sp.whatph":["Korean BBQ, Hongdae","弘大烤肉","ホンデの焼肉","홍대 고깃집","BBQ Korea, Hongdae"],
-"sp.amt":["Amount","金額","金額","금액","Jumlah"],
+"sp.amt":["Amount (₩)","金額（韓元）","金額（ウォン）","금액(원)","Jumlah (₩)"],
 "sp.cur":["Currency","幣別","通貨","통화","Mata uang"],
 "sp.payer":["Paid by","誰付的","支払った人","결제자","Dibayar oleh"],
 "sp.day":["Day","日期","日","날짜","Hari"],
@@ -859,7 +859,7 @@ function allSeats(){ const ids=SEATS.map(s=>s.id);
   Object.keys(D.members).forEach(id=>{ if(!ids.includes(id)) ids.push(id); }); return ids; }
 function joined(){ return allSeats().filter(id=>D.members[id]&&D.members[id].name); }
 function nameOf(id){ const m=D.members[id]; if(m&&m.name) return m.name; const s=seatOf(id); return s.n||t("seat.free"); }
-function myCur(){ const m=D.members[me]; return (m&&m.cur)||seatOf(me).cur||"THB"; }
+function myCur(){ return "THB"; }   // everyone lives in Thailand: all conversions shown in baht
 function av(id,size){ const s=seatOf(id), n=nameOf(id);
   return '<span class="av" style="background:var('+s.c+')'+(size?';width:'+size+'px;height:'+size+'px;font-size:'+(size*0.5)+'px':'')+'">'+esc(n.slice(0,1).toUpperCase())+'</span>'; }
 function toast(msg){ const el=document.createElement("div"); el.className="toast"; el.textContent=msg;
@@ -882,7 +882,7 @@ function applyI18n(){
   $$("[data-ip]").forEach(el=>el.placeholder=t(el.dataset.ip));
   $("#lang").value=lang;
   const keep=id=>$(id).value;
-  const kStay=keep("#p_stay"),kPace=keep("#p_pace"),kCat=keep("#i_cat"),kSDay=keep("#s_day"),kEDay=keep("#e_day");
+  const kPace=keep("#p_pace"),kCat=keep("#i_cat"),kSDay=keep("#s_day"),kEDay=keep("#e_day");
   fillSel($("#p_pace"),PACES,kPace||"balanced");
   fillSel($("#i_cat"),CATS,kCat||"food"); fillDays($("#s_day"),kSDay||0); fillDays($("#e_day"),kEDay||0);
   $("#foot").textContent=t("foot");
@@ -943,7 +943,7 @@ function renderPrefs(){
     setChips("#actchips",p.acts); setChips("#areachips",p.areas); setChips("#foodchips",p.food);
     setChips("#staychips",p.stays||(p.stay?[p.stay]:[])); setChips("#habitchips",p.habits);
     $("#p_pace").value=p.pace||"balanced";
-    $("#p_budget").value=p.budget||""; fillCur($("#p_cur"),p.cur||myCur()); $("#p_note").value=p.note||"";
+    $("#p_budget").value=p.budget||""; fillCur($("#p_cur"),"THB"); $("#p_note").value=p.note||"";
     budgetHint(); }
   $("#anscount").textContent=answered.length+" / "+Math.max(list.length,answered.length)+" "+t("ans.n");
 
@@ -995,7 +995,7 @@ function renderIdeas(){
       '<div class="ttl">'+(it.link?'<a href="'+esc(it.link)+'" target="_blank" rel="noopener" style="color:inherit">'+esc(it.title)+' ↗</a>':esc(it.title))+'</div>'+
       '<div class="sub">'+(cat?'<span class="tag">'+esc(opt(cat))+'</span>':"")+
         (it.note?'<span>'+esc(it.note)+'</span>':"")+'</div>'+
-      '<div class="sub"><span class="who">'+av(it.by)+esc(nameOf(it.by))+'</span>'+
+      '<div class="sub">'+(it.by?'<span class="who">'+av(it.by)+esc(nameOf(it.by))+'</span>':"")+
         (vs.length?'<span class="avstack">'+vs.map(v=>av(v)).join("")+'</span>':"")+'</div></div>'+
       '<button class="vote" data-vote="'+id+'" aria-pressed="'+vs.includes(me)+'"><b>'+vs.length+'</b><small>'+esc(t("vote"))+'</small></button>'+
       '<button class="x" data-del="ideas:'+id+'" aria-label="delete">✕</button></div>';}).join("")
@@ -1158,7 +1158,7 @@ $("#p_cur").addEventListener("change",budgetHint);
 $("#savepref").addEventListener("click",()=>{ if(needMe())return;
   put("prefs",me,{acts:getChips("#actchips"),areas:getChips("#areachips"),food:getChips("#foodchips"),
     stays:getChips("#staychips"),habits:getChips("#habitchips"),pace:$("#p_pace").value,budget:Number($("#p_budget").value||0),
-    cur:$("#p_cur").value,note:$("#p_note").value.trim(),ts:Date.now()});
+    cur:"THB",note:$("#p_note").value.trim(),ts:Date.now()});
   $("#prefsaved").textContent="✓ "+t("pref.saved"); setTimeout(()=>$("#prefsaved").textContent="",2400);});
 
 $("#addidea").addEventListener("click",()=>{ if(needMe())return;
@@ -1175,16 +1175,16 @@ $("#addslot").addEventListener("click",()=>{ if(needMe())return;
   $("#s_title").value=""; $("#s_note").value="";});
 
 $("#e_all").addEventListener("click",()=>$$("#e_with .chip").forEach(c=>c.setAttribute("aria-pressed","true")));
-const ehint=()=>{const v=Number($("#e_amt").value||0),c=$("#e_cur").value;
-  $("#e_hint").textContent=v>0&&c!=="KRW"?"= "+won(v*rate(c)):"";};
+const ehint=()=>{const v=Number($("#e_amt").value||0);
+  $("#e_hint").textContent=v>0?"≈ "+inCur(v,"THB"):"";};
 $("#e_amt").addEventListener("input",ehint); $("#e_cur").addEventListener("change",ehint);
 $("#addexp").addEventListener("click",()=>{ if(needMe())return;
   const desc=$("#e_desc").value.trim(), amt=Number($("#e_amt").value||0);
   if(!desc){ $("#e_desc").focus(); return; } if(!(amt>0)){ $("#e_amt").focus(); return; }
   const w=$$('#e_with .chip[aria-pressed="true"]').map(c=>c.dataset.w);
   if(!w.length){ toast(t("sp.for")); return; }
-  const cur=$("#e_cur").value;
-  put("expenses","e"+Date.now().toString(36),{desc,amt,cur,krw:amt*rate(cur),
+  const cur="KRW";   // everyone pays in won; settlement is shown in baht
+  put("expenses","e"+Date.now().toString(36),{desc,amt,cur,krw:amt,
     payer:$("#e_payer").value||me,day:Number($("#e_day").value),with:w,by:me,ts:Date.now()});
   $("#e_desc").value=""; $("#e_amt").value=""; ehint();});
 
