@@ -84,3 +84,21 @@ Code layout: `src/index.js` (routing + handlers), `src/classify.js` (Claude), `s
 ## Out of scope
 
 Settle-up math, edit/delete commands, proactive reminders, the web page.
+
+
+---
+
+## 9. Web page ↔ Notion (added later the same night)
+
+Amber wanted the whole group to use only the web page, but on GitHub Pages the page stored everything per device. Chosen fix (option 2 of 3): the page's data layer talks to the same Worker, which reads and writes the five Notion boards.
+
+- `bot/src/api.js`: `GET /api/state` returns `{members, prefs, ideas, slots, expenses}` in exactly the page's document shapes; `PUT /api/:coll/:id` upserts; `DELETE /api/:coll/:id` archives. CORS allows `https://smcurlyqq.github.io` and localhost only. State is cached 8 s per isolate and invalidated on write.
+- Ids: page-generated ids are stored in a `Client ID` text property on every board; bot-created rows have none and are addressed by their 32-hex Notion page id. The five founders' Crew rows are matched by name once and stamped with their seat id (`tw jp kr hk id`).
+- Mapping tables (page option keys ↔ Notion option names) live at the top of `api.js`. Stays rows appear in the page as ideas with `cat: "stay"`.
+- Page (`korea/index.html`): `remoteDB()` implements the same `collection().onSnapshot` / `doc().set()` / `doc().delete()` surface the Claude-artifact db had, polling every 15 s and on tab focus, re-polling ~1 s after a write. Exchange rates stay local (they are only conversion defaults).
+- Everyone lives in Thailand: the only display currency is THB (`myCur()` returns THB; the per-person currency selects are hidden); expenses are entered in won and settlement is shown in baht. THB added to every Notion Currency select; the five Crew rows set to THB.
+- Crew cards show arrival time (`Arrival` date property, stored with `time_zone: "Asia/Seoul"`) plus an optional flight number. All dates/times in the app are Asia/Seoul; the page formats with `timeZone: "Asia/Seoul"`.
+- Taste form: Stay type is multi-select (`Stay type` multi_select), budget is per person per night in THB (`Stay budget / night`), new `Habits` multi-select (10 options, see `HABIT` map), 13 stay areas.
+- The Notion card on the Trip pane and the brand tagline were removed at Amber's request.
+
+Lesson recorded: the Notion MCP `ALTER COLUMN … SET SELECT(...)` keeps options whose names match (and refuses to change their colour) and drops the rest — so renaming options wipes values, adding options with the old names intact is safe.

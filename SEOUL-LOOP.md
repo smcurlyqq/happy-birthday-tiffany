@@ -25,14 +25,17 @@ Amber 🇹🇼 · Akiha 🇯🇵 · Hye Yeon 🇰🇷 · Gigi 🇭🇰 · Nadia 
 
 **功能**：進入頁（選語言＋選你是誰）、倒數、出發前檢查清單、五國語言（zh/ja/ko/en/id 自動偵測）、喜好蒐集與即時統計、口袋名單投票、每日行程、多幣別記帳與最少轉帳結清、複製 LINE 摘要。
 
-**資料層有兩種模式**（`connect()` 自動判斷）：
-- 當作 Claude Artifact 開啟 → 用 `claude.use("db")` 共享資料庫，多人即時同步
-- 靜態託管（GitHub Pages）→ 退回 `localStorage`，只存在各自裝置
+**資料層（`connect()` 自動判斷）**：
+- 2026-09-11 深夜起：靜態託管時走 bot Worker 的 `/api`，背後就是 Notion 五個表，所以**大家在網頁上看到的是同一份**。每 15 秒輪詢、寫入後 1 秒再拉。匯率留在各自裝置。
+- 當作 Claude Artifact 開啟 → 仍用 `claude.use("db")`。
+- 兩個都不行才退回 `localStorage`。
 
 Artifact 網址：<https://claude.ai/code/artifact/eaf9ed37-cc32-4be6-be16-f1ef6a601103>
 （⚠️ 宣告了共享資料庫的 artifact 屬於組織內部，**不能公開分享**，所以朋友打不開。這就是 Notion 存在的原因。）
 
-**合併到 `main` 之後**，既有的 `.github/workflows/pages.yml` 會自動部署到：
+外觀 2026-09-11 晚上改成圓潤風（Inter + Noto Sans，暖奶油底、橘色重點、圓角卡片），Bodoni 雜誌風被 Amber 否決。顯示幣別一律泰銖（五個人都住泰國），記帳輸入一律韓元。成員卡顯示抵達首爾時間。Taste 表單：住宿型態多選、住宿預算每人每晚（THB）、旅行習慣多選、13 個住宿區域。所有日期時間都是首爾時區。
+
+推到 `main` 之後，既有的 `.github/workflows/pages.yml` 會自動部署到：
 ```
 https://smcurlyqq.github.io/happy-birthday/korea/
 ```
@@ -89,6 +92,8 @@ https://smcurlyqq.github.io/happy-birthday/korea/
 - ❌ **尚未在真實群組實測**。下一步：拉進群 → 它會回群組 ID → 填進 `ALLOWED_GROUP_IDS` → 重新部署 → 各種訊息各試一則。
 
 **Anthropic**：console.anthropic.com 帳號 ambre，key 名稱 seoul-loop-bot，已儲值 5 美元。Haiku 4.5 每則訊息幾百 token，整趟旅行預估不到 1 美元。
+
+網頁 `/api` 見 `bot/src/api.js` 與 `bot/README.md`；Notion 每個表多了 `Client ID` 欄位對應網頁的 id，別刪。
 
 Cloudflare API token 建立時的坑：「Edit Cloudflare Workers」範本套完後，Account Resources 和 Zone Resources 兩格都是必填但預設空的，要分別選自己的帳號和 All zones，不然 Continue to summary 按不下去。
 

@@ -78,6 +78,18 @@ LINE side: Messaging API → Use webhook on, Allow bot to join group chats on, A
 
 Actions → **Test bot classifier** → Run workflow. Feeds ~25 messages in five languages through the real classifier and prints intent, confidence and latency for each. Costs a few cents.
 
+## The web page's API
+
+The same Worker serves `/api` for `korea/index.html`, so the page and the bot share one set of Notion boards:
+
+| Route | Does |
+|---|---|
+| `GET /api/state` | everything the page needs — members, prefs, ideas (Stays included as `cat: stay`), slots, expenses |
+| `PUT /api/:coll/:id` | upsert one document (`members`, `prefs`, `ideas`, `slots`, `expenses`) |
+| `DELETE /api/:coll/:id` | archive it |
+
+Only `https://smcurlyqq.github.io` (and localhost) may call it. Page ids are kept in each board's `Client ID` property. Field mappings are the tables at the top of `src/api.js`; if a Notion option is renamed, change it there too.
+
 ## Code
 
 - `src/index.js` — webhook entry, routing, the intent handlers
@@ -85,6 +97,7 @@ Actions → **Test bot classifier** → Run workflow. Feeds ~25 messages in five
 - `src/notion.js` — reads and writes for the five boards (English property names)
 - `src/line.js` — replies, help text, the Flex card, leaving groups
 - `src/links.js` — URL extraction, page metadata, host/word rules
+- `src/api.js` — the web page's `/api` data layer over the same boards
 
 ## Troubleshooting
 
