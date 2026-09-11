@@ -59,57 +59,38 @@ https://smcurlyqq.github.io/happy-birthday/korea/
 **匯率是寫死在公式裡的**（1 TWD = 45 KRW、1 JPY = 9.5、1 HKD = 185、1 IDR = 0.088、1 USD = 1440）。
 出發前要更新的話，得去改公式，不是改欄位。網頁上的匯率則可以直接編輯。
 
-「成員與喜好」有一個 `LINE ID` 欄位，是給 bot 用的（見下）。
+2026-09-11 晚上整個 Notion 改成純英文：資料庫叫 Crew / Ideas / Itinerary / Expenses / Stays，欄位名與選項值都去掉中文，主頁說明文也是英文。bot 程式裡寫死的欄位名跟這個對應，改欄位名要一起改 `bot/src/notion.js`。Crew 的 `LINE ID` 欄位是給 bot 綁定用的。
 
 ---
 
-## 三、LINE bot
+## 三、LINE bot（v2，2026-09-11 晚上上線）
 
-`bot/src/index.js` — Cloudflare Worker。行為：群組裡有人貼連結 → 判斷類別 → 寫進 Notion（住宿進 Stays，其他進 Ideas 並設好 `類型`）→ 回一張 Flex 卡片附「改分類」按鈕。沒有連結的訊息一律不理。
+`bot/` — Cloudflare Worker。設計文件：`docs/superpowers/specs/2026-09-11-bot-v2-ai-collector-design.md`，使用說明：`bot/README.md`。
 
-分類靠三層加權：網域（10 分）> 網頁 og 標題（3 分）＝ 使用者打的字（3 分）> og 描述（1 分）。
-`區域` 也會從文字裡猜（弘大／明洞／江南／聖水／益善洞）。
+**行為**：
+- 有連結的訊息 → 規則判斷（網域 > og 標題 > 使用者打的字），住宿進 Stays，其他進 Ideas。不用 AI。
+- 沒有連結的訊息 → 全部丟給 Claude Haiku 4.5（結構化輸出），判成 expense / idea / itinerary / vote / bind / help / ignore。ignore 或信心 < 0.7 就完全不回。
+- 每張卡片有「I'm in」按鈕 = 投票；打錯類別按一下改。
+- 所有回覆純英文；指令字五語都認（我是／私は／저는／saya／I am；說明／ヘルプ／도움말／bantuan／help）。
+- 記帳、投票需要先綁定（I am 名字），否則 bot 會請他先綁。
 
-指令：`我是 <名字>`（綁定 LINE userId 到成員表，之後記提案人）、`說明`。
+**群組白名單**：`wrangler.toml` 的 `ALLOWED_GROUP_IDS`。空的 = 設定模式，bot 進群會回群組 ID。填進去重新部署後，被拉進別的群會自動退出，也不會為別的群呼叫 Claude 或 Notion。一對一私訊一律不理。
 
-### 部署狀態：已上線（2026-09-11）
+**程式結構**：`src/index.js`（路由與各意圖處理）、`src/classify.js`（Claude）、`src/notion.js`（五個資料庫的讀寫，英文欄位名）、`src/line.js`（回覆、說明、卡片、退群）、`src/links.js`（連結路徑）。
+
+### 部署狀態
 
 - Worker：`https://seoul-loop-bot.smcurlyqq.workers.dev`（GET 會回「Seoul Loop bot is awake」）
 - LINE channel：provider `mbqq` → channel `mbpp`（channel id 2011563838）。群組裡顯示的名字是 mbpp。
 - Webhook URL 已填 `…/webhook`，Use webhook 已開；Allow bot to join group chats 開、Auto-reply 關。
 - Notion 整合「Seoul Loop bot」已 Connect 到首爾主頁，五個資料庫繼承權限。
-- 五個 GitHub secrets 都已設定。要重新部署：Actions → Deploy LINE bot → Run workflow（推 `main` 不會自動部署）。
-- 說明文字已改成五語（zh/ja/ko/en/id），綁定回覆中英雙語。
+- 六個 GitHub secrets 都已設定（Cloudflare ×2、LINE ×2、Notion、Anthropic）。要重新部署：Actions → Deploy LINE bot → Run workflow（推 `main` 不會自動部署）。
+- 分類測試：Actions → Test bot classifier → Run workflow，跑 25 則五語樣本。2026-09-11 結果 24/25，唯一沒對的是一句沒有具體時間的日文行程被判 ignore，符合「寧可安靜」的設計。
+- ❌ **尚未在真實群組實測**。下一步：拉進群 → 它會回群組 ID → 填進 `ALLOWED_GROUP_IDS` → 重新部署 → 各種訊息各試一則。
 
-#### 當初的部署步驟（留作參考）
-
-`.github/workflows/deploy-bot.yml` 已經寫好，用 GitHub Actions 跑 wrangler，**不需要本機 Node 或終端機**。
-但需要先在 repo 設定五個 secret：
-
-<https://github.com/smcurlyqq/happy-birthday/settings/secrets/actions>
-
-| Secret 名稱 | 從哪裡拿 |
-|---|---|
-| `CLOUDFLARE_API_TOKEN` | dash.cloudflare.com/profile/api-tokens → Edit Cloudflare Workers 範本 |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare 首頁右側，或網址列那一串 |
-| `LINE_CHANNEL_SECRET` | LINE Developers → Basic settings |
-| `LINE_CHANNEL_ACCESS_TOKEN` | LINE Developers → Messaging API → Issue |
-| `NOTION_TOKEN` | notion.so/profile/integrations 建整合後的 Internal Integration Secret |
-
-設好之後 Actions → Deploy LINE bot → Run workflow。
-成功後把 `https://seoul-loop-bot.<子網域>.workers.dev/webhook` 填回 LINE 的 Webhook URL。
-
-### 已知進度（2026-09-11）
-
-- ✅ LINE Provider / Channel / 三個開關
-- ✅ Notion 整合建立並 Connect
-- ✅ Cloudflare token、五個 secret
-- ✅ 部署成功兩次（初版 + 五語說明）
-- ❌ **尚未在真實群組貼過連結**。第一次貼很可能會噴錯，那是正常的，看 Cloudflare dashboard → Workers → seoul-loop-bot → Logs，或本機 `npx wrangler tail`。
+**Anthropic**：console.anthropic.com 帳號 ambre，key 名稱 seoul-loop-bot，已儲值 5 美元。Haiku 4.5 每則訊息幾百 token，整趟旅行預估不到 1 美元。
 
 Cloudflare API token 建立時的坑：「Edit Cloudflare Workers」範本套完後，Account Resources 和 Zone Resources 兩格都是必填但預設空的，要分別選自己的帳號和 All zones，不然 Continue to summary 按不下去。
-
----
 
 ## 踩過／預期會踩的坑
 
@@ -128,16 +109,17 @@ Cloudflare API token 建立時的坑：「Edit Cloudflare Workers」範本套完
 ## 做過的決定（不用重新想）
 
 - **Notion 當共享資料層，不是網頁** — 因為宣告 db 的 Claude artifact 不能公開分享，五個不同國家的朋友沒有同一個組織帳號。
-- **bot v1 不接 LLM 分類** — 網域規則＋五語關鍵字＋一鍵改分類已覆蓋多數情況；接 LLM 要多一把 key、多一筆費用、多一段延遲，準確度提升有限。不夠準再加。
+- **bot v1 不接 LLM**，v2（同日晚上）改接 Claude Haiku 4.5 — Amber 要收記帳、行程、投票、無連結推薦，沒有 AI 就得逼大家記指令符號；她選了 AI 判讀。有連結的訊息仍走規則，不花錢。
 - **視覺走雜誌編輯風** — Bodoni Moda + Archivo，暖報紙底、細線、無圓角無陰影，單一深紅重點色，五個人用低彩度丹青顏料當識別色。這是使用者從四個方向裡挑的，第一版的首爾地鐵配色被否決了。
 - **進入頁同時選語言** — 不然日文和印尼文的朋友一進來看到瀏覽器亂猜的語言。
-- **記帳留在網頁不做進 bot** — 使用者要的是「只要蒐集」。
+- **記帳的「結清計算」留在網頁**，bot 只負責把每一筆寫進 Expenses。
 
 ---
 
 ## 下一步（建議順序）
 
-1. 把 mbpp 加好友（LINE Developers → Messaging API 分頁的 QR code）→ 邀進群 → 它會自動發五語說明。
-2. 貼一個 Airbnb 連結實測；每個人打「我是 名字」綁定。
-3. 提醒 🇮🇩 Nadia：**韓國對印尼不免簽**，觀光簽要及早送件。距離出發只剩約五週。
-4. 網頁與 Notion 連結貼進群。
+1. 把 mbpp 加好友（LINE Developers → Messaging API 分頁的 QR code）→ 邀進群 → 它會回英文說明 + 群組 ID。
+2. 把群組 ID 填進 `bot/wrangler.toml` 的 `ALLOWED_GROUP_IDS`，推上 main，Actions 重新部署。
+3. 實測：一個 Airbnb 連結、一句記帳、一句推薦、一句行程、按一次 I'm in、一句閒聊（應該沒反應）。每個人打 I am 名字綁定。
+4. 提醒 🇮🇩 Nadia：**韓國對印尼不免簽**，觀光簽要及早送件。距離出發只剩約五週。
+5. 網頁與 Notion 連結貼進群。
