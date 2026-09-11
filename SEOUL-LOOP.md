@@ -11,11 +11,11 @@ Amber 🇹🇼 · Akiha 🇯🇵 · Hye Yeon 🇰🇷 · Gigi 🇭🇰 · Nadia 
 
 | | 位置 | 狀態 |
 |---|---|---|
-| **網頁** | `korea/index.html` | ✅ 寫完，已推分支；**尚未合併到 `main`，公開網址還沒生效** |
-| **Notion** | 見下方連結 | ✅ 五個資料庫都建好、資料已填 |
-| **LINE bot** | `bot/` | ⚠️ 程式寫完但**從未部署、從未實際跑過** |
+| **網頁** | `korea/index.html` | ✅ 已合併到 `main`（PR #3，2026-09-11），公開網址已生效 |
+| **Notion** | 見下方連結 | ✅ 五個資料庫都建好、資料已填；已開「任何有連結的人 → 可編輯」 |
+| **LINE bot** | `bot/` | ✅ 已部署到 Cloudflare Worker，webhook 已接上 LINE；**尚未在真實群組實測** |
 
-分支：`claude/korea-trip-planner-tou9gc`
+分支 `claude/korea-trip-planner-tou9gc` 已合併，之後直接在 `main` 上改。
 
 ---
 
@@ -36,7 +36,7 @@ Artifact 網址：<https://claude.ai/code/artifact/eaf9ed37-cc32-4be6-be16-f1ef6
 ```
 https://smcurlyqq.github.io/happy-birthday/korea/
 ```
-這個網址是公開的，可以直接貼 LINE 群。**這件事還沒做，需要開 PR 合併。**
+這個網址是公開的，可以直接貼 LINE 群。**已生效（2026-09-11）。**
 
 要改的地方都在 `index.html` 的常數區：`DAYS`（四天日期）、`SEATS`（五個人與代表色）、`RATES0`（預設匯率）。
 
@@ -54,7 +54,7 @@ https://smcurlyqq.github.io/happy-birthday/korea/
 | 4 · 記帳 Expenses | `e7220d9f26ef46008598a0e8583bcd0b` |
 | 5 · 住宿候選 Stays | `d2986ee9b16b45c5b4db8938235fdfab` |
 
-**還沒做**：Notion 右上 Share → Anyone with the link → **Can edit**。沒開的話朋友只能看不能改。
+**已完成**：Notion 右上 Share → Anyone with the link → **Can edit**（2026-09-11）。
 
 **匯率是寫死在公式裡的**（1 TWD = 45 KRW、1 JPY = 9.5、1 HKD = 185、1 IDR = 0.088、1 USD = 1440）。
 出發前要更新的話，得去改公式，不是改欄位。網頁上的匯率則可以直接編輯。
@@ -72,7 +72,16 @@ https://smcurlyqq.github.io/happy-birthday/korea/
 
 指令：`我是 <名字>`（綁定 LINE userId 到成員表，之後記提案人）、`說明`。
 
-### 部署狀態：未完成
+### 部署狀態：已上線（2026-09-11）
+
+- Worker：`https://seoul-loop-bot.smcurlyqq.workers.dev`（GET 會回「Seoul Loop bot is awake」）
+- LINE channel：provider `mbqq` → channel `mbpp`（channel id 2011563838）。群組裡顯示的名字是 mbpp。
+- Webhook URL 已填 `…/webhook`，Use webhook 已開；Allow bot to join group chats 開、Auto-reply 關。
+- Notion 整合「Seoul Loop bot」已 Connect 到首爾主頁，五個資料庫繼承權限。
+- 五個 GitHub secrets 都已設定。要重新部署：Actions → Deploy LINE bot → Run workflow（推 `main` 不會自動部署）。
+- 說明文字已改成五語（zh/ja/ko/en/id），綁定回覆中英雙語。
+
+#### 當初的部署步驟（留作參考）
 
 `.github/workflows/deploy-bot.yml` 已經寫好，用 GitHub Actions 跑 wrangler，**不需要本機 Node 或終端機**。
 但需要先在 repo 設定五個 secret：
@@ -92,16 +101,13 @@ https://smcurlyqq.github.io/happy-birthday/korea/
 
 ### 已知進度（2026-09-11）
 
-- ✅ LINE Provider 已建立
-- ✅ Messaging API Channel 已建立
-- ❓ 三個開關狀態未確認（見下方坑）
-- ❌ Notion 整合未建立
-- ❌ Cloudflare token 未取得
-- ❌ 五個 secret 未設定
-- ❌ 從未部署、**程式從未對真實 LINE 或 Notion 跑過一次**
+- ✅ LINE Provider / Channel / 三個開關
+- ✅ Notion 整合建立並 Connect
+- ✅ Cloudflare token、五個 secret
+- ✅ 部署成功兩次（初版 + 五語說明）
+- ❌ **尚未在真實群組貼過連結**。第一次貼很可能會噴錯，那是正常的，看 Cloudflare dashboard → Workers → seoul-loop-bot → Logs，或本機 `npx wrangler tail`。
 
-最後一點要特別強調：bot 的程式通過語法檢查，但**沒有任何端對端測試**。第一次部署很可能會噴錯，
-那是正常的，看 `npx wrangler tail` 或 Actions 的 log。
+Cloudflare API token 建立時的坑：「Edit Cloudflare Workers」範本套完後，Account Resources 和 Zone Resources 兩格都是必填但預設空的，要分別選自己的帳號和 All zones，不然 Continue to summary 按不下去。
 
 ---
 
@@ -131,7 +137,7 @@ https://smcurlyqq.github.io/happy-birthday/korea/
 
 ## 下一步（建議順序）
 
-1. **開 PR 把分支合併到 `main`** → 公開網址生效 → 貼進 LINE 群。這步最有價值而且只差一個 PR。
-2. Notion 開「Anyone with the link → Can edit」→ 也貼進群。
+1. 把 mbpp 加好友（LINE Developers → Messaging API 分頁的 QR code）→ 邀進群 → 它會自動發五語說明。
+2. 貼一個 Airbnb 連結實測；每個人打「我是 名字」綁定。
 3. 提醒 🇮🇩 Nadia：**韓國對印尼不免簽**，觀光簽要及早送件。距離出發只剩約五週。
-4. bot 有空再弄，沒有也不影響旅行。
+4. 網頁與 Notion 連結貼進群。
