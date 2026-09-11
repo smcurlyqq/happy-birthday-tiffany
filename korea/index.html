@@ -1,39 +1,40 @@
+<meta charset="utf-8">
 <title>Seoul Loop</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600;1,6..96,400&family=Archivo:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Nunito:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
 :root{
-  --paper:#F2EFE9; --card:#FBFAF6; --sunk:#EAE5DC;
-  --ink:#14120F; --ink2:#57514A; --ink3:#8E877D;
-  --rule:#DCD6CB; --rule2:#BEB6A7;
-  --accent:#8C1D18;
-  --good:#2F5D4E; --bad:#8C1D18; --warn:#A67C2E;
-  /* traveller marks — muted dancheong pigments */
-  --p1:#8C1D18; --p2:#2B4562; --p3:#2F5D4E; --p4:#A67C2E; --p5:#5E3A55;
-  --p6:#6B4A3A; --p7:#3F4A2E; --p8:#7A3B4E; --p9:#4A4038;
+  --paper:#FAF6EF; --card:#FFFDF9; --sunk:#F1EADF; --tint:#FBE9DD;
+  --ink:#1E1A17; --ink2:#4A423B; --ink3:#7D7167;
+  --rule:#E5DACB; --rule2:#CBBBA7;
+  --accent:#E2703A; --accent2:#B75120;
+  --good:#3E8E63; --bad:#C94B3B; --warn:#C98A2E;
+  /* traveller marks — friendly, one per person */
+  --p1:#E2703A; --p2:#3A86A8; --p3:#4F9D69; --p4:#D9A441; --p5:#9B6BB3;
+  --p6:#C46F8F; --p7:#7A8F3B; --p8:#B0573F; --p9:#7D7167;
   --ln:var(--accent);
   --cjk:'Noto Sans TC';
-  --disp:'Bodoni Moda', Georgia, var(--cjk), serif;
-  --body:'Archivo', var(--cjk), system-ui, -apple-system, sans-serif;
+  --disp:'Zen Maru Gothic', var(--cjk), 'Nunito', system-ui, sans-serif;
+  --body:'Nunito', var(--cjk), system-ui, -apple-system, sans-serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#131110; --card:#1A1817; --sunk:#232120;
-    --ink:#EEEAE3; --ink2:#A9A199; --ink3:#7B736A;
-    --rule:#302B27; --rule2:#4A433D;
-    --accent:#D9564E; --good:#5FA88C; --bad:#D9564E; --warn:#D0A24E;
-    --p1:#D9564E; --p2:#7BA3CE; --p3:#5FA88C; --p4:#D0A24E; --p5:#B48AAA;
-    --p6:#C08E70; --p7:#93A46B; --p8:#CE7D94; --p9:#A79A8C;
+    --paper:#1B1714; --card:#231E1A; --sunk:#2B2521; --tint:#3A2A20;
+    --ink:#F3ECE3; --ink2:#D5CABD; --ink3:#A2948A;
+    --rule:#3A3129; --rule2:#55483D;
+    --accent:#EF8A56; --accent2:#F5A97E; --good:#6FBF8E; --bad:#E8735F; --warn:#E0B15A;
+    --p1:#EF8A56; --p2:#6FB3D2; --p3:#6FBF8E; --p4:#E0B15A; --p5:#BE99D6;
+    --p6:#E19AB4; --p7:#A9BE63; --p8:#D48C74; --p9:#A2948A;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#131110; --card:#1A1817; --sunk:#232120;
-  --ink:#EEEAE3; --ink2:#A9A199; --ink3:#7B736A;
-  --rule:#302B27; --rule2:#4A433D;
-  --accent:#D9564E; --good:#5FA88C; --bad:#D9564E; --warn:#D0A24E;
-  --p1:#D9564E; --p2:#7BA3CE; --p3:#5FA88C; --p4:#D0A24E; --p5:#B48AAA;
-  --p6:#C08E70; --p7:#93A46B; --p8:#CE7D94; --p9:#A79A8C;
+  --paper:#1B1714; --card:#231E1A; --sunk:#2B2521; --tint:#3A2A20;
+  --ink:#F3ECE3; --ink2:#D5CABD; --ink3:#A2948A;
+  --rule:#3A3129; --rule2:#55483D;
+  --accent:#EF8A56; --accent2:#F5A97E; --good:#6FBF8E; --bad:#E8735F; --warn:#E0B15A;
+  --p1:#EF8A56; --p2:#6FB3D2; --p3:#6FBF8E; --p4:#E0B15A; --p5:#BE99D6;
+  --p6:#E19AB4; --p7:#A9BE63; --p8:#D48C74; --p9:#A2948A;
 }
 :root[lang="ja"]{ --cjk:'Noto Sans JP'; }
 :root[lang="ko"]{ --cjk:'Noto Sans KR'; }
@@ -273,6 +274,71 @@ dialog::backdrop{background:rgba(20,18,15,.5)}
   .cdown{grid-template-columns:repeat(2,1fr);gap:14px 10px}
   .seats{gap:0 18px}
 }
+
+/* ── v2 look: rounded & friendly (overrides the editorial rules above) ── */
+body{font-size:15.5px;line-height:1.6}
+.brand,.head h2,.hero .dates,.daystrip b,.cdown b,.seat .nm,.kv dd,.item .ttl,.vote b,.dayhead .n,.dayhead b,
+.slot .st,.tile b,.bal .amt,.settle .amt,.gcover .gt,.gask,.empty{font-weight:700;letter-spacing:0;font-style:normal}
+#mon,#g_mon,.gcover .gt em,.hero .dates em,.seat.free .nm{font-style:normal}
+.hero .dates{font-size:clamp(40px,13vw,72px);line-height:.95;font-weight:900}
+.gcover .gt{font-size:clamp(34px,10vw,50px);line-height:1;font-weight:900}
+#mon,#g_mon{font-size:.55em;font-weight:700}
+.head h2,.gask{font-size:24px}
+.head{border-bottom:0;padding:0;margin-bottom:-4px}
+.head p,.lbl,.seat .fl,.stop span,.rates label,.kv dt,.tag,.gcover .gk,.gcover .gd,.brand small,.daystrip span,
+.cdown .lbl,.tile .lbl,.vote small,.bar .n,.slot .tm{letter-spacing:.01em;text-transform:none;font-weight:700}
+.head p,.lbl,.seat .fl,.rates label,.kv dt,.gcover .gk,.gcover .gd,.brand small,.daystrip span,.cdown .lbl,.tile .lbl{font-size:12px}
+.vote small{font-size:10px}
+.top{border-bottom:1px solid var(--rule)}
+.card{border-radius:16px;border:1px solid var(--rule)}
+.hero{border-bottom:0}
+.gcover{border-bottom:0;padding-bottom:6px}
+.pill,.btn,.chip,.tag,.vote,.stop,.glang{border-radius:999px;letter-spacing:0;text-transform:none}
+.pill{font-size:12.5px;font-weight:700;padding:6px 12px;border-color:var(--rule2)}
+.btn{font-size:13px;font-weight:800;padding:10px 18px;background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn.ghost{background:transparent;color:var(--accent2);border-color:var(--rule2)}
+.btn.ghost:hover{background:var(--tint);color:var(--accent2);border-color:var(--accent)}
+.btn.tiny{padding:6px 12px;font-size:12px}
+.chip{border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tag{font-size:11px;font-weight:700;padding:3px 9px;background:var(--sunk);border:0;color:var(--ink2)}
+.vote{border-radius:14px;padding:6px 10px;background:var(--sunk);border:1px solid transparent}
+.vote[aria-pressed="true"]{background:var(--tint);border-color:var(--accent);color:var(--accent2)}
+.vote[aria-pressed="true"] small{color:var(--accent2)}
+.rail{border-top:0;gap:4px;padding:10px 0 10px}
+.stop{border-right:0;padding:7px 12px;min-width:0;color:var(--ink2)}
+.stop span{font-size:12.5px;letter-spacing:0}
+.stop[aria-selected="true"]{background:var(--tint);color:var(--accent2)}
+.stop[aria-selected="true"]::after{display:none}
+.glangs{border:1px solid var(--rule);border-radius:999px;overflow:hidden;padding:3px;gap:2px;background:var(--card)}
+.glang{border-right:0;font-size:12.5px;letter-spacing:0;color:var(--ink2)}
+.glang[aria-pressed="true"]{background:var(--accent);color:#fff}
+.seat,.gpick{border-top:0;background:var(--card);border:1px solid var(--rule);border-left:5px solid var(--ln);
+  border-radius:14px;padding:11px 14px 12px;margin-bottom:8px}
+.seats{gap:0 12px}
+.seat.isme{background:var(--tint);border-color:var(--accent);border-left-color:var(--accent)}
+.seat .nm{font-size:18px}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=url],select{
+  border:1px solid var(--rule);border-radius:10px;padding:8px 11px;background:var(--card)}
+textarea{border:1px solid var(--rule);border-radius:10px;background:var(--card)}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--tint)}
+select{background-position:calc(100% - 12px) 16px,calc(100% - 8px) 16px}
+.bar .track{border-radius:999px;height:7px}
+.bar .fill{border-radius:999px}
+.tiles{border:0;gap:10px}
+.tile{border:0;background:var(--sunk);border-radius:14px;padding:12px 12px 13px}
+.dayhead{border-bottom:1px solid var(--rule);background:var(--sunk);border-radius:15px 15px 0 0}
+.daystrip{border-top:0;gap:8px}
+.daystrip div{border-right:0;background:var(--sunk);border-radius:12px;padding:10px 10px 8px}
+.cdown{border-top:0}
+.checklist li{border-bottom:1px solid var(--rule)}
+.av{font-weight:800}
+.empty{font-style:normal;font-weight:600;color:var(--ink3)}
+dialog{border:1px solid var(--rule);border-radius:18px}
+.card[style*="border-top:1.5px solid var(--ink)"]{border-top:1px solid var(--rule)!important}
+.gpick .gflag+*{font-weight:700}
+.gpick small,.gpick .gst{letter-spacing:0;text-transform:none;font-size:12px}
 </style>
 
 <header class="top">
@@ -347,17 +413,6 @@ dialog::backdrop{background:rgba(20,18,15,.5)}
     </div>
     <div class="daystrip" id="daystrip"></div>
     <div class="cdown" id="cdown"></div>
-  </div>
-
-  <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:10px;border-top:1.5px solid var(--ink)">
-    <div>
-      <div class="lbl" data-i="link.p">Notion holds what we edit together</div>
-      <a id="notionlink" href="https://www.notion.so/3d6b331a325081989f75d13d4fff3184" target="_blank" rel="noopener"
-         style="font-family:var(--disp);font-size:22px;color:var(--accent);text-decoration:none;display:inline-block;margin-top:4px"
-         data-i="link.go">Open the Notion boards →</a>
-    </div>
-    <div class="muted" style="font-size:12.5px" data-i="link.what">Crew &amp; taste · Ideas &amp; votes · Itinerary · Expenses</div>
-    <div class="row"><button class="btn ghost tiny" id="copylink2" data-i="link.copy">Copy the link for LINE</button></div>
   </div>
 
   <div class="head"><h2 data-i="crew.h">The crew</h2><p data-i="crew.p">tap your seat to claim it</p></div>
@@ -644,7 +699,7 @@ const S={
 "dlg.taken":["is sitting here already. Is that you?","已經登記在這裡了，這是你嗎？","が既に登録されています。あなたですか？","님이 이미 등록되어 있습니다. 본인인가요?","sudah duduk di sini. Ini kamu?"],
 "needseat":["Claim your seat first — top right.","先在右上角登記你的位子。","先に右上で席を登録してください。","먼저 오른쪽 위에서 자리를 등록하세요.","Ambil kursimu dulu — kanan atas."],
 "del":["Delete this?","要刪掉嗎？","削除しますか？","삭제할까요?","Hapus ini?"],
-"offline":["This page keeps your notes on this device. What the group edits together lives in the Notion boards below.","這一頁只把資料存在你這台裝置。大家一起編輯的東西在下面的 Notion。","このページの入力はこの端末に保存されます。みんなで編集するものは下の Notion に。","이 페이지 입력은 이 기기에만 저장됩니다. 함께 고치는 내용은 아래 Notion에 있습니다.","Halaman ini menyimpan catatanmu di perangkat ini. Yang diedit bersama ada di Notion di bawah."],
+"offline":["This page keeps your notes on this device. What the group edits together lives in Notion.","這一頁只把資料存在你這台裝置。大家一起編輯的東西在 Notion。","このページの入力はこの端末に保存されます。みんなで編集するものは Notion に。","이 페이지 입력은 이 기기에만 저장됩니다. 함께 고치는 내용은 Notion에 있습니다.","Halaman ini menyimpan catatanmu di perangkat ini. Yang diedit bersama ada di Notion."],
 "foot":["Shared notebook for 17–20 Oct. Everything typed here is visible to everyone with the link.","10/17–20 的共同筆記本。這裡打的東西，有連結的人都看得到。","10/17–20 の共有ノート。ここに書いたことはリンクを持つ全員に見えます。","10월 17–20일 공동 노트. 여기 적은 내용은 링크가 있는 모두에게 보입니다.","Catatan bersama 17–20 Okt. Semua yang ditulis terlihat oleh pemegang tautan."]
 };
 const ACTS=[["food","Food & street eats","美食小吃","グルメ・屋台","맛집·길거리 음식","Kuliner & jajanan"],
@@ -657,10 +712,18 @@ const ACTS=[["food","Food & street eats","美食小吃","グルメ・屋台","�
 ["spa","Jjimjilbang","汗蒸幕","チムジルバン","찜질방","Jjimjilbang"],
 ["photo","Photo spots","拍照景點","撮影スポット","사진 명소","Spot foto"]];
 const AREAS=[["hongdae","Hongdae","弘大","ホンデ","홍대","Hongdae"],
+["yeonnam","Yeonnam / Hapjeong","延南・合井","延南・合井","연남·합정","Yeonnam / Hapjeong"],
 ["myeongdong","Myeongdong","明洞","明洞","명동","Myeongdong"],
-["gangnam","Gangnam","江南","江南","강남","Gangnam"],
+["insadong","Insadong","仁寺洞","仁寺洞","인사동","Insadong"],
+["ikseon","Ikseon-dong / Jongno","益善洞・鍾路","益善洞・鍾路","익선동·종로","Ikseon-dong / Jongno"],
+["bukchon","Bukchon / Samcheong","北村・三清洞","北村・三清洞","북촌·삼청동","Bukchon / Samcheong"],
+["dongdaemun","Dongdaemun","東大門","東大門","동대문","Dongdaemun"],
+["itaewon","Itaewon / Hannam","梨泰院・漢南","梨泰院・漢南","이태원·한남","Itaewon / Hannam"],
+["yongsan","Yongsan / Seoul Station","龍山・首爾站","龍山・ソウル駅","용산·서울역","Yongsan / Stasiun Seoul"],
 ["seongsu","Seongsu","聖水","ソンス","성수","Seongsu"],
-["ikseon","Ikseon-dong / Jongno","益善洞・鍾路","益善洞・鍾路","익선동·종로","Ikseon-dong / Jongno"]];
+["gangnam","Gangnam","江南","江南","강남","Gangnam"],
+["apgujeong","Apgujeong / Cheongdam","狎鷗亭・清潭","狎鷗亭・清潭","압구정·청담","Apgujeong / Cheongdam"],
+["jamsil","Jamsil","蠶室","蚕室","잠실","Jamsil"]];
 const STAYS=[["hotel","Hotel","飯店","ホテル","호텔","Hotel"],
 ["guesthouse","Guesthouse","民宿","ゲストハウス","게스트하우스","Guesthouse"],
 ["airbnb","Whole apartment","整層公寓","一棟貸し","아파트 전체","Apartemen utuh"],
@@ -1093,7 +1156,7 @@ async function copy(text){ try{ await navigator.clipboard.writeText(text); toast
     ta.remove(); } }
 $("#copyline").addEventListener("click",()=>copy(summary()));
 $("#copylink").addEventListener("click",()=>copy(location.href));
-$("#copylink2").addEventListener("click",()=>copy(location.href));
+($("#copylink2")||{addEventListener(){}} ).addEventListener("click",()=>copy(location.href));
 $("#g_name").addEventListener("input",()=>{ $("#g_hi").textContent=$("#g_name").value; });
 $("#g_back").addEventListener("click",()=>{ pendingSeat=null; $("#gate2").hidden=true; $("#gate1").hidden=false; });
 $("#gate_skip").addEventListener("click",closeGate);
