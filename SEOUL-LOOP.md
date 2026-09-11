@@ -74,7 +74,11 @@ https://smcurlyqq.github.io/happy-birthday/korea/
 - 有連結的訊息 → 規則判斷（網域 > og 標題 > 使用者打的字），住宿進 Stays，其他進 Ideas。不用 AI。
 - 沒有連結的訊息 → 全部丟給 Claude Haiku 4.5（結構化輸出），判成 expense / idea / itinerary / vote / bind / help / ignore。ignore 或信心 < 0.7 就完全不回。
 - 每張卡片有「I'm in」按鈕 = 投票；打錯類別按一下改。
-- 所有回覆純英文；指令字五語都認（我是／私は／저는／saya／I am；說明／ヘルプ／도움말／bantuan／help）。
+- 歡迎／說明是一則訊息五段（en/ja/ko/粵/id），範例句一律英文，附旅行網頁網址，不提 Notion。其他回覆純英文；指令字五語都認（我是／私は／저는／saya／I am；說明／ヘルプ／도움말／bantuan／help）。
+- 圖片訊息也會收：抓 LINE 原圖丟給 Haiku 看，認得出店家就收 idea（飯店進 Stays、已在名單就投票），看不出來安靜。測試圖在 `bot/test/fixtures/`。
+- Naver 地圖短網址（naver.me）會轉去抓 m.place.naver.com 拿店名，因為桌面版地圖頁沒有標題。
+- 「let's try X」不管 X 認不認得都收；帶問號的時間提議（wanna / should we / 〜行かない？）不記行程。
+- 設定模式（白名單空）下在群裡打 `group id` 會回群組 ID；鎖定後這個指令失效。卡片和回覆只連旅行網頁，不連 Notion。
 - 記帳、投票需要先綁定（I am 名字），否則 bot 會請他先綁。
 
 **群組白名單**：`wrangler.toml` 的 `ALLOWED_GROUP_IDS`。空的 = 設定模式，bot 進群會回群組 ID。填進去重新部署後，被拉進別的群會自動退出，也不會為別的群呼叫 Claude 或 Notion。一對一私訊一律不理。
@@ -88,7 +92,7 @@ https://smcurlyqq.github.io/happy-birthday/korea/
 - Webhook URL 已填 `…/webhook`，Use webhook 已開；Allow bot to join group chats 開、Auto-reply 關。
 - Notion 整合「Seoul Loop bot」已 Connect 到首爾主頁，五個資料庫繼承權限。
 - 六個 GitHub secrets 都已設定（Cloudflare ×2、LINE ×2、Notion、Anthropic）。要重新部署：Actions → Deploy LINE bot → Run workflow（推 `main` 不會自動部署）。
-- 分類測試：Actions → Test bot classifier → Run workflow，跑 25 則五語樣本。2026-09-11 結果 24/25，唯一沒對的是一句沒有具體時間的日文行程被判 ignore，符合「寧可安靜」的設計。
+- 分類測試：Actions → Test bot classifier → Run workflow，跑 35 則五語文字樣本 + 1 張截圖。2026-09-12 結果 34/35，唯一沒對的是字面上的「let's try OOO」佔位符被略過，真實店名都會收。
 - ❌ **尚未在真實群組實測**。下一步：拉進群 → 它會回群組 ID → 填進 `ALLOWED_GROUP_IDS` → 重新部署 → 各種訊息各試一則。
 
 **Anthropic**：console.anthropic.com 帳號 ambre，key 名稱 seoul-loop-bot，已儲值 5 美元。Haiku 4.5 每則訊息幾百 token，整趟旅行預估不到 1 美元。

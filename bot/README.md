@@ -28,7 +28,8 @@ bot:    (nothing — it stays out of the conversation)
 
 | Message | Path |
 |---|---|
-| Has a link | Deterministic: host rules (Airbnb → Stays, Tabelog → Food…), then the page's og tags, then whatever you typed next to the link. No AI, no cost. |
+| Has a link | Deterministic: host rules (Airbnb → Stays, Tabelog → Food…), then the page's og tags, then whatever you typed next to the link. Naver Map links are resolved through the mobile place page for the name. No AI, no cost. |
+| Is an image | Claude Haiku 4.5 looks at it: a shop / map / listing / review screenshot becomes an idea (or stay, or a vote if it's already listed); selfies, memes and chat screenshots are ignored. |
 | No link | Claude Haiku 4.5 classifies it as expense / idea / itinerary / vote / bind / help / ignore. Anything unclear → ignore, silently. |
 
 The classifier sees today's date (Seoul), the trip dates, the five names, and the current Ideas/Stays titles, so "I'm in for Gwangjang" resolves to the right row.
