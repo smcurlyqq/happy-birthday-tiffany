@@ -548,10 +548,6 @@ dialog{border:1px solid var(--rule);border-radius:18px}
   <div class="head"><h2 data-i="sp.log">Expense log</h2><p id="explogp"></p></div>
   <div class="card" id="explist"></div>
 
-  <div class="row" style="margin-top:2px">
-    <button class="btn ghost" id="copyline" data-i="sp.copy">Copy summary for LINE</button>
-    <button class="btn ghost" id="copylink" data-i="sp.link">Copy this link</button>
-  </div>
 </section>
 
 <p class="foot" id="foot"></p>
@@ -1195,8 +1191,6 @@ async function copy(text){ try{ await navigator.clipboard.writeText(text); toast
   catch(e){ const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
     document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); toast(t("copied"));}catch(_){}
     ta.remove(); } }
-$("#copyline").addEventListener("click",()=>copy(summary()));
-$("#copylink").addEventListener("click",()=>copy(location.href));
 ($("#copylink2")||{addEventListener(){}} ).addEventListener("click",()=>copy(location.href));
 $("#g_name").addEventListener("input",()=>{ $("#g_hi").textContent=$("#g_name").value; });
 $("#g_back").addEventListener("click",()=>{ pendingSeat=null; $("#gate2").hidden=true; $("#gate1").hidden=false; });
