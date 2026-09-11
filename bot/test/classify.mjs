@@ -49,6 +49,13 @@ const cases = [
   ["Gigi",     "should we do Bukchon on Sunday morning?",                   "ignore"],
   ["Akiha",    "18日の午後、カフェ行かない？",                               "ignore"],
   ["Amber",    "ok confirmed: Oct 18 3pm Onion Seongsu, meet at the entrance", "itinerary"],
+  // "let's try …" in the wild
+  ["Amber",    "let's try Onion",                                           "idea"],
+  ["Amber",    "let's try Myeongdong Kyoja",                                "idea"],
+  ["Gigi",     "lets try that tteokbokki place in Sindang",                 "idea"],
+  ["Nadia",    "let's try OOO",                                             "idea"],
+  ["Hye Yeon", "let's try the cafe from that video",                        "idea"],
+  ["Akiha",    "let's try Gwangjang Market",                                "vote"],
 ];
 
 const env = { ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY };
@@ -59,11 +66,11 @@ for (const [sender, msg, want] of cases) {
   const t0 = Date.now();
   const out = await classify(env, { text: msg, senderName: sender === "unknown" ? null : sender, candidates });
   const ms = Date.now() - t0;
-  const got = !out ? "null" : out.confidence < 0.7 ? `ignore(<0.7 ${out.intent})` : out.intent;
+  const got = !out ? "null" : out.confidence < 0.7 ? `ignore(<0.7 ${out.intent} ${out.confidence})` : out.intent;
   const ok = got === want || (want === "ignore" && got.startsWith("ignore"));
   if (!ok) bad++;
   const detail = out?.[out.intent] ? " " + JSON.stringify(out[out.intent]) : "";
-  console.log(`${ok ? "✓" : "✗"} ${want.padEnd(9)} got ${got.padEnd(9)} ${ms}ms  ${sender}: ${msg}${detail}`);
+  console.log(`${ok ? "✓" : "✗"} ${want.padEnd(9)} got ${got.padEnd(9)} c=${out?.confidence ?? "-"} ${ms}ms  ${sender}: ${msg}${detail}`);
 }
 console.log(`\n${cases.length - bad}/${cases.length} as expected`);
 process.exit(bad > 2 ? 1 : 0);   // allow a couple of judgement calls to differ
