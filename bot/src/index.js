@@ -8,17 +8,21 @@
  *
  * The bot only works inside groups listed in ALLOWED_GROUP_IDS; it leaves
  * any other group it is added to and never calls Claude for them.
+ *
+ * /api/* is the web page's data layer (see api.js) — same Notion boards.
  */
 
 import { classify, CONFIDENCE_FLOOR, seoulToday } from "./classify.js";
 import * as db from "./notion.js";
 import { reply, leave, text, card, HELP, BIND_FIRST, KINDS, kindKey } from "./line.js";
 import { extractUrls, resolve, classifyLink, guessArea } from "./links.js";
+import { handleApi } from "./api.js";
 
 /* ── worker entry ───────────────────────────────────────────── */
 export default {
   async fetch(req, env, ctx) {
     const url = new URL(req.url);
+    if (url.pathname.startsWith("/api")) return handleApi(req, env);
     if (req.method === "GET") return new Response("Seoul Loop bot is awake 🇰🇷", { status: 200 });
     if (req.method !== "POST" || url.pathname !== "/webhook") return new Response("not found", { status: 404 });
 

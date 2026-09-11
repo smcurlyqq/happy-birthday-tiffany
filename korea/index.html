@@ -391,7 +391,9 @@ dialog{border:1px solid var(--rule);border-radius:18px}
       <div class="gfields">
         <label class="f"><span class="lbl" data-i="dlg.name">Name</span>
           <input type="text" id="g_name" maxlength="24"></label>
-        <label class="f"><span class="lbl" data-i="dlg.flight">Flights (optional)</span>
+        <label class="f"><span class="lbl" data-i="dlg.arrive">Arrival in Seoul</span>
+          <input type="datetime-local" id="g_arrive" min="2026-10-16T00:00" max="2026-10-20T23:59"></label>
+        <label class="f"><span class="lbl" data-i="dlg.flight">Flight no. (optional)</span>
           <input type="text" id="g_flight" data-ip="dlg.flightph"></label>
       </div>
       <div class="row" style="justify-content:space-between">
@@ -443,19 +445,25 @@ dialog{border:1px solid var(--rule);border-radius:18px}
       <div class="lbl" style="margin-bottom:7px" data-i="pref.area">Base us around…</div>
       <div class="chipset" id="areachips"></div>
     </div>
-    <div class="row">
-      <label class="f"><span class="lbl" data-i="pref.stay">Stay</span>
-        <select id="p_stay"></select></label>
-      <label class="f"><span class="lbl" data-i="pref.pace">Pace</span>
-        <select id="p_pace"></select></label>
+    <div>
+      <div class="lbl" style="margin-bottom:7px" data-i="pref.stay">Stay type (pick any)</div>
+      <div class="chipset" id="staychips"></div>
     </div>
     <div class="row">
-      <label class="f"><span class="lbl" data-i="pref.budget">Budget for the whole trip</span>
+      <label class="f"><span class="lbl" data-i="pref.budget">Stay budget · per person per night</span>
         <input type="number" id="p_budget" min="0" step="10" placeholder="0"></label>
       <label class="f" style="max-width:120px"><span class="lbl" data-i="pref.cur">Currency</span>
         <select id="p_cur"></select></label>
     </div>
     <div class="muted mono" id="budgethint" style="font-size:12px"></div>
+    <div>
+      <div class="lbl" style="margin-bottom:7px" data-i="pref.habits">How I travel</div>
+      <div class="chipset" id="habitchips"></div>
+    </div>
+    <div class="row">
+      <label class="f"><span class="lbl" data-i="pref.pace">Pace</span>
+        <select id="p_pace"></select></label>
+    </div>
     <div>
       <div class="lbl" style="margin-bottom:7px" data-i="pref.food">Food I can't eat</div>
       <div class="chipset" id="foodchips"></div>
@@ -555,7 +563,8 @@ dialog{border:1px solid var(--rule);border-radius:18px}
   <h3 data-i="dlg.h">Claim your seat</h3>
   <p class="muted" style="font-size:13px;margin:0 0 12px" data-i="dlg.p">Your name shows up on votes, plans and every won you spend.</p>
   <label class="f" style="margin-bottom:12px"><span class="lbl" data-i="dlg.name">Name</span><input type="text" id="me_name" maxlength="24"></label>
-  <label class="f" style="margin-bottom:12px"><span class="lbl" data-i="dlg.flight">Flights (optional)</span><input type="text" id="me_flight" data-ip="dlg.flightph"></label>
+  <label class="f" style="margin-bottom:12px"><span class="lbl" data-i="dlg.arrive">Arrival in Seoul</span><input type="datetime-local" id="me_arrive" min="2026-10-16T00:00" max="2026-10-20T23:59"></label>
+  <label class="f" style="margin-bottom:12px"><span class="lbl" data-i="dlg.flight">Flight no. (optional)</span><input type="text" id="me_flight" data-ip="dlg.flightph"></label>
   <div class="row" style="justify-content:space-between">
     <button type="submit" class="glink" id="me_notme" value="notme" data-i="dlg.notme">Not you?</button>
     <span class="grow"></span>
@@ -579,7 +588,7 @@ const S={
 "gate.skip":["Just looking","只是看看","見るだけ","그냥 둘러보기","Cuma lihat-lihat"],
 "gate.back":["Back","上一步","戻る","뒤로","Kembali"],
 "gate.enter":["Enter","進去","はじめる","들어가기","Masuk"],
-"gate.confirm":["Check your name, and add your flights if you know them.","確認一下名字，知道航班的話也填進去。","名前を確認して、便が決まっていれば入力を。","이름을 확인하고, 항공편을 알면 적어 주세요.","Cek namamu, isi penerbangan kalau sudah tahu."],
+"gate.confirm":["Check your name, and add when you land if you know it.","確認一下名字，知道幾點抵達的話也填進去。","名前を確認して、到着時刻が決まっていれば入力を。","이름을 확인하고, 도착 시간을 알면 적어 주세요.","Cek namamu, isi jam tiba kalau sudah tahu."],
 "dlg.notme":["Not you?","不是你？","別の人？","본인이 아닌가요?","Bukan kamu?"],
 "t.trip":["Trip","行程","旅程","여행","Trip"],
 "t.prefs":["Taste","喜好","好み","취향","Selera"],
@@ -596,7 +605,8 @@ const S={
 "crew.p":["tap your seat to claim it","點自己的位子登記","自分の席をタップ","자리를 눌러 등록","ketuk kursimu"],
 "crew.add":["+ add someone","+ 新增成員","+ メンバー追加","+ 사람 추가","+ tambah orang"],
 "seat.free":["free seat","空位","空席","빈자리","kursi kosong"],
-"seat.noflight":["no flight yet","航班未定","便未定","항공편 미정","belum ada penerbangan"],
+"seat.noflight":["arrival not set","抵達時間未填","到着未設定","도착 시간 미정","jam tiba belum diisi"],
+"seat.arrives":["Arrives","抵達","到着","도착","Tiba"],
 "seat.claim":["tap to claim this seat","點一下登記這個位子","タップして登録","눌러서 등록","ketuk untuk ambil kursi"],
 "ess.h":["Before we fly","出發前","出発前に","출발 전","Sebelum terbang"],
 "ess.p":["five passports, five sets of rules","五本護照，五套規則","旅券5冊、規則も5通り","여권 다섯, 규정도 다섯","lima paspor, lima aturan"],
@@ -618,9 +628,10 @@ const S={
 "pref.p":["visible to the whole group","全員都看得到","全員に公開されます","모두에게 보입니다","terlihat oleh semua"],
 "pref.act":["I'm here for…","我最想要…","目的は…","나는 이걸 하러 간다…","Aku ke sana untuk…"],
 "pref.area":["Base us around…","住宿想在…","拠点にしたいのは…","숙소는 이 근처…","Menginap di sekitar…"],
-"pref.stay":["Stay","住宿型態","宿の種類","숙소 형태","Penginapan"],
+"pref.stay":["Stay type (pick any)","住宿型態（可複選）","宿の種類（複数可）","숙소 형태(복수 선택)","Jenis penginapan (boleh banyak)"],
+"pref.habits":["How I travel","旅行習慣","旅のスタイル","여행 습관","Cara aku traveling"],
 "pref.pace":["Pace","步調","ペース","일정 강도","Tempo"],
-"pref.budget":["Budget for the whole trip","整趟預算","旅行全体の予算","여행 전체 예산","Budget seluruh trip"],
+"pref.budget":["Stay budget · per person per night","住宿預算 · 每人每晚","宿の予算・1人1泊","숙소 예산 · 1인 1박","Budget penginapan · per orang per malam"],
 "pref.cur":["Currency","幣別","通貨","통화","Mata uang"],
 "pref.food":["Food I can't eat","飲食禁忌","食べられないもの","못 먹는 음식","Yang tidak bisa kumakan"],
 "pref.note":["One thing I really don't want to miss","絕對不想錯過的一件事","絶対に外せないこと","절대 놓치기 싫은 것","Satu hal yang wajib"],
@@ -631,7 +642,9 @@ const S={
 "agg.p":["live tally","即時統計","リアルタイム集計","실시간 집계","hitungan langsung"],
 "agg.top":["Most wanted","最多人想要","人気","최다 선택","Paling diminati"],
 "agg.area":["Where to stay","住宿區域","エリア","숙소 지역","Area menginap"],
-"agg.budget":["Budget, in won","預算（韓元）","予算（ウォン）","예산(원)","Budget dalam won"],
+"agg.budget":["Stay budget per night, in won","住宿預算 每人每晚（韓元）","宿の予算 1人1泊（ウォン）","숙소 예산 1인 1박(원)","Budget penginapan per malam, dalam won"],
+"agg.stay":["Stay type","住宿型態","宿の種類","숙소 형태","Jenis penginapan"],
+"agg.habits":["How we travel","旅行習慣","旅のスタイル","여행 습관","Cara kami traveling"],
 "agg.pace":["Pace","步調","ペース","일정 강도","Tempo"],
 "agg.food":["Watch out for","要注意","注意","주의","Perhatikan"],
 "agg.low":["lowest","最低","最低","최저","terendah"],
@@ -692,13 +705,15 @@ const S={
 "dlg.h":["Claim your seat","登記你的位子","席を登録","자리 등록","Ambil kursimu"],
 "dlg.p":["Your name shows up on votes, plans and every won you spend.","你的名字會出現在投票、行程和每一筆花費上。","名前は投票・日程・支出に表示されます。","이름은 투표·일정·지출에 표시됩니다.","Namamu muncul di voting, rencana, dan tiap pengeluaran."],
 "dlg.name":["Name","名字","名前","이름","Nama"],
-"dlg.flight":["Flights (optional)","航班（選填）","フライト（任意）","항공편(선택)","Penerbangan (opsional)"],
-"dlg.flightph":["BR160 17 Oct 09:20 → 20 Oct 21:00","BR160 10/17 09:20 → 10/20 21:00","BR160 10/17 09:20 → 10/20 21:00","BR160 10/17 09:20 → 10/20 21:00","BR160 17 Okt 09:20 → 20 Okt 21:00"],
+"dlg.arrive":["Arrival in Seoul","抵達首爾時間","ソウル到着","서울 도착 시간","Tiba di Seoul"],
+"dlg.flight":["Flight no. (optional)","航班編號（選填）","便名（任意）","항공편명(선택)","No. penerbangan (opsional)"],
+"dlg.flightph":["TG658","TG658","TG658","TG658","TG658"],
 "dlg.cancel":["Cancel","取消","キャンセル","취소","Batal"],
 "dlg.save":["Save","儲存","保存","저장","Simpan"],
 "dlg.taken":["is sitting here already. Is that you?","已經登記在這裡了，這是你嗎？","が既に登録されています。あなたですか？","님이 이미 등록되어 있습니다. 본인인가요?","sudah duduk di sini. Ini kamu?"],
 "needseat":["Claim your seat first — top right.","先在右上角登記你的位子。","先に右上で席を登録してください。","먼저 오른쪽 위에서 자리를 등록하세요.","Ambil kursimu dulu — kanan atas."],
 "del":["Delete this?","要刪掉嗎？","削除しますか？","삭제할까요?","Hapus ini?"],
+"sync.fail":["Couldn\u2019t save — check your connection","儲存失敗，請確認網路","保存できませんでした。通信を確認してください","저장 실패 — 연결을 확인해 주세요","Gagal menyimpan — cek koneksimu"],
 "offline":["This page keeps your notes on this device. What the group edits together lives in Notion.","這一頁只把資料存在你這台裝置。大家一起編輯的東西在 Notion。","このページの入力はこの端末に保存されます。みんなで編集するものは Notion に。","이 페이지 입력은 이 기기에만 저장됩니다. 함께 고치는 내용은 Notion에 있습니다.","Halaman ini menyimpan catatanmu di perangkat ini. Yang diedit bersama ada di Notion."],
 "foot":["Shared notebook for 17–20 Oct. Everything typed here is visible to everyone with the link.","10/17–20 的共同筆記本。這裡打的東西，有連結的人都看得到。","10/17–20 の共有ノート。ここに書いたことはリンクを持つ全員に見えます。","10월 17–20일 공동 노트. 여기 적은 내용은 링크가 있는 모두에게 보입니다.","Catatan bersama 17–20 Okt. Semua yang ditulis terlihat oleh pemegang tautan."]
 };
@@ -728,6 +743,16 @@ const STAYS=[["hotel","Hotel","飯店","ホテル","호텔","Hotel"],
 ["guesthouse","Guesthouse","民宿","ゲストハウス","게스트하우스","Guesthouse"],
 ["airbnb","Whole apartment","整層公寓","一棟貸し","아파트 전체","Apartemen utuh"],
 ["hostel","Hostel dorm","青旅床位","ドミトリー","호스텔 도미","Hostel dorm"]];
+const HABITS=[["solo","Need some alone time","喜歡有個人空間","一人の時間がほしい","혼자 시간이 필요해","Butuh waktu sendiri"],
+["together","Prefer moving as a group","喜歡大家一起行動","みんなで動きたい","다 같이 움직이는 게 좋아","Suka jalan bersama"],
+["early","Early riser","早起派","朝型","아침형","Bangun pagi"],
+["late","Night owl","夜貓子","夜型","저녁형","Suka begadang"],
+["walk","Happy to walk a lot","走很多路也 OK","よく歩くのOK","많이 걸어도 OK","Oke jalan kaki jauh"],
+["taxi","Taxi over subway","能搭計程車就搭","タクシー派","택시 선호","Lebih suka taksi"],
+["plan","Like a fixed plan","喜歡照計畫走","予定通りに動きたい","계획대로 가는 게 좋아","Suka rencana pasti"],
+["flow","Go with the flow","隨興就好","気分で決めたい","즉흥적으로","Ikut arus aja"],
+["photo","Will stop for photos","會停下來拍照","写真で止まる","사진 찍느라 멈춰요","Sering berhenti foto"],
+["queue","Will queue for good food","願意為美食排隊","行列でも食べたい","맛집이면 줄 서도 OK","Mau antre demi makanan"]];
 const PACES=[["chill","Chill","慢慢走","のんびり","여유롭게","Santai"],
 ["balanced","Balanced","鬆緊適中","バランス","적당히","Seimbang"],
 ["packed","Packed","排好排滿","詰め込む","빡세게","Padat"]];
@@ -737,17 +762,18 @@ const FOODS=[["halal","Halal only","只吃清真","ハラルのみ","할랄만",
 ["veg","Vegetarian","素食","ベジタリアン","채식","Vegetarian"],
 ["seafood","Seafood allergy","海鮮過敏","魚介アレルギー","해산물 알레르기","Alergi seafood"],
 ["spicy","Not spicy","不吃辣","辛いのが苦手","매운 거 X","Tidak pedas"]];
-const CATS=[["food","Food","美食","グルメ","맛집","Kuliner"],
+const CATS=[["stay","Stay","住宿","宿","숙소","Penginapan"],
+["food","Food","美食","グルメ","맛집","Kuliner"],
 ["cafe","Café","咖啡","カフェ","카페","Kafe"],
 ["sight","Sight","景點","名所","명소","Wisata"],
 ["shop","Shop","購物","買い物","쇼핑","Belanja"],
 ["night","Night","夜生活","夜","야간","Malam"],
 ["other","Other","其他","その他","기타","Lainnya"]];
-const CUR={KRW:{s:"₩",d:0},TWD:{s:"NT$",d:0},JPY:{s:"¥",d:0},HKD:{s:"HK$",d:0},IDR:{s:"Rp",d:0},USD:{s:"$",d:0}};
-const RATES0={KRW:1,TWD:45,JPY:9.5,HKD:185,IDR:0.088,USD:1440};
-const SEATS=[{id:"tw",flag:"🇹🇼",c:"--p1",cur:"TWD",n:"Amber"},{id:"jp",flag:"🇯🇵",c:"--p2",cur:"JPY",n:"Akiha"},
-{id:"kr",flag:"🇰🇷",c:"--p3",cur:"KRW",n:"Hye Yeon"},{id:"hk",flag:"🇭🇰",c:"--p4",cur:"HKD",n:"Gigi"},
-{id:"id",flag:"🇮🇩",c:"--p5",cur:"IDR",n:"Nadia"}];
+const CUR={THB:{s:"฿",d:0},KRW:{s:"₩",d:0},TWD:{s:"NT$",d:0},JPY:{s:"¥",d:0},HKD:{s:"HK$",d:0},IDR:{s:"Rp",d:0},USD:{s:"$",d:0}};
+const RATES0={KRW:1,THB:42,TWD:45,JPY:9.5,HKD:185,IDR:0.088,USD:1440};  // seed values — edit on the Trip pane
+const SEATS=[{id:"tw",flag:"🇹🇼",c:"--p1",cur:"THB",n:"Amber"},{id:"jp",flag:"🇯🇵",c:"--p2",cur:"THB",n:"Akiha"},
+{id:"kr",flag:"🇰🇷",c:"--p3",cur:"THB",n:"Hye Yeon"},{id:"hk",flag:"🇭🇰",c:"--p4",cur:"THB",n:"Gigi"},
+{id:"id",flag:"🇮🇩",c:"--p5",cur:"THB",n:"Nadia"}];  // everyone lives in Thailand — settle in baht
 const EXTRA_C=["--p6","--p7","--p8","--p9"];
 const DAYS=["2026-10-17","2026-10-18","2026-10-19","2026-10-20"];
 const LOCALE={en:"en-GB",zh:"zh-TW",ja:"ja-JP",ko:"ko-KR",id:"id-ID"};
@@ -770,6 +796,7 @@ const won=n=>"₩"+nf(Math.round(n||0));
 function inCur(krw,c){const r=CFG.rates[c]||1;const v=krw/r;const m=CUR[c]||CUR.KRW;
   return m.s+nf(v, v<50&&c!=="KRW"?1:0);}
 const rate=c=>Number(CFG.rates[c])||RATES0[c]||1;
+const krwOf=e=>Number(e.krw!=null&&e.krw!==""?e.krw:Number(e.amt||0)*rate(e.cur||"KRW"));
 
 /* ───────────────────────── persistence ───────────────────────── */
 const LS="sl.data.v1";
@@ -789,9 +816,29 @@ function putCfg(){ saveLocal(); render();
   clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{ if(DB) DB.doc("config/main").set(CFG).catch(()=>{}); },500);
 }
+const API="https://seoul-loop-bot.smcurlyqq.workers.dev/api";
+function remoteDB(base){
+  const subs={}; let timer=null, busy=false;
+  async function pull(){ if(busy) return; busy=true;
+    try{ const r=await fetch(base+"/state",{cache:"no-store"}); if(!r.ok) throw new Error(r.status);
+      const st=await r.json();
+      for(const c in subs){ const docs=Object.entries(st[c]||{}).map(([id,d])=>({id,exists:true,data:()=>d})); subs[c]({docs}); }
+    }catch(e){ console.warn("sync failed",e); } finally{ busy=false; } }
+  function schedule(ms){ clearTimeout(timer); timer=setTimeout(async()=>{ await pull(); schedule(15000); },ms); }
+  document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") schedule(0); });
+  const call=async(method,path,body)=>{ const r=await fetch(base+path,{method,headers:body?{"Content-Type":"application/json"}:{},body:body?JSON.stringify(body):undefined});
+    if(!r.ok){ const e=new Error("save failed"); e.code=t("sync.fail"); throw e; } schedule(900); return r.json(); };
+  schedule(0);
+  return { collection:c=>({ onSnapshot:cb=>{ subs[c]=cb; } }),
+    doc:path=>{ const [c,id]=path.split("/"); return {
+      set:obj=>c==="config"?Promise.resolve():call("PUT","/"+c+"/"+encodeURIComponent(id),obj),
+      delete:()=>c==="config"?Promise.resolve():call("DELETE","/"+c+"/"+encodeURIComponent(id)),
+      onSnapshot:()=>{} }; } };
+}
 async function connect(){
-  if(!window.claude||!claude.use) return;
-  let db=null; try{ db=await claude.use("db"); }catch(e){}
+  let db=null;
+  if(window.claude&&claude.use){ try{ db=await claude.use("db"); }catch(e){} }
+  if(!db&&API) db=remoteDB(API);
   if(!db) return;
   DB=db;
   for(const coll of ["members","prefs","ideas","slots","expenses"]){
@@ -812,13 +859,16 @@ function allSeats(){ const ids=SEATS.map(s=>s.id);
   Object.keys(D.members).forEach(id=>{ if(!ids.includes(id)) ids.push(id); }); return ids; }
 function joined(){ return allSeats().filter(id=>D.members[id]&&D.members[id].name); }
 function nameOf(id){ const m=D.members[id]; if(m&&m.name) return m.name; const s=seatOf(id); return s.n||t("seat.free"); }
-function myCur(){ const m=D.members[me]; return (m&&m.cur)||seatOf(me).cur||"KRW"; }
+function myCur(){ const m=D.members[me]; return (m&&m.cur)||seatOf(me).cur||"THB"; }
 function av(id,size){ const s=seatOf(id), n=nameOf(id);
   return '<span class="av" style="background:var('+s.c+')'+(size?';width:'+size+'px;height:'+size+'px;font-size:'+(size*0.5)+'px':'')+'">'+esc(n.slice(0,1).toUpperCase())+'</span>'; }
 function toast(msg){ const el=document.createElement("div"); el.className="toast"; el.textContent=msg;
   document.body.appendChild(el); setTimeout(()=>el.remove(),1900); }
 function fmtDay(i,opts){ const d=new Date(DAYS[i]+"T00:00:00");
   return d.toLocaleDateString(LOCALE[lang]||"en-GB",opts||{month:"short",day:"numeric",weekday:"short"}); }
+function arriveText(m){ if(!m.arrive) return m.flight||t("seat.noflight");
+  const d=new Date(m.arrive); const when=isNaN(d)?m.arrive:d.toLocaleString(LOCALE[lang]||"en-GB",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+  return "✈ "+t("seat.arrives")+" "+when+(m.flight?" · "+m.flight:""); }
 function needMe(){ if(!me||!D.members[me]){ openGate(); return true; } return false; }
 
 /* ───────────────────────── i18n plumbing ───────────────────────── */
@@ -833,10 +883,10 @@ function applyI18n(){
   $("#lang").value=lang;
   const keep=id=>$(id).value;
   const kStay=keep("#p_stay"),kPace=keep("#p_pace"),kCat=keep("#i_cat"),kSDay=keep("#s_day"),kEDay=keep("#e_day");
-  fillSel($("#p_stay"),STAYS,kStay||"hotel"); fillSel($("#p_pace"),PACES,kPace||"balanced");
+  fillSel($("#p_pace"),PACES,kPace||"balanced");
   fillSel($("#i_cat"),CATS,kCat||"food"); fillDays($("#s_day"),kSDay||0); fillDays($("#e_day"),kEDay||0);
   $("#foot").textContent=t("foot");
-  chipset("#actchips",ACTS); chipset("#areachips",AREAS); chipset("#foodchips",FOODS);
+  chipset("#actchips",ACTS); chipset("#areachips",AREAS); chipset("#foodchips",FOODS); chipset("#staychips",STAYS); chipset("#habitchips",HABITS);
   const f=$("#ideafilter");
   f.innerHTML='<button class="chip" data-f="all" aria-pressed="'+(ideaFilter==="all")+'">'+esc(t("idea.all"))+'</button>'+
     CATS.map(c=>'<button class="chip" data-f="'+c[0]+'" aria-pressed="'+(ideaFilter===c[0])+'">'+esc(opt(c))+'</button>').join("");
@@ -879,7 +929,7 @@ function renderTrip(){
   $("#seats").innerHTML=allSeats().map(id=>{const s=seatOf(id),m=D.members[id];
     return '<button class="seat'+(m&&m.name?"":" free")+(id===me?" isme":"")+'" data-seat="'+id+'" style="--ln:var('+s.c+')">'+
       '<span class="nm">'+s.flag+' '+esc(nameOf(id))+'</span>'+
-      '<span class="fl">'+esc(m&&m.name?(m.flight||t("seat.noflight")):t("seat.claim"))+'</span></button>';}).join("");
+      '<span class="fl">'+esc(m&&m.name?arriveText(m):t("seat.claim"))+'</span></button>';}).join("");
 
   $("#essentials").innerHTML=["ess1","ess2","ess3","ess4","ess5","ess6"].map(k=>{
     const p=t(k).split("|"); return '<li><span>'+p[0]+'</span><span><b>'+esc(p[1])+'</b> — '+esc(p[2])+'</span></li>';}).join("");
@@ -891,7 +941,8 @@ function renderPrefs(){
   const list=joined(), answered=list.filter(id=>D.prefs[id]);
   if(prefFor!==me){ prefFor=me; const p=D.prefs[me]||{};
     setChips("#actchips",p.acts); setChips("#areachips",p.areas); setChips("#foodchips",p.food);
-    $("#p_stay").value=p.stay||"hotel"; $("#p_pace").value=p.pace||"balanced";
+    setChips("#staychips",p.stays||(p.stay?[p.stay]:[])); setChips("#habitchips",p.habits);
+    $("#p_pace").value=p.pace||"balanced";
     $("#p_budget").value=p.budget||""; fillCur($("#p_cur"),p.cur||myCur()); $("#p_note").value=p.note||"";
     budgetHint(); }
   $("#anscount").textContent=answered.length+" / "+Math.max(list.length,answered.length)+" "+t("ans.n");
@@ -899,7 +950,7 @@ function renderPrefs(){
   const agg=$("#aggcard");
   if(!answered.length){ agg.innerHTML='<div class="empty">'+esc(t("agg.none"))+'</div>'; }
   else{
-    const tally=(rows,field)=>{const c={};answered.forEach(id=>((D.prefs[id]||{})[field]||[]).forEach(v=>c[v]=(c[v]||0)+1));
+    const tally=(rows,field)=>{const c={};answered.forEach(id=>{const pp=D.prefs[id]||{}; const vals=pp[field]||(field==="stays"&&pp.stay?[pp.stay]:[]); vals.forEach(v=>c[v]=(c[v]||0)+1);});
       return rows.filter(r=>c[r[0]]).sort((a,b)=>c[b[0]]-c[a[0]]).map(r=>[opt(r),c[r[0]]]);};
     const bars=(arr)=>arr.map(([label,n])=>'<div class="bar"><div>'+esc(label)+
       '<div class="track"><div class="fill" style="width:'+Math.round(n/answered.length*100)+'%"></div></div></div>'+
@@ -910,6 +961,8 @@ function renderPrefs(){
     agg.innerHTML=
       '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.top"))+'</div><div class="bars">'+bars(tally(ACTS,"acts"))+'</div></div>'+
       '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.area"))+'</div><div class="bars">'+bars(tally(AREAS,"areas"))+'</div></div>'+
+      '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.stay"))+'</div><div class="bars">'+bars(tally(STAYS,"stays"))+'</div></div>'+
+      '<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.habits"))+'</div><div class="bars">'+bars(tally(HABITS,"habits"))+'</div></div>'+
       (buds.length?'<div><div class="lbl" style="margin-bottom:8px">'+esc(t("agg.budget"))+'</div><dl class="kv">'+
         '<dt>'+esc(t("agg.low"))+'</dt><dd>'+won(Math.min(...buds))+'</dd>'+
         '<dt>'+esc(t("agg.avg"))+'</dt><dd>'+won(buds.reduce((a,b)=>a+b,0)/buds.length)+'</dd>'+
@@ -922,11 +975,11 @@ function renderPrefs(){
   const A=$("#answers");
   A.innerHTML=answered.length? answered.map(id=>{const p=D.prefs[id];
     const tags=(rows,vals)=>(vals||[]).map(v=>{const r=rows.find(x=>x[0]===v);return r?'<span class="tag">'+esc(opt(r))+'</span>':"";}).join("");
-    const st=STAYS.find(x=>x[0]===p.stay), pc=PACES.find(x=>x[0]===p.pace);
+    const pc=PACES.find(x=>x[0]===p.pace);
     return '<div class="item"><div class="body">'+
       '<div class="ttl"><span class="who">'+av(id)+esc(nameOf(id))+'</span></div>'+
-      '<div class="chipset">'+tags(ACTS,p.acts)+tags(AREAS,p.areas)+
-        (st?'<span class="tag">'+esc(opt(st))+'</span>':"")+(pc?'<span class="tag">'+esc(opt(pc))+'</span>':"")+
+      '<div class="chipset">'+tags(ACTS,p.acts)+tags(AREAS,p.areas)+tags(STAYS,p.stays||(p.stay?[p.stay]:[]))+tags(HABITS,p.habits)+
+        (pc?'<span class="tag">'+esc(opt(pc))+'</span>':"")+
         (p.budget?'<span class="tag">'+won(Number(p.budget)*rate(p.cur))+'</span>':"")+
         tags(FOODS,p.food)+'</div>'+
       (p.note?'<div class="sub" style="color:var(--ink2)">“'+esc(p.note)+'”</div>':"")+
@@ -975,8 +1028,8 @@ function renderSplit(){
   const total=exps.reduce((s,k)=>s+Number(D.expenses[k].krw||0),0);
   const bal={}; crew.forEach(id=>bal[id]=0);
   exps.forEach(k=>{const e=D.expenses[k]; const w=(e.with||[]).filter(x=>bal[x]!==undefined);
-    if(!w.length) return; const each=Number(e.krw||0)/w.length;
-    if(bal[e.payer]!==undefined) bal[e.payer]+=Number(e.krw||0);
+    if(!w.length) return; const each=krwOf(e)/w.length;
+    if(bal[e.payer]!==undefined) bal[e.payer]+=krwOf(e);
     w.forEach(x=>bal[x]-=each);});
   const mine=bal[me]||0;
   $("#sptiles").innerHTML=
@@ -1008,7 +1061,7 @@ function renderSplit(){
       '<div class="sub"><span class="tag">'+esc(fmtDay(Number(e.day)||0,{month:"short",day:"numeric"}))+'</span>'+
       '<span class="who">'+av(e.payer)+esc(nameOf(e.payer))+' '+esc(t("sp.paid"))+'</span>'+
       '<span class="avstack">'+(e.with||[]).map(x=>av(x)).join("")+'</span></div></div>'+
-      '<div style="text-align:right"><div class="mono" style="font-weight:500">'+won(e.krw)+'</div>'+
+      '<div style="text-align:right"><div class="mono" style="font-weight:500">'+won(krwOf(e))+'</div>'+
       (e.cur!=="KRW"?'<div class="mono muted" style="font-size:11.5px">'+(CUR[e.cur]||CUR.KRW).s+nf(e.amt,0)+'</div>':"")+'</div>'+
       '<button class="x" data-del="expenses:'+k+'" aria-label="delete">✕</button></div>';}).join("")
     : '<div class="empty">'+esc(t("sp.none"))+'</div>';
@@ -1032,16 +1085,16 @@ function renderGate(){
       '<span class="gflag">'+st.flag+'</span><span class="gname">'+esc(nameOf(id))+'</span>'+
       '<span class="gstate">'+esc(taken?t("gate.taken"):t("gate.free"))+'</span></button>';}).join("");
 }
-function gateStep2(seat,name,flight){
+function gateStep2(seat,name,flight,arrive){
   pendingSeat=seat;
   $("#g_flag").textContent=seat.flag; $("#g_hi").textContent=name||"";
-  $("#g_name").value=name||""; $("#g_flight").value=flight||"";
+  $("#g_name").value=name||""; $("#g_flight").value=flight||""; $("#g_arrive").value=arrive||"";
   $("#gate1").hidden=true; $("#gate2").hidden=false;
   $("#gate2").classList.remove("gstep"); void $("#gate2").offsetWidth; $("#gate2").classList.add("gstep");
   setTimeout(()=>$("#g_name").focus(),80);
 }
 function gatePick(id){ const st=seatOf(id), m=D.members[id];
-  gateStep2({id,flag:st.flag,c:st.c,cur:st.cur},(m&&m.name)||st.n||"",(m&&m.flight)||""); }
+  gateStep2({id,flag:st.flag,c:st.c,cur:st.cur},(m&&m.name)||st.n||"",(m&&m.flight)||"",(m&&m.arrive)||""); }
 function setLang(L){ if(!LANGS.includes(L)) return; lang=L; localStorage.setItem("sl.lang",lang);
   const pr=D.prefs[me]||{}; applyI18n(); prefFor=null; sigMembers=""; render();
   setChips("#actchips",pr.acts); setChips("#areachips",pr.areas); setChips("#foodchips",pr.food); }
@@ -1058,7 +1111,7 @@ $("#lang").addEventListener("change",e=>setLang(e.target.value));
 document.addEventListener("click",e=>{
   const gl=e.target.closest("[data-gl]"); if(gl){ setLang(gl.dataset.gl); return; }
   const gp=e.target.closest("[data-g]"); if(gp){ gatePick(gp.dataset.g); return; }
-  const chip=e.target.closest("#actchips .chip,#areachips .chip,#foodchips .chip,#e_with .chip");
+  const chip=e.target.closest("#actchips .chip,#areachips .chip,#foodchips .chip,#staychips .chip,#habitchips .chip,#e_with .chip");
   if(chip){ chip.setAttribute("aria-pressed", chip.getAttribute("aria-pressed")!=="true"); return; }
   const f=e.target.closest("#ideafilter .chip");
   if(f){ ideaFilter=f.dataset.f; $$("#ideafilter .chip").forEach(c=>c.setAttribute("aria-pressed",c===f)); renderIdeas(); return; }
@@ -1078,13 +1131,13 @@ $("#addseat").addEventListener("click",()=>{
   const id="x"+Math.random().toString(36).slice(2,6);
   const used=allSeats().length-SEATS.length;
   pendingSeat={id,flag:"🌏",c:EXTRA_C[used%EXTRA_C.length],cur:"USD",fresh:true};
-  $("#me_name").value=""; $("#me_flight").value=""; $("#medlg").showModal();});
+  $("#me_name").value=""; $("#me_flight").value=""; $("#me_arrive").value=""; $("#medlg").showModal();});
 
 function openSeat(id){
   const s=seatOf(id), m=D.members[id];
   if(m&&m.name&&id!==me&&!confirm(m.name+" "+t("dlg.taken"))) return;
   pendingSeat={id,flag:s.flag,c:s.c,cur:s.cur};
-  $("#me_name").value=m&&m.name?m.name:(s.n||""); $("#me_flight").value=m&&m.flight?m.flight:"";
+  $("#me_name").value=m&&m.name?m.name:(s.n||""); $("#me_flight").value=m&&m.flight?m.flight:""; $("#me_arrive").value=m&&m.arrive?m.arrive:"";
   $("#medlg").showModal(); setTimeout(()=>$("#me_name").focus(),40);
 }
 $("#medlg").addEventListener("close",()=>{
@@ -1093,7 +1146,7 @@ $("#medlg").addEventListener("close",()=>{
   if($("#medlg").returnValue!=="ok"||!pendingSeat) return;
   const name=$("#me_name").value.trim(); if(!name) return;
   const p=pendingSeat;
-  put("members",p.id,{name,flight:$("#me_flight").value.trim(),flag:p.flag,c:p.c,cur:p.cur});
+  put("members",p.id,{name,flight:$("#me_flight").value.trim(),arrive:$("#me_arrive").value||"",flag:p.flag,c:p.c,cur:(D.members[p.id]||{}).cur||p.cur});
   me=p.id; localStorage.setItem("sl.me",me); prefFor=null; sigMembers=""; pendingSeat=null; render();});
 
 $("#rates").addEventListener("input",e=>{const c=e.target.dataset.rate; if(!c)return;
@@ -1104,7 +1157,7 @@ $("#p_budget").addEventListener("input",budgetHint);
 $("#p_cur").addEventListener("change",budgetHint);
 $("#savepref").addEventListener("click",()=>{ if(needMe())return;
   put("prefs",me,{acts:getChips("#actchips"),areas:getChips("#areachips"),food:getChips("#foodchips"),
-    stay:$("#p_stay").value,pace:$("#p_pace").value,budget:Number($("#p_budget").value||0),
+    stays:getChips("#staychips"),habits:getChips("#habitchips"),pace:$("#p_pace").value,budget:Number($("#p_budget").value||0),
     cur:$("#p_cur").value,note:$("#p_note").value.trim(),ts:Date.now()});
   $("#prefsaved").textContent="✓ "+t("pref.saved"); setTimeout(()=>$("#prefsaved").textContent="",2400);});
 
@@ -1166,7 +1219,7 @@ $("#gate_other").addEventListener("click",()=>{
 $("#g_enter").addEventListener("click",()=>{
   const name=$("#g_name").value.trim(); if(!name){ $("#g_name").focus(); return; }
   const seat=pendingSeat; if(!seat) return;
-  put("members",seat.id,{name,flight:$("#g_flight").value.trim(),flag:seat.flag,c:seat.c,cur:seat.cur});
+  put("members",seat.id,{name,flight:$("#g_flight").value.trim(),arrive:$("#g_arrive").value||"",flag:seat.flag,c:seat.c,cur:(D.members[seat.id]||{}).cur||seat.cur});
   me=seat.id; localStorage.setItem("sl.me",me);
   prefFor=null; sigMembers=""; pendingSeat=null;
   fillCur($("#p_cur"),myCur()); fillCur($("#e_cur"),myCur());
