@@ -808,11 +808,22 @@ function putCfg(){ saveLocal(); render();
 const API="https://seoul-loop-bot.smcurlyqq.workers.dev/api";
 function remoteDB(base){
   const subs={}; let timer=null, busy=false;
+  // Recent local writes win over the server for a while: the Worker caches state for a
+  // few seconds and Notion's query index lags a little, so a pull right after a delete
+  // could otherwise resurrect the row (and a save could flicker back to the old value).
+  const recent=new Map();   // "coll/id" → {until, doc|null}
+  const remember=(c,id,doc)=>recent.set(c+"/"+id,{until:Date.now()+20000,doc});
   async function pull(){ if(busy) return; busy=true;
     try{ const r=await fetch(base+"/state",{cache:"no-store"}); if(!r.ok) throw new Error(r.status);
       const st=await r.json();
       if(st.rates&&st.rates.THB){ CFG={rates:Object.assign({},RATES0,st.rates)}; saveLocal(); }
-      for(const c in subs){ const docs=Object.entries(st[c]||{}).map(([id,d])=>({id,exists:true,data:()=>d})); subs[c]({docs}); }
+      const now=Date.now();
+      for(const c in subs){
+        const merged=Object.assign({},st[c]||{});
+        for(const [key,v] of recent){ if(v.until<now){ recent.delete(key); continue; }
+          const [cc,id]=key.split("/"); if(cc!==c) continue;
+          if(v.doc===null) delete merged[id]; else merged[id]=v.doc; }
+        const docs=Object.entries(merged).map(([id,d])=>({id,exists:true,data:()=>d})); subs[c]({docs}); }
     }catch(e){ console.warn("sync failed",e); } finally{ busy=false; } }
   function schedule(ms){ clearTimeout(timer); timer=setTimeout(async()=>{ await pull(); schedule(15000); },ms); }
   document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") schedule(0); });
@@ -821,8 +832,8 @@ function remoteDB(base){
   schedule(0);
   return { collection:c=>({ onSnapshot:cb=>{ subs[c]=cb; } }),
     doc:path=>{ const [c,id]=path.split("/"); return {
-      set:obj=>c==="config"?Promise.resolve():call("PUT","/"+c+"/"+encodeURIComponent(id),obj),
-      delete:()=>c==="config"?Promise.resolve():call("DELETE","/"+c+"/"+encodeURIComponent(id)),
+      set:obj=>{ if(c==="config") return Promise.resolve(); remember(c,id,obj); return call("PUT","/"+c+"/"+encodeURIComponent(id),obj); },
+      delete:()=>{ if(c==="config") return Promise.resolve(); remember(c,id,null); return call("DELETE","/"+c+"/"+encodeURIComponent(id)); },
       onSnapshot:()=>{} }; } };
 }
 async function connect(){

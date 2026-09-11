@@ -91,7 +91,7 @@ const json = (o, status = 200, extra = {}) =>
 
 /* ── read ───────────────────────────────────────────────────── */
 let cache = { at: 0, data: null };
-const CACHE_MS = 8000;
+const CACHE_MS = 3000;
 
 /* Live exchange rates, KRW per 1 unit of each currency, refreshed twice a day.
    Source: open.er-api.com (free, no key). Falls back to the seeds if it is down. */
