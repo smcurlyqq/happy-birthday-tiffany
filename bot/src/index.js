@@ -14,7 +14,7 @@
 
 import { classify, CONFIDENCE_FLOOR, seoulToday } from "./classify.js";
 import * as db from "./notion.js";
-import { reply, leave, text, card, HELP_MESSAGES, BIND_FIRST, KINDS, kindKey } from "./line.js";
+import { reply, leave, text, card, HELP_MESSAGES, BIND_FIRST, KINDS, kindKey, PAGE_URL } from "./line.js";
 import { extractUrls, resolve, classifyLink, guessArea } from "./links.js";
 import { handleApi } from "./api.js";
 
@@ -129,14 +129,14 @@ async function collectLink(link, note, ev, env) {
   const conf = KINDS[kind];
 
   const dupe = await db.findByUrl(env, conf.board === "stays" ? env.NOTION_STAYS_DB : env.NOTION_IDEAS_DB, page.url);
-  if (dupe) return reply(env, ev.replyToken, [text(`Already filed → ${dupe.url}`)]);
+  if (dupe) return reply(env, ev.replyToken, [text(`Already on the list → ${PAGE_URL}`)]);
 
   const me = await db.memberByLineId(env, ev.source?.userId);
   const area = guessArea(`${page.title} ${page.desc} ${note}`);
   const row = { title: page.title, url: page.url, note, area, byId: me?.id, kind: conf.select };
   const created = conf.board === "stays" ? await db.createStay(env, row) : await db.createIdea(env, row);
 
-  return reply(env, ev.replyToken, [card({ title: page.title, host: page.host, kind, sure, pageId: created.id, notionUrl: created.url })]);
+  return reply(env, ev.replyToken, [card({ title: page.title, host: page.host, kind, sure, pageId: created.id })]);
 }
 
 /* ── AI-classified intents ──────────────────────────────────── */
@@ -158,7 +158,7 @@ async function onIdea(x, me, ev, env) {
   if (!x) return;
   const kind = kindKey(x.kind);
   const created = await db.createIdea(env, { title: x.title, note: x.note, area: x.area, byId: me?.id, kind: x.kind });
-  return reply(env, ev.replyToken, [card({ title: x.title, host: "", kind, sure: true, pageId: created.id, notionUrl: created.url })]);
+  return reply(env, ev.replyToken, [card({ title: x.title, host: "", kind, sure: true, pageId: created.id })]);
 }
 
 async function onItinerary(x, me, ev, env) {
@@ -209,7 +209,7 @@ async function onPostback(ev, env) {
   const row = { title: name, url, note, area, byId, kind: conf.select };
   const made = conf.board === "stays" ? await db.createStay(env, row) : await db.createIdea(env, row);
   await db.archive(env, pageId);
-  return reply(env, ev.replyToken, [text(`${conf.emoji} Moved to ${conf.board === "stays" ? "Stays" : `Ideas › ${conf.label}`}\n${made.url}`)]);
+  return reply(env, ev.replyToken, [text(`${conf.emoji} Moved to ${conf.board === "stays" ? "Stays" : `Ideas › ${conf.label}`}`)]);
 }
 
 /* ── formatting ─────────────────────────────────────────────── */

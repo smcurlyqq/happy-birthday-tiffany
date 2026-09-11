@@ -116,7 +116,7 @@ export const kindKey = name => Object.keys(KINDS).find(k => KINDS[k].select === 
  * Flex card confirming a filed Idea/Stay, with an "I'm in" vote button and
  * one-tap recategorisation.
  */
-export function card({ title, host, kind, sure, pageId, notionUrl }) {
+export function card({ title, host, kind, sure, pageId }) {
   const conf = KINDS[kind];
   const board = conf.board;
   const head = !sure ? "📥 Got it — which kind is this?"
@@ -141,8 +141,8 @@ export function card({ title, host, kind, sure, pageId, notionUrl }) {
           { type: "text", text: head, size: "xs", color: sure ? "#8C1D18" : "#A67C2E", weight: "bold" },
           { type: "text", text: title.slice(0, 120), wrap: true, weight: "bold", size: "md" },
           ...(host ? [{ type: "text", text: host, size: "xs", color: "#8E877D" }] : []),
-          { type: "text", text: "Open in Notion →", size: "xs", color: "#2B4562",
-            action: { type: "uri", uri: notionUrl } },
+          { type: "text", text: "Open the trip page →", size: "xs", color: "#2B4562",
+            action: { type: "uri", uri: PAGE_URL } },
         ],
       },
       footer: {
