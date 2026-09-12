@@ -5,9 +5,8 @@
 
 const LINE = "https://api.line.me/v2/bot";
 
-export const MEMBER_LIST = "Amber · Akiha · Hye Yeon · Gigi · Nadia";
-
-export const PAGE_URL = "https://smcurlyqq.github.io/happy-birthday/korea/";
+import { TRIP, MEMBER_LIST, PAGE_URL } from "./config.js";
+export { MEMBER_LIST, PAGE_URL };
 
 /* One welcome message: English first, then the same guide in Japanese, Korean,
    Cantonese and Indonesian. Example messages stay in English everywhere — the group talks in English. */
@@ -21,7 +20,7 @@ const EX = {
 };
 
 const HELP_TEXT = [
-  "🇰🇷 Seoul Loop bot",
+  `🇰🇷 ${TRIP.name} bot`,
   "Everything you tell me lands on our trip page:",
   PAGE_URL,
   "",

@@ -12,8 +12,9 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 export const MODEL = "claude-haiku-4-5";
 export const CONFIDENCE_FLOOR = 0.7;
 
-export const MEMBERS = ["Amber", "Akiha", "Hye Yeon", "Gigi", "Nadia"];
-export const TRIP_DATES = ["2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20"];
+import { TRIP, MEMBER_NAMES, DAYS, TRIP_SPAN, GROUP_SIZE } from "./config.js";
+export const MEMBERS = MEMBER_NAMES;
+export const TRIP_DATES = DAYS;
 
 const Currency = z.enum(["KRW", "TWD", "JPY", "HKD", "IDR", "USD"]);
 const IdeaKind = z.enum(["Food", "Cafe", "Sight", "Shop", "Night", "Other"]);
@@ -49,9 +50,9 @@ export const Intent = z.object({
   bind: z.object({ name: z.string() }).nullable(),
 });
 
-/** Today's date in Seoul as YYYY-MM-DD. */
+/** Today's date in the trip's time zone as YYYY-MM-DD. */
 export function seoulToday(now = new Date()) {
-  return new Date(now.getTime() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat("en-CA", { timeZone: TRIP.timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
 }
 
 function systemPrompt(candidates) {
@@ -59,16 +60,16 @@ function systemPrompt(candidates) {
     ? candidates.map(c => `${c.id} | ${c.board} | ${c.title}`).join("\n")
     : "(none yet)";
   return [
-    "You are the quiet collector bot in a LINE group chat for a five-person trip to Seoul, 2026-10-17 (Sat) to 2026-10-20 (Tue).",
+    `You are the quiet collector bot in a LINE group chat for a ${GROUP_SIZE}-person trip to ${TRIP.city}, ${TRIP_SPAN}.`,
     `Members: ${MEMBERS.join(", ")}. Messages arrive in Chinese, Japanese, Korean, English or Indonesian.`,
-    `Today in Seoul: ${seoulToday()}.`,
+    `Today in ${TRIP.city}: ${seoulToday()}.`,
     "",
     "Classify ONE message into exactly one intent:",
     "- expense: the sender says they paid for something (amount + what). Currency defaults to KRW when unstated; ₩/원 → KRW, NT$/台幣 → TWD, ¥/円 → JPY, HK$ → HKD, Rp → IDR. split_with lists member names explicitly mentioned as sharing the cost; empty array means everyone.",
     "- idea: the sender proposes a place or activity for the trip that is NOT already in the candidate list. Any explicit proposal counts — “let’s try X”, “let’s go to X”, “we should do X”, “想去 X”, “X 行きたい”, “X 가보자”, “ayo ke X” — even when X is a name you don’t recognise, a nickname, a placeholder, or a vague reference like “the cafe from that video”: file it anyway with the text as the title and kind Other if unsure. Title format: English name, then the Korean name in parentheses whenever you know or can infer it — “Gwangjang Market (광장시장)”, “Onion Seongsu (어니언 성수)”, “Bukchon Hanok Village (북촌한옥마을)”. The Korean is what people paste into Naver Map, so include it whenever the place has a Korean name; leave it out only for non-Korean names. Put any other detail in note. Do NOT ignore a proposal just because you can’t identify the place.",
     "- itinerary: the sender states a settled plan for a specific trip date (optionally a time / meeting point) — e.g. “Oct 18 2pm Gyeongbokgung, meet at exit 5”. `what` uses the same “English (Korean)” format as ideas — “Gyeongbokgung Palace (경복궁)”. A question or a tentative suggestion about timing (“wanna grab coffee on the 18th?”, “should we do Bukchon Sunday?”, “maybe…”) is NOT itinerary: it is still being discussed, so ignore it.",
     "- vote: the sender says they want to join / are in for a candidate that already exists in the list below. Use its id. If the place is mentioned but not in the list, that is an idea, not a vote.",
-    "- bind: the sender states their own name (\"I am Gigi\", \"我是 Gigi\", \"私は Gigi\", \"저는 Gigi\", \"saya Gigi\"). Return the member name as written in the members list.",
+    `- bind: the sender states their own name ("I am ${MEMBER_NAMES[0]}", "我是 ${MEMBER_NAMES[0]}", "私は ${MEMBER_NAMES[0]}", "저는 ${MEMBER_NAMES[0]}", "saya ${MEMBER_NAMES[0]}"). Return the member name as written in the members list.`,
     "- help: the sender asks what the bot can do.",
     "- ignore: everything else — chit-chat, reactions, questions to the group, jokes, replies, proposals phrased as questions, plans that are not settled, anything you are unsure about. When in doubt, ignore. Being silent is always safe; filing chatter is not.",
     "",
@@ -121,7 +122,7 @@ export const ImageIntent = z.object({
 function imagePrompt(candidates) {
   const list = candidates.length ? candidates.map(c => `${c.id} | ${c.board} | ${c.title}`).join("\n") : "(none yet)";
   return [
-    "You are the quiet collector bot in a LINE group chat for a five-person trip to Seoul, 2026-10-17 to 2026-10-20.",
+    `You are the quiet collector bot in a LINE group chat for a ${GROUP_SIZE}-person trip to ${TRIP.city}, ${TRIP_SPAN}.`,
     "Someone shared an image. Decide whether it shows ONE specific place worth saving for the trip:",
     "- A map pin, a shop / restaurant / cafe / bar page, a hotel or Airbnb listing, a screenshot of a review or a social post about a venue → idea. Extract the place name as the title in the format “English (Korean)” — “Onion Seongsu (어니언 성수)” — the Korean part is what people paste into Naver Map, so copy it exactly as shown. kind: Food, Cafe, Sight, Shop, Night, Stay (hotels, guesthouses, apartments) or Other. Put the address, station, price or anything useful you can read in note.",
     "- If the place is already in the candidate list below → vote for it instead (use its id).",
@@ -176,7 +177,7 @@ export const LinkIntent = z.object({
 function linkPrompt(candidates) {
   const list = candidates.length ? candidates.map(c => `${c.id} | ${c.board} | ${c.title}`).join("\n") : "(none yet)";
   return [
-    "You tidy up a link someone dropped in a LINE group for a five-person trip to Seoul, 2026-10-17 to 2026-10-20.",
+    `You tidy up a link someone dropped in a LINE group for a ${GROUP_SIZE}-person trip to ${TRIP.city}, ${TRIP_SPAN}.`,
     "You get the page's title, description and some of its visible text, plus what the sender typed next to the link.",
     "Return one row for the trip's Ideas list:",
     "- title: “English (Korean)” — e.g. “Cheonggye Plaza (청계광장)”. Copy the Korean exactly as the page shows it; never invent it. If the place has no Korean name, English only.",

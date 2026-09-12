@@ -14,7 +14,7 @@
 
 import { classify, classifyImage, describeLink, CONFIDENCE_FLOOR, seoulToday } from "./classify.js";
 import * as db from "./notion.js";
-import { reply, leave, text, card, imageContent, HELP_MESSAGES, BIND_FIRST, KINDS, kindKey, PAGE_URL } from "./line.js";
+import { reply, leave, text, card, imageContent, HELP_MESSAGES, BIND_FIRST, KINDS, kindKey, PAGE_URL, MEMBER_LIST } from "./line.js";
 import { extractUrls, resolve, classifyLink, guessArea } from "./links.js";
 import { handleApi } from "./api.js";
 
@@ -110,7 +110,7 @@ async function onText(ev, env) {
       case "help":      return reply(env, ev.replyToken, HELP_MESSAGES);
       case "bind": {
         const m = await db.memberByName(env, out.bind?.name || "");
-        return m ? onBind(m, ev, env) : reply(env, ev.replyToken, [text(`No member called “${out.bind?.name}”. Use one of: ${"Amber · Akiha · Hye Yeon · Gigi · Nadia"}`)]);
+        return m ? onBind(m, ev, env) : reply(env, ev.replyToken, [text(`No member called “${out.bind?.name}”. Use one of: ${MEMBER_LIST}`)]);
       }
       case "expense":   return onExpense(out.expense, me, ev, env);
       case "idea":      return onIdea(out.idea, me, ev, env);

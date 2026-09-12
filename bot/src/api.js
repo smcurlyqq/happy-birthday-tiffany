@@ -14,16 +14,10 @@
 
 import { notion, plainTitle, plainText } from "./notion.js";
 
-const DAYS = ["2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20"];   // all dates/times in this app are Asia/Seoul
-const SEATS = {
-  tw: { name: "Amber",    flag: "🇹🇼", c: "--p1" },
-  jp: { name: "Akiha",    flag: "🇯🇵", c: "--p2" },
-  kr: { name: "Hye Yeon", flag: "🇰🇷", c: "--p3" },
-  hk: { name: "Gigi",     flag: "🇭🇰", c: "--p4" },
-  id: { name: "Nadia",    flag: "🇮🇩", c: "--p5" },
-};
+import { TRIP, DAYS } from "./config.js";
+const SEATS = Object.fromEntries(TRIP.members.map(m => [m.seat, { name: m.name, flag: m.flag, c: m.c }]));
 const EXTRA_C = ["--p6", "--p7", "--p8", "--p9"];
-const DEFAULT_CUR = "THB";
+const DEFAULT_CUR = TRIP.settleCurrency;
 
 /* page option keys ↔ Notion option names */
 const ACT  = { food: "Food", sight: "Sights", shop: "Shopping", cafe: "Cafes", night: "Nightlife", nature: "Autumn leaves", kpop: "K-pop", spa: "Jjimjilbang", photo: "Photo spots" };
@@ -37,7 +31,7 @@ const CAT  = { food: "Food", cafe: "Cafe", sight: "Sight", shop: "Shop", night: 
 const inv = m => Object.fromEntries(Object.entries(m).map(([k, v]) => [v, k]));
 const ACT_R = inv(ACT), AREA_R = inv(AREA), STAY_R = inv(STAY), PACE_R = inv(PACE), FOOD_R = inv(FOOD), CAT_R = inv(CAT), HABIT_R = inv(HABIT), BUDGET_R = inv(BUDGET);
 
-const ALLOWED_ORIGINS = [/^https:\/\/smcurlyqq\.github\.io$/, /^http:\/\/localhost(:\d+)?$/, /^http:\/\/127\.0\.0\.1(:\d+)?$/];
+const ALLOWED_ORIGINS = [...TRIP.pageOrigins, /^http:\/\/localhost(:\d+)?$/, /^http:\/\/127\.0\.0\.1(:\d+)?$/];
 
 /* ── entry ──────────────────────────────────────────────────── */
 export async function handleApi(req, env) {
@@ -77,7 +71,7 @@ export async function handleApi(req, env) {
 }
 
 function corsHeaders(origin) {
-  const ok = ALLOWED_ORIGINS.some(re => re.test(origin)) ? origin : "https://smcurlyqq.github.io";
+  const ok = ALLOWED_ORIGINS.some(re => re.test(origin)) ? origin : new URL(TRIP.pageUrl).origin;
   return {
     "Access-Control-Allow-Origin": ok,
     "Access-Control-Allow-Methods": "GET, PUT, DELETE, OPTIONS",
@@ -189,7 +183,7 @@ async function state(env) {
     out.expenses[docId(p)] = {
       desc: plainTitle(P["Item"]),
       amt: P["Amount"]?.number || 0,
-      cur: P["Currency"]?.select?.name || "KRW",
+      cur: P["Currency"]?.select?.name || TRIP.localCurrency,
       payer,
       with: (P["Split with"]?.relation || []).map(r => seat(r.id)).filter(Boolean),
       day: Math.max(0, DAYS.indexOf((P["Date"]?.date?.start || "").slice(0, 10))),
@@ -365,7 +359,7 @@ async function putExpense(env, id, e) {
   const props = {
     "Item": { title: title(e.desc) },
     "Amount": { number: Number(e.amt) || 0 },
-    "Currency": sel(e.cur || "KRW"),
+    "Currency": sel(e.cur || TRIP.localCurrency),
     "Date": { date: { start: DAYS[Number(e.day)] || DAYS[0] } },
     "Paid by": rel(payerPid),
     "Split with": rel(withPids),
