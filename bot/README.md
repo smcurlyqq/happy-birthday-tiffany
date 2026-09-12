@@ -42,6 +42,7 @@ Every card has an **I'm in** button — that is the vote. Wrong category? Tap th
 |---|---|
 | `I am Gigi` · `我是 Gigi` · `私は Gigi` · `저는 Gigi` · `saya Gigi` | Links your LINE account to the Crew row, once. Needed before expenses and votes are credited to you. |
 | `help` · `說明` · `ヘルプ` · `도움말` · `bantuan` | Shows the help text again. |
+| `unlink me` · `解除綁定` · `連携解除` · `연결 해제` · `lepas tautan` | Frees your seat. A seat linked to one LINE account can't be claimed by another until then; one account holds at most one seat. |
 
 Names must match the Crew table: Amber · Akiha · Hye Yeon · Gigi · Nadia.
 

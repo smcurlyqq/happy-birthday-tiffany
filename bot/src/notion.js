@@ -42,10 +42,13 @@ export async function memberByLineId(env, lineId) {
   return (await members(env)).find(m => m.lineId === lineId) || null;
 }
 
+/** Exact full name, or the first word of a two-word name ("Hye" → Hye Yeon). Never a loose substring. */
 export async function memberByName(env, name) {
-  const want = name.trim().toLowerCase();
-  return (await members(env)).find(m => m.name.toLowerCase() === want)
-      || (await members(env)).find(m => m.name.toLowerCase().includes(want))
+  const want = String(name || "").trim().toLowerCase();
+  if (want.length < 2) return null;
+  const all = await members(env);
+  return all.find(m => m.name.toLowerCase() === want)
+      || all.find(m => m.name.toLowerCase().split(" ")[0] === want)
       || null;
 }
 
