@@ -77,8 +77,14 @@ async function onText(ev, env) {
   if (/^(help|說明|使用說明|ヘルプ|도움말|bantuan)$/i.test(msg))
     return reply(env, ev.replyToken, HELP_MESSAGES);
 
+  if (/^(unlink me|unbind|解除綁定|解綁|連携解除|연결 해제|lepas tautan)$/i.test(msg)) return onUnbind(ev, env);
+
+  // "I am Gigi" binds — but only when the name is one of ours, so "I am so hungry" stays chatter.
   const bind = msg.match(/^(?:i\s*am|i'm|我是|我叫|私は|저는|saya)\s*(.{1,24})$/i);
-  if (bind) return onBind(bind[1].trim(), ev, env);
+  if (bind) {
+    const m = await db.memberByName(env, bind[1].trim());
+    if (m) return onBind(m, ev, env);
+  }
 
   const links = extractUrls(msg);
   if (links.length) {
@@ -102,7 +108,10 @@ async function onText(ev, env) {
   try {
     switch (out.intent) {
       case "help":      return reply(env, ev.replyToken, HELP_MESSAGES);
-      case "bind":      return onBind(out.bind?.name || "", ev, env);
+      case "bind": {
+        const m = await db.memberByName(env, out.bind?.name || "");
+        return m ? onBind(m, ev, env) : reply(env, ev.replyToken, [text(`No member called “${out.bind?.name}”. Use one of: ${"Amber · Akiha · Hye Yeon · Gigi · Nadia"}`)]);
+      }
       case "expense":   return onExpense(out.expense, me, ev, env);
       case "idea":      return onIdea(out.idea, me, ev, env);
       case "itinerary": return onItinerary(out.itinerary, me, ev, env);
@@ -114,13 +123,20 @@ async function onText(ev, env) {
   }
 }
 
-async function onBind(name, ev, env) {
+async function onBind(m, ev, env) {
   const userId = ev.source?.userId;
   if (!userId) return reply(env, ev.replyToken, [text("I can't read your LINE ID here — a group setting may be blocking it.")]);
-  const m = await db.memberByName(env, name);
-  if (!m) return reply(env, ev.replyToken, [text(`No member called “${name}”. Use one of: ${"Amber · Akiha · Hye Yeon · Gigi · Nadia"}`)]);
-  await db.bindLineId(env, m.id, userId);
+  const r = await db.bindLineId(env, m.id, userId);
+  if (r === "taken")
+    return reply(env, ev.replyToken, [text(`${m.name} is already linked to another LINE account. If that's really you, ask them to type “unlink me” first.`)]);
   return reply(env, ev.replyToken, [text(`✓ Linked — you're ${m.name}. Links, expenses and votes will be credited to you.`)]);
+}
+
+async function onUnbind(ev, env) {
+  const userId = ev.source?.userId;
+  if (!userId) return;
+  const name = await db.unbindLineId(env, userId);
+  return reply(env, ev.replyToken, [text(name ? `✓ Unlinked from ${name}.` : "You weren't linked to anyone.")]);
 }
 
 /* ── links (no AI) ──────────────────────────────────────────── */

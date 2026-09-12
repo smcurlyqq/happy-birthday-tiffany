@@ -49,10 +49,30 @@ export async function memberByName(env, name) {
       || null;
 }
 
+/**
+ * Link a LINE account to a Crew row. One account owns at most one seat, and a seat
+ * already owned by a different account is refused — the owner must unlink first.
+ * @returns "ok" | "taken"
+ */
 export async function bindLineId(env, memberId, lineId) {
-  await notion(env, `/pages/${memberId}`, "PATCH", {
-    properties: { "LINE ID": { rich_text: rich(lineId) } },
-  });
+  const all = await members(env);
+  const target = all.find(m => m.id === memberId);
+  if (target?.lineId && target.lineId !== lineId) return "taken";
+  for (const m of all) {
+    if (m.id !== memberId && m.lineId === lineId)                 // moving seats: drop the old one
+      await notion(env, `/pages/${m.id}`, "PATCH", { properties: { "LINE ID": { rich_text: [] } } });
+  }
+  if (target?.lineId !== lineId)
+    await notion(env, `/pages/${memberId}`, "PATCH", { properties: { "LINE ID": { rich_text: rich(lineId) } } });
+  return "ok";
+}
+
+/** Remove whatever seat this LINE account holds. @returns the member name, or null */
+export async function unbindLineId(env, lineId) {
+  const m = (await members(env)).find(x => x.lineId === lineId);
+  if (!m) return null;
+  await notion(env, `/pages/${m.id}`, "PATCH", { properties: { "LINE ID": { rich_text: [] } } });
+  return m.name;
 }
 
 /* ── candidates for voting ──────────────────────────────────── */
