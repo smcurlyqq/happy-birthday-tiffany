@@ -101,6 +101,10 @@ https://smcurlyqq.github.io/happy-birthday/korea/
 
 Cloudflare API token 建立時的坑：「Edit Cloudflare Workers」範本套完後，Account Resources 和 Zone Resources 兩格都是必填但預設空的，要分別選自己的帳號和 All zones，不然 Continue to summary 按不下去。
 
+## 已打包成 skill
+
+整套（bot、網頁、workflows、Notion schema、設定步驟）做成公開的 Claude Code skill：https://github.com/smcurlyqq/trip-loop 。本機也連結到 `~/.claude/skills/trip-loop`。所有朋友名字、ID、網址都換成佔位符；trip-specific 設定集中在 `bot/src/config.js` 與網頁頂端常數。之後這個 repo 的 bot 若有大改，記得同步到 skill 的 `assets/`。
+
 ## 踩過／預期會踩的坑
 
 1. **LINE 聊天模式沒改成 Bot** → webhook 完全不觸發，bot 像死掉一樣。
